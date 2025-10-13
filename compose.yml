@@ -1,0 +1,75 @@
+services:
+  # Nginx Service
+  nginx:
+    build: ./.docker/nginx
+    ports:
+      - "${APP_PORT}:80"
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - node
+      - php
+    networks:
+      - app-network
+
+  # PHP Service (Laravel)
+  php:
+    build:
+      context: ./.docker/php
+    user: "${UID}:${GID}"
+    volumes:
+      - ./:/var/www
+      - ./.docker/php/development.ini:/usr/local/etc/php/conf.d/development.ini
+    command: sh -c "composer install && php-fpm"
+    environment:
+      # Laravelが利用する環境変数を設定
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  # PostgreSQL + PostGIS Service
+  db:
+    image: postgis/postgis:16-3.4  # PostGIS対応の公式イメージ
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data # 名前付きボリュームでデータを永続化
+    networks:
+      - app-network
+
+  # Node.js Service (for Frontend Development)
+  # ターミナルで `npm run dev` を実行するために利用
+  node:
+    image: node:20-alpine
+    user: "${UID}:${GID}"
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./node_modules:/var/www/node_modules
+    command: sh -c "npm install && npm run dev"
+    tty: true # コンテナを起動し続けるため
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+
+# Networks
+networks:
+  app-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  db-data: # データを永続化するための名前付きボリューム

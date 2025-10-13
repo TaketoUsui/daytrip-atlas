@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE/Editor settings
+.idea/
+.vscode/
+
+# Node.js dependencies
+node_modules/
+
+# PHP dependencies (managed inside container)
+vendor/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+storage/logs/*.log
+npm-debug.log*
+
+# Environment files
+.env
