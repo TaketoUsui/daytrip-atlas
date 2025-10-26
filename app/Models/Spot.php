@@ -6,7 +6,6 @@ use App\Enums\SpotRole;
 use App\Enums\CoordinateReliability;
 use App\Enums\UserSpotInterestStatus;
 use Clickbar\Magellan\Data\Geometries\Point;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,8 +13,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Spot extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         "name",
         "slug",
