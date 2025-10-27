@@ -9,7 +9,7 @@ enum CoordinateReliability: string{
 
     public static function options(): array{
         return collect(self::cases())
-            ->mapWithKeys(fn(self $case) => [$case->value])
+            ->map(fn(self $case) => [$case->value])
             ->all();
     }
 }
