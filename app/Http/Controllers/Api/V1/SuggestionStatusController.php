@@ -3,47 +3,24 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SuggestionStatusResource;
+use App\Models\SuggestionSet;
 use Illuminate\Http\Request;
 
 class SuggestionStatusController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * No.6 提案ステータス取得
+     *
+     * @param Request $request
+     * @param SuggestionSet $suggestionSet
+     * @return SuggestionStatusResource
      */
-    public function index()
-    {
-        //
-    }
+    public function getStatus(Request $request, SuggestionSet $suggestionSet){
+        $suggestionSet->loadMissing([
+            "items.cluster:id,name",
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return new SuggestionStatusResource($suggestionSet);
     }
 }
