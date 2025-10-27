@@ -16,7 +16,7 @@ Route::get('/', [TopPageController::class, 'show'])
     ->name('top');
 
 // No.2 提案リクエスト受付
-Route::post('/suggestions', [SuggestionController::class, 'store'])
+Route::post('/suggestions', [SuggestionController::class, 'startAnalyze'])
     ->name('suggestions.store');
 
 // No.3 提案待機ページ
