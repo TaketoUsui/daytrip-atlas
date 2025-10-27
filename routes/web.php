@@ -35,7 +35,7 @@ Route::middleware(['auth'])
 ->prefix('admin')
 ->name('admin.')
 ->group(function () {
-    Route::get("/", [AdminTopPageController::class, "show"])
+    Route::get("/", [AdminTopPageController::class, "index"])
         ->name('top');
 
     // スポット管理 (CRUD)
