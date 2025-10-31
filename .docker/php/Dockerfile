@@ -23,4 +23,14 @@ RUN apt-get update && apt-get install -y \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
     # 不要なファイルを削除
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+
+WORKDIR /var/www
+
+COPY ./composer.json ./composer.lock* ./
+
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+
+COPY . .
+
+RUN composer install --no-interaction --no-plugins --prefer-dist
