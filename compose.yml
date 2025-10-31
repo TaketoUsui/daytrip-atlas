@@ -15,12 +15,13 @@ services:
   # PHP Service (Laravel)
   php:
     build:
-      context: ./.docker/php
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
     user: "${UID}:${GID}"
     volumes:
       - ./:/var/www
       - ./.docker/php/development.ini:/usr/local/etc/php/conf.d/development.ini
-    command: sh -c "composer install && php-fpm"
+    command: php-fpm
     environment:
       # Laravelが利用する環境変数を設定
       - DB_CONNECTION=${DB_CONNECTION}
@@ -33,6 +34,30 @@ services:
       - app-network
     depends_on:
       - db
+
+  # Laravel Queue Worker Service
+  queue:
+      build:
+          context: .
+          dockerfile: ./.docker/php/Dockerfile # php サービスと同じ Dockerfile を使用
+      user: "${UID}:${GID}"
+      volumes:
+          - ./:/var/www
+          - ./.docker/php/development.ini:/usr/local/etc/php/conf.d/development.ini
+      command: sh -c "php /var/www/artisan queue:work --sleep=3 --tries=3"
+      environment:
+          # php サービスと同様の環境変数を設定
+          - DB_CONNECTION=${DB_CONNECTION}
+          - DB_HOST=${DB_HOST}
+          - DB_PORT=${DB_PORT}
+          - DB_DATABASE=${DB_DATABASE}
+          - DB_USERNAME=${DB_USERNAME}
+          - DB_PASSWORD=${DB_PASSWORD}
+      restart: always # ワーカーが何らかの理由で停止した場合に再起動
+      networks:
+          - app-network
+      depends_on:
+          - db
 
   # PostgreSQL + PostGIS Service
   db:
@@ -52,13 +77,15 @@ services:
   # Node.js Service (for Frontend Development)
   # ターミナルで `npm run dev` を実行するために利用
   node:
-    image: node:20-alpine
+    build:
+      context: .
+      dockerfile: ./.docker/node/Dockerfile
     user: "${UID}:${GID}"
     working_dir: /var/www
     volumes:
       - ./:/var/www
-      - ./node_modules:/var/www/node_modules
-    command: sh -c "npm install && npm run dev"
+#      - ./node_modules:/var/www/node_modules
+    command: npm run dev
     tty: true # コンテナを起動し続けるため
     ports:
       - "5173:5173"

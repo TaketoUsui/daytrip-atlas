@@ -2,10 +2,41 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property int $suggestion_set_id
+ * @property int $cluster_id
+ * @property int $key_visual_image_id
+ * @property int $catchphrase_id
+ * @property int $model_plan_id
+ * @property int $display_order
+ * @property string|null $generated_travel_time_text
+ * @property-read Catchphrase $catchphrase
+ * @property-read Cluster $cluster
+ * @property-read Image $keyVisualImage
+ * @property-read ModelPlan $modelPlan
+ * @property-read SuggestionSet $suggestionSet
+ * @method static Builder<static>|SuggestionSetItem newModelQuery()
+ * @method static Builder<static>|SuggestionSetItem newQuery()
+ * @method static Builder<static>|SuggestionSetItem query()
+ * @method static Builder<static>|SuggestionSetItem whereCatchphraseId($value)
+ * @method static Builder<static>|SuggestionSetItem whereClusterId($value)
+ * @method static Builder<static>|SuggestionSetItem whereDisplayOrder($value)
+ * @method static Builder<static>|SuggestionSetItem whereGeneratedTravelTimeText($value)
+ * @method static Builder<static>|SuggestionSetItem whereId($value)
+ * @method static Builder<static>|SuggestionSetItem whereKeyVisualImageId($value)
+ * @method static Builder<static>|SuggestionSetItem whereModelPlanId($value)
+ * @method static Builder<static>|SuggestionSetItem whereSuggestionSetId($value)
+ * @method static Builder<static>|SuggestionSetItem whereUuid($value)
+ * @mixin Eloquent
+ */
 class SuggestionSetItem extends Model
 {
     public $timestamps = false;
