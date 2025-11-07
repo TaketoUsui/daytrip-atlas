@@ -34,6 +34,7 @@ export default function SuggestionWaitPage({ uuid }) {
                 const data = response.data.data;
 
                 // 取得したデータでReactのStateを更新
+
                 setStatus(data.status);
                 setMessage(data.message);
                 setFoundClusters(data.found_clusters || []); // API定義 (No.6)
@@ -96,6 +97,7 @@ export default function SuggestionWaitPage({ uuid }) {
     return (
         <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
             <h1>AIがあなたへのおすすめを分析中...</h1>
+            {/* この {message} が動的に更新される */}
             <p style={{ fontSize: '1.2em', fontWeight: 'bold' }}>{message}</p>
 
             {/*  */}
@@ -113,7 +115,7 @@ export default function SuggestionWaitPage({ uuid }) {
             </div>
 
             {/* 中間生成物 (found_clusters) の表示 */}
-            {foundClusters.length > 0 && (
+            {status === 'analyzing_items' && foundClusters.length > 0 && (
                 <div>
                     <h3>見つかった候補地:</h3>
                     <ul style={{ listStyle: 'none', paddingLeft: 0 }}>

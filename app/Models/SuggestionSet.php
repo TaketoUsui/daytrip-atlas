@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
  * @property string $session_id
  * @property int|null $user_id
  * @property SuggestionStatus $status
+ * @property array<array-key, mixed>|null $processing_details
  * @property float $input_latitude
  * @property float $input_longitude
  * @property array<array-key, mixed>|null $input_tags_json
@@ -33,6 +34,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|SuggestionSet whereInputLatitude($value)
  * @method static Builder<static>|SuggestionSet whereInputLongitude($value)
  * @method static Builder<static>|SuggestionSet whereInputTagsJson($value)
+ * @method static Builder<static>|SuggestionSet whereProcessingDetails($value)
  * @method static Builder<static>|SuggestionSet whereSessionId($value)
  * @method static Builder<static>|SuggestionSet whereStatus($value)
  * @method static Builder<static>|SuggestionSet whereUserId($value)
@@ -47,6 +49,7 @@ class SuggestionSet extends Model
         "session_id",
         "user_id",
         "status",
+        "processing_details",
         "input_latitude",
         "input_longitude",
         "input_tags_json",
@@ -56,6 +59,7 @@ class SuggestionSet extends Model
     {
         return [
             "status" => SuggestionStatus::class,
+            "processing_details" => "array",
             "input_tags_json" => "array",
             "input_latitude" => "float",
             "input_longitude" => "float",
