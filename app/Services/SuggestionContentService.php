@@ -93,7 +93,7 @@ class SuggestionContentService
         // 2. キービジュアルも動的生成
         // ModelPlanに紐づくリレーション（items.spot）をロードしておく
         $modelPlan->loadMissing('items.spot');
-        $image = $this->imageGenerationService->generateImageForModelPlan($modelPlan);
+        $image = $this->imageGenerationService->generateImageForModelPlan($modelPlan, $tags); // $tags を引数に追加
 
         return new SuggestionContentDto(
             clusterId: $modelPlan->cluster_id,
@@ -130,7 +130,9 @@ class SuggestionContentService
 
         // 4. キービジュアルの生成
         // $modelPlanにはリレーションがロード済み
-        $image = $this->imageGenerationService->generateImageForModelPlan($modelPlan);
+
+        $modelPlan->loadMissing('items.spot');
+        $image = $this->imageGenerationService->generateImageForModelPlan($modelPlan, $tags); // $tags を引数に追加
 
         return new SuggestionContentDto(
             clusterId: $cluster->id,
