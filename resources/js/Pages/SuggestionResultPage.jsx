@@ -91,7 +91,9 @@ export default function SuggestionResultPage({ suggestionSet }) {
                               (このパスが公開URLとして解決可能である前提)
                             */}
                             <img
-                                src={item.key_visual_image.storage_path}
+                                // [変更] item.key_visual_image.storage_path を [!code --]
+                                // [変更] item.key_visual_image.public_url に変更 [!code ++]
+                                src={item.key_visual_image.public_url} // [!code ++]
                                 alt={item.key_visual_image.alt_text}
                                 style={styles.cardImage}
                             />

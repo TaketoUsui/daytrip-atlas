@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\SuggestionStatus;
 use App\Models\SuggestionSet;
+use App\Models\Tag;
 use App\Services\ClusterSelectionService;
 use App\Services\SuggestionContentService;
 use Illuminate\Bus\Queueable;
@@ -47,14 +48,25 @@ class GenerateSuggestionsJob implements ShouldQueue
         ClusterSelectionService $clusterSelectionService,
         SuggestionContentService $suggestionContentService
     ): void {
-        //
-        DB::beginTransaction();
+        // [変更] トランザクションはまだ開始しない
+        // [!code --] DB::beginTransaction();
 
         try {
             // Step 1: ステータス更新（クラスター選定中）
-            $this->suggestionSet->update(['status' => SuggestionStatus::ProcessingClusters]);
+            // [変更] この更新を即時コミットするため、トランザクションの外で実行 [!code ++]
+            $tagIds = $this->suggestionSet->input_tags_json ?? [];
+            $tagsMessage = "提案のリクエストを受け付けました...";
+            if (!empty($tagIds)) {
+                $tagNames = Tag::whereIn('id', $tagIds)->pluck('name')->implode('」「');
+                $tagsMessage = "「{$tagNames}」のテーマを検出しました。";
+            }
 
-            // Step 2: クラスターの選定
+            $this->suggestionSet->update([
+                'status' => SuggestionStatus::ProcessingClusters,
+                'processing_details' => ['message' => $tagsMessage . ' あなたに合いそうな観光地を探しています...']
+            ]);
+
+            // Step 2: クラスターの選定 (DB読み取りのみなのでトランザクション不要)
             $selectedClusters = $clusterSelectionService->selectClusters($this->suggestionSet);
 
             if ($selectedClusters->isEmpty()) {
@@ -62,13 +74,24 @@ class GenerateSuggestionsJob implements ShouldQueue
                     'suggestion_set_id' => $this->suggestionSet->id
                 ]);
                 // 提案が0件でもジョブは「完了」
-                $this->suggestionSet->update(['status' => SuggestionStatus::Complete]);
-                DB::commit();
+                $this->suggestionSet->update([
+                    'status' => SuggestionStatus::Complete,
+                    'processing_details' => null // 完了時はクリア
+                ]);
+                // [!code --] DB::commit();
                 return;
             }
 
             // Step 3: ステータス更新（コンテンツ分析中）
-            $this->suggestionSet->update(['status' => SuggestionStatus::AnalyzingItems]);
+            // [変更] この更新も即時コミットするため、トランザクションの外で実行 [!code ++]
+            $clusterNames = $selectedClusters->pluck('name')[0];
+            $this->suggestionSet->update([
+                'status' => SuggestionStatus::AnalyzingItems,
+                'processing_details' => ['message' => "「{$clusterNames}」など、注目のエリアが見つかりました。おすすめのプランを組み立てています..."]
+            ]);
+
+            // [変更] ここからコンテンツ作成（書き込み）が始まるため、トランザクションを開始 [!code ++]
+            DB::beginTransaction(); // [!code ++]
 
             // Step 4: コンテンツの動的生成ループ
             foreach ($selectedClusters as $index => $cluster) {
@@ -79,6 +102,7 @@ class GenerateSuggestionsJob implements ShouldQueue
                 );
 
                 // Step 5: 提案アイテム (suggestion_set_items) をDBに保存
+                // [変更] この create 処理はトランザクション内で実行される [!code ++]
                 $this->suggestionSet->items()->create([
                     // 'uuid' は Model boot() で自動生成される
                     'cluster_id' => $contentDto->clusterId,
@@ -91,14 +115,22 @@ class GenerateSuggestionsJob implements ShouldQueue
                 ]);
             }
 
-            // Step 6: 完了ステータスに更新
-            $this->suggestionSet->update(['status' => SuggestionStatus::Complete]);
+            DB::commit(); // [!code ++]
 
-            DB::commit();
+            // Step 6: 完了ステータスに更新
+            // [変更] コミットが成功した後、最終ステータスを即時更新 [!code ++]
+            $this->suggestionSet->update([
+                'status' => SuggestionStatus::Complete,
+                'processing_details' => null // 完了時はクリア
+            ]);
+
+            // [!code --] DB::commit();
 
         } catch (Throwable $e) {
-            //
-            DB::rollBack();
+            // [変更] トランザクションが開始された後（Step 4以降）で失敗した場合にのみロールバック [!code ++]
+            if (DB::transactionLevel() > 0) { // [!code ++]
+                DB::rollBack(); // [!code ++]
+            } // [!code ++]
 
             Log::error("Suggestion generation failed", [
                 "suggestion_set_id" => $this->suggestionSet->id,
@@ -107,7 +139,10 @@ class GenerateSuggestionsJob implements ShouldQueue
             ]);
 
             // ステータスを「失敗」に更新
-            $this->suggestionSet->update(['status' => SuggestionStatus::Failed]);
+            $this->suggestionSet->update([
+                'status' => SuggestionStatus::Failed,
+                'processing_details' => ['message' => 'エラーが発生しました: ' . $e->getMessage()]
+            ]);
 
             // ジョブを明示的に失敗させ、failed_jobsテーブルに記録
             $this->fail($e);

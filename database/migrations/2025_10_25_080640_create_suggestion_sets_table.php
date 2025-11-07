@@ -22,6 +22,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->enum('status', SuggestionStatus::options())
                 ->default(SuggestionStatus::Pending->value);
+            $table->jsonb('processing_details')->nullable();
             $table->double('input_latitude');
             $table->double('input_longitude');
             $table->jsonb('input_tags_json')

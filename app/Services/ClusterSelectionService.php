@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Enums\ClusterStatus;
 use App\Models\Cluster;
 use App\Models\SuggestionSet;
+use App\Models\Tag;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -56,21 +58,63 @@ class ClusterSelectionService
 
         // 2. PostGIS空間クエリの実行
         //
-        $clusters = Cluster::query()
-            // 公開中のクラスターのみを対象
-            ->where('status', ClusterStatus::Published)
-            // PostGIS (laravel-magellan) の 'stDWithin' 関数を使用
-            // 'location' カラム (Geography) が
-            // $originPoint から $SEARCH_RADIUS_METERS (メートル) 以内にあるか
-//            ->where(ST::dWithinGeography(
-//                'location',      // 検索対象の (Geography) カラム
-//                $originPoint,      // 比較元の Point オブジェクト
-//                self::SEARCH_RADIUS_METERS // 距離 (メートル)
-//            ))
-            // MVPの要件: ランダム性を加えて選定
-            ->inRandomOrder()
-            ->limit(self::TARGET_SUGGESTION_COUNT)
-            ->get();
+        $tagIds = $suggestionSet->input_tags_json ?? [];
+        // ベースとなるクエリ（公開中のみ）を作成 [!code ++]
+        $query = Cluster::query() // [!code ++]
+        ->where('status', ClusterStatus::Published);
+
+//        $clusters = Cluster::query()
+//            // 公開中のクラスターのみを対象
+//            ->where('status', ClusterStatus::Published)
+//            // PostGIS (laravel-magellan) の 'stDWithin' 関数を使用
+//            // 'location' カラム (Geography) が
+//            // $originPoint から $SEARCH_RADIUS_METERS (メートル) 以内にあるか
+////            ->where(ST::dWithinGeography(
+////                'location',      // 検索対象の (Geography) カラム
+////                $originPoint,      // 比較元の Point オブジェクト
+////                self::SEARCH_RADIUS_METERS // 距離 (メートル)
+////            ))
+//            // MVPの要件: ランダム性を加えて選定
+//            ->inRandomOrder()
+//            ->limit(self::TARGET_SUGGESTION_COUNT)
+//            ->get();
+
+
+//        $tagIds = $suggestionSet->input_tags_json ?? [];
+//
+//
+//        $query = Cluster::query()
+//        ->where('status', ClusterStatus::Published)
+//
+//        ->where(ST::dWithinGeography(
+//            'location',
+//            $originPoint,
+//            self::SEARCH_RADIUS_METERS
+//        ));
+
+        if (empty($tagIds)) { // [!code ++]
+            // タグが未選択の場合 (従来のMVPロジック: ランダム選定) [!code ++]
+            Log::info("[ClusterSelection] No tags provided. Selecting randomly.", ['suggestion_set_id' => $suggestionSet->id]); // [!code ++]
+            $clusters = $query->inRandomOrder() // [!code ++]
+            ->limit(self::TARGET_SUGGESTION_COUNT) // [!code ++]
+            ->get(); // [!code ++]
+        } else { // [!code ++]
+            // タグが選択された場合 (デモ用ロジック: 関連度順) [!code ++]
+            $tagNames = Tag::whereIn('id', $tagIds)->pluck('name')->implode(', '); // [!code ++]
+            Log::info("[ClusterSelection] Selecting clusters based on tags: [{$tagNames}] (distance ignored for demo)", ['suggestion_set_id' => $suggestionSet->id]); // [!code ++]
+
+            $clusters = $query // [!code ++]
+            // 関連するタグを持つスポットの数をカウントする [!code ++]
+            ->withCount(['spots' => function (Builder $spotQuery) use ($tagIds) { // [!code ++]
+                // spotsリレーション経由で、さらにtagsリレーションを絞り込む [!code ++]
+                $spotQuery->whereHas('tags', function (Builder $tagQuery) use ($tagIds) { // [!code ++]
+                    $tagQuery->whereIn('tags.id', $tagIds); // [!code ++]
+                }); // [!code ++]
+            }]) // [!code ++]
+            ->orderByDesc('spots_count') // カウント数で降順ソート [!code ++]
+            ->limit(self::TARGET_SUGGESTION_COUNT) // [!code ++]
+            ->get(); // [!code ++]
+        } // [!code ++]
 
         Log::info(
             "[ClusterSelection] Found {$clusters->count()} clusters.",
