@@ -137,6 +137,7 @@ erDiagram
         VARCHAR alt_text
         VARCHAR copyright_holder
         ENUM image_quality_level "'manually_verified_photo', 'ai_generic'"
+        TEXT description "説明文（任意）"
         TIMESTAMP created_at
     }
 

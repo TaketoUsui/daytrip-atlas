@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
  * @property string $storage_path
  * @property string|null $alt_text
  * @property string|null $copyright_holder
- * @property array<array-key, mixed>|null $metadata
+ * @property string|null $description
  * @property ImageQualityLevel $image_quality_level
  * @property Carbon|null $created_at
  * @property-read Collection<int, Spot> $spots
@@ -36,7 +36,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Image whereFileName($value)
  * @method static Builder<static>|Image whereId($value)
  * @method static Builder<static>|Image whereImageQualityLevel($value)
- * @method static Builder<static>|Image whereMetadata($value)
+ * @method static Builder<static>|Image whereDescription($value)
  * @method static Builder<static>|Image whereStoragePath($value)
  * @method static Builder<static>|Image whereUuid($value)
  * @mixin Eloquent
@@ -52,14 +52,13 @@ class Image extends Model
         "storage_path",
         "alt_text",
         "copyright_holder",
-        "metadata",
+        "description",
         "image_quality_level",
     ];
 
     protected function casts(): array
     {
         return [
-            "metadata" => "array",
             "image_quality_level" => ImageQualityLevel::class,
         ];
     }
@@ -83,19 +82,6 @@ class Image extends Model
         return $this->belongsToMany(Spot::class, "spot_images")
             ->withPivot("display_order")
             ->orderBy("display_order");
-    }
-    /**
-     * AIプロンプト用にmetadataをJSON文字列として取得するアクセサ
-     * @return string
-     */
-    public function getMetadataForPromptAttribute(): string
-    {
-
-        if (empty($this->metadata)) {
-            return '[]';
-        }
-
-        return json_encode($this->metadata, JSON_UNESCAPED_UNICODE);
     }
 
     /**
