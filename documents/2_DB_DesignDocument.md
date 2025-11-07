@@ -107,7 +107,7 @@ erDiagram
         INTEGER id PK
         VARCHAR name
         VARCHAR slug UK
-        GEOGRAPHY location "PostGIS (GiSTインデックス必須)"
+        GEOGRAPHY location "PostGIS (GiSTインデックス必須)。spots群の地理的中心（Centroid）"
         VARCHAR prefecture "都道府県"
         VARCHAR municipality "市区町村"
         VARCHAR address_detail "詳細住所"

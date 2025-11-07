@@ -39,8 +39,6 @@ AIによる徹底したパーソナライズで、ユーザー一人ひとりの
 
 - **企画書**: [`documents/proposal.md`](/documents/proposal.md)
 - **DB設計書**: [`documents/DB_DesignDocument.md`](documents/DB_DesignDocument.md)
-- **MVP要件定義書**: [`documents/MVP_RequirementsSpecificationDocument.md`](documents/MVP_RequirementsSpecificationDocument.md)
-- **MVP API設計書**: [`documents/MVP_API_DesignDocument.md`](documents/MVP_API_DesignDocument.md)
 
 ## セットアップ
 
@@ -60,7 +58,3 @@ docker-compose exec node npm run dev
 
 - **スポット中心アプローチ**: すべての情報の最小単位を「スポット」と定義し、これを中心にデータ構造を設計することで、柔軟なプランニングと高い再利用性を実現しています。
 - **ER図**や各テーブルの詳細は、[DB設計書](documents/DB_DesignDocument.md)を参照してください。
-
-## API仕様
-
-- ユーザーの行動ログ記録や明示的フィードバックなど、非同期通信に使用するAPIのエンドポイント仕様は、[API設計書](documents/MVP_API_DesignDocument.md)に定義されています。
