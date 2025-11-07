@@ -5,6 +5,8 @@ namespace App\Services\Gemini;
 use App\Enums\ImageQualityLevel;
 use App\Models\Image;
 use App\Models\ModelPlan;
+use App\Models\Tag;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
@@ -12,37 +14,53 @@ use Throwable;
 /**
  * AIによるキービジュアル（のメタデータ）生成とDB保存を担当するサービス。
  *
+ * [変更] デモ最適化のため、AIによる「キーワード生成」から、
+ * DB事前登録画像からの「選定」ロジックに変更。
+ *
  * @see MVP_旅先提案アルゴリズム設計 C. インフラストラクチャサービス
  */
 class ImageGenerationService extends BaseGeminiClient
 {
     /**
-     * AIを使用して、モデルプランに最適な「検索キーワード」を生成し、
-     * それをメタデータとして持つImageレコードを作成する。
+     * AIを使用して、モデルプランに最適な「キービジュアル画像」を
+     * DBに事前登録されたリストから選定し、そのImageモデルを返す。
      *
-     * @param ModelPlan $modelPlan キービジュアルを生成する対象のモデルプラン
-     * @return Image 生成されたImageモデル
-     * @throws Throwable AIのレスポンスが不正、またはDB保存に失敗した場合
+     * @param ModelPlan $modelPlan キービジュアルを選定する対象のモデルプラン
+     * @param Collection<int, Tag> $tags ユーザーが入力したタグ（選定のヒント）
+     * @return Image 選定されたImageモデル
+     * @throws Throwable AIのレスポンスが不正、またはDB検索に失敗した場合
      */
-    public function generateImageForModelPlan(ModelPlan $modelPlan): Image
+    public function generateImageForModelPlan(ModelPlan $modelPlan, Collection $tags): Image
     {
         Log::info(
-            "[ImageGeneration] Generating image metadata for ModelPlan ID: {$modelPlan->id}",
+            "[ImageGeneration] Selecting image for ModelPlan ID: {$modelPlan->id}",
             ['plan_name' => $modelPlan->name]
         );
 
-        // 1. AIへの指示（プロンプト）を構築
-        $prompt = $this->buildPrompt($modelPlan);
 
-        // 2. BaseGeminiClient経由でAI APIをコール
+        $availableImages = Image::query()
+        ->where('image_quality_level', ImageQualityLevel::ManuallyVerifiedPhoto)
+        ->select(['id', 'alt_text', 'metadata'])
+        ->get();
+
+        if ($availableImages->isEmpty()) {
+            Log::warning("[ImageGeneration] No 'ManuallyVerifiedPhoto' images found in DB. Falling back to AiGeneric.", ['plan_id' => $modelPlan->id]);
+            // フォールバック: 既存のAiGeneric画像を返すか、ダミーのAiGeneric画像を作成する（ここではAiGenericの1件目を返す）
+            return $this->findFallbackImage();
+        }
+
+        // 2. AIへの指示（プロンプト）を構築
+        $prompt = $this->buildPrompt($modelPlan, $tags, $availableImages);
+
+        // 3. BaseGeminiClient経由でAI APIをコール
         $response = $this->generateContent($prompt);
 
-        // 3. AIのレスポンス（キーワード）をDBに保存
-        $image = $this->saveImageToDb($response);
+
+        $image = $this->findImageFromResponse($response, $availableImages);
 
         Log::info(
-            "[ImageGeneration] Successfully generated Image ID: {$image->id}",
-            ['keyword_alt_text' => $image->alt_text]
+            "[ImageGeneration] Successfully selected Image ID: {$image->id}",
+            ['alt_text' => $image->alt_text]
         );
 
         return $image;
@@ -52,69 +70,102 @@ class ImageGenerationService extends BaseGeminiClient
      * AIへの指示（プロンプト）を構築する
      *
      * @param ModelPlan $modelPlan
+     * @param Collection<int, Tag> $tags ユーザー入力タグ
+     * @param Collection<int, Image> $availableImages DB内の画像リスト
      * @return string
      */
-    private function buildPrompt(ModelPlan $modelPlan): string
+    private function buildPrompt(ModelPlan $modelPlan, Collection $tags, Collection $availableImages): string
     {
         // プラン名と、プランに含まれるスポット名を取得
         $planName = $modelPlan->name;
-        // リレーションがロードされていることを期待 (SuggestionContentServiceでロードすべき)
-        // もしロードされていない場合でも、N+1を避けるためプラン名だけで実行する
+        // リレーションがロードされていることを期待 (SuggestionContentServiceでロード済み)
         $spotNames = $modelPlan->items
-            ->sortBy('display_order')
+        ->sortBy('display_order')
             ->map(fn($item) => $item->spot->name)
             ->implode('、');
 
-        $context = "プラン名: {$planName}\n主な訪問スポット: {$spotNames}";
-        if ($spotNames === '') {
-            $context = "プラン名: {$planName}";
-        }
 
-        // アルゴリズム設計書 に従い、検索キーワードを要求する
+        $userTheme = $tags->isEmpty() ? '指定なし' : $tags->pluck('name')->implode('、');
+
+        $context = "プラン名: {$planName}\n主な訪問スポット: {$spotNames}\nユーザーの希望テーマ: {$userTheme}";
+
+
+        $imageListPrompt = $availableImages->map(
+            fn(Image $image) => "- ID {$image->id}: 説明=\"{$image->alt_text}\", 特徴メタデータ={$image->metadata_for_prompt}"
+        )->implode("\n");
+
+
+        // [変更] プロンプトを「キーワード生成」から「ID選定」に変更
         return <<<PROMPT
         あなたは優秀なアートディレクターです。
-        以下の「モデルプラン」のキービジュアルとして、ストックフォトサービス（Unsplashなど）で検索すべき、
-        最も象徴的で魅力的な「英語の検索キーワード」を1つだけ生成してください。
+        以下の「モデルプラン」と「ユーザーの希望テーマ」に最もふさわしいキービジュアル画像を、
+        提示された「画像リスト」の中から1つだけ選び、そのIDを返してください。
 
         # モデルプラン
         {$context}
 
+        # 画像リスト (この中から選んでください)
+        {$imageListPrompt}
+
         # 出力形式
         以下のキーを持つJSONオブジェクトを1つだけ生成してください。
-        - "keyword": (string) 生成した英語の検索キーワード (例: "Kamakura Great Buddha sunset")
+        - "image_id": (int) 選定した画像のID (例: 1)
 
         JSONのみを返し、前後に説明文や ```json タグは不要です。
         PROMPT;
     }
 
     /**
-     * AIのレスポンス（キーワード）を検証し、ImageレコードとしてDBに保存する
+     * AIのレスポンス（image_id）を検証し、Imageモデルを取得する
      *
      * @param array $response AIから返されたパース済みのJSON配列
+     * @param Collection $availableImages AIに提示した画像リスト
      * @return Image
      * @throws \RuntimeException AIのレスポンスが不正な場合
      */
-    private function saveImageToDb(array $response): Image
+    private function findImageFromResponse(array $response, Collection $availableImages): Image
     {
-        $keyword = $response['keyword'] ?? null;
+        $imageId = $response['image_id'] ?? null;
 
-        if (empty($keyword) || !is_string($keyword)) {
-            throw new \RuntimeException("[ImageGeneration] AI response is missing 'keyword' key or content is empty.");
+        if (empty($imageId) || !is_numeric($imageId)) {
+            throw new \RuntimeException("[ImageGeneration] AI response is missing 'image_id' key or content is invalid.");
         }
 
-        $fileName = 'ai_generic_' . Str::uuid() . '.jpg';
 
-        // アルゴリズム設計 と DB設計 に従う
-        return Image::create([
-            // uuidはImageモデルのbooted()メソッドで自動生成される想定
-            'file_name' => $fileName,
-            // MVPでは、フロントエンドで表示する共通のプレースホルダー画像パスを指定する
-            'storage_path' => 'images/placeholders/' . $fileName,
-            // alt_text にAIが生成したキーワードを格納する
-            'alt_text' => $keyword,
-            'copyright_holder' => 'AI Suggested Keyword (Placeholder)',
-            //
-            'image_quality_level' => ImageQualityLevel::AiGeneric,
-        ]);
+        $image = $availableImages->firstWhere('id', $imageId);
+
+        if (!$image) {
+
+            Log::warning("[ImageGeneration] AI returned an unknown image_id: {$imageId}. Falling back to first available image.", [
+                'available_ids' => $availableImages->pluck('id')->all()
+            ]);
+            return $availableImages->first();
+        }
+
+
+        return Image::find($image->id);
     }
+
+    /**
+     * フォールバック用の画像を取得する
+     * @return Image
+     */
+    private function findFallbackImage(): Image
+    {
+        // AiGenericの画像が1件も存在しない場合に備え、
+        // 存在しない場合はAiGeneric画像を1件作成する（ロジックは簡略化）
+        return Image::firstOrCreate(
+            ['image_quality_level' => ImageQualityLevel::AiGeneric],
+            [
+                'file_name' => 'ai_fallback.jpg',
+                'storage_path' => 'images/placeholders/ai_fallback.jpg', //
+                'alt_text' => 'AI Generated Fallback Image',
+                'copyright_holder' => 'AI Suggested Keyword (Placeholder)',
+            ]
+        );
+    }
+
+    /**
+     * (旧メソッド: saveImageToDb は findImageFromResponse に置き換えられました)
+     */
 }

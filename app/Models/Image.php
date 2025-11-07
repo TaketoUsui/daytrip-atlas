@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -19,6 +20,7 @@ use Illuminate\Support\Str;
  * @property string $storage_path
  * @property string|null $alt_text
  * @property string|null $copyright_holder
+ * @property array<array-key, mixed>|null $metadata
  * @property ImageQualityLevel $image_quality_level
  * @property Carbon|null $created_at
  * @property-read Collection<int, Spot> $spots
@@ -34,6 +36,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Image whereFileName($value)
  * @method static Builder<static>|Image whereId($value)
  * @method static Builder<static>|Image whereImageQualityLevel($value)
+ * @method static Builder<static>|Image whereMetadata($value)
  * @method static Builder<static>|Image whereStoragePath($value)
  * @method static Builder<static>|Image whereUuid($value)
  * @mixin Eloquent
@@ -42,17 +45,21 @@ class Image extends Model
 {
     const UPDATED_AT = null;
 
+    protected $appends = ['public_url'];
+
     protected $fillable = [
         "file_name",
         "storage_path",
         "alt_text",
         "copyright_holder",
+        "metadata",
         "image_quality_level",
     ];
 
     protected function casts(): array
     {
         return [
+            "metadata" => "array",
             "image_quality_level" => ImageQualityLevel::class,
         ];
     }
@@ -76,5 +83,31 @@ class Image extends Model
         return $this->belongsToMany(Spot::class, "spot_images")
             ->withPivot("display_order")
             ->orderBy("display_order");
+    }
+    /**
+     * AIプロンプト用にmetadataをJSON文字列として取得するアクセサ
+     * @return string
+     */
+    public function getMetadataForPromptAttribute(): string
+    {
+
+        if (empty($this->metadata)) {
+            return '[]';
+        }
+
+        return json_encode($this->metadata, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * storage_path から完全な公開URLを生成するアクセサ
+     *
+     * @return string
+     */
+    public function getPublicUrlAttribute(): string // [!code ++]
+    { // [!code ++]
+        // 'public' ディスク (config/filesystems.phpで定義) を使い、 // [!code ++]
+        // $this->storage_path (例: 'demo_images/nara.png') から // [!code ++]
+        // 完全なURL (例: '/storage/demo_images/nara.png') を生成する。 // [!code ++]
+        return Storage::disk('public')->url($this->storage_path); // [!code ++]
     }
 }

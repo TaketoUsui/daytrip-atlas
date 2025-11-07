@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ClusterSeeder::class,
             TagSeeder::class,
+            DemoImageSeeder::class,
         ]);
 
 //        User::factory(10)->create();
