@@ -61,6 +61,21 @@ class SpotSeeder extends Seeder
                 'cluster_name' => '兵庫県神戸市',
                 'tags' => ['グルメ', '歴史・文化'],
             ],
+            [
+                'name' => '有馬温泉',
+                'slug' => 'arima-onsen',
+                'lat' => 34.7975,
+                'lon' => 135.2485,
+                'prefecture' => '兵庫県',
+                'municipality' => '神戸市',
+                'address_detail' => '北区有馬町',
+                'min_duration_minutes' => 120,
+                'max_duration_minutes' => 240,
+                'spot_role' => SpotRole::MainDestination->value,
+                'coordinate_reliability' => CoordinateReliability::ManuallyVerified->value,
+                'cluster_name' => '兵庫県神戸市',
+                'tags' => ['自然・癒やし', '歴史・文化', 'デート向き'],
+            ],
 
             // 大阪市エリア
             [
@@ -124,6 +139,21 @@ class SpotSeeder extends Seeder
                 'coordinate_reliability' => CoordinateReliability::ManuallyVerified->value,
                 'cluster_name' => '京都府京都市',
                 'tags' => ['自然・癒やし', '絶景'],
+            ],
+            [
+                'name' => '渡月橋',
+                'slug' => 'togetsukyo',
+                'lat' => 35.0125,
+                'lon' => 135.6775,
+                'prefecture' => '京都府',
+                'municipality' => '京都市',
+                'address_detail' => '右京区嵯峨',
+                'min_duration_minutes' => 30,
+                'max_duration_minutes' => 60,
+                'spot_role' => SpotRole::SubDestination->value,
+                'coordinate_reliability' => CoordinateReliability::ManuallyVerified->value,
+                'cluster_name' => '京都府京都市',
+                'tags' => ['絶景', 'デート向き'],
             ],
 
             // 奈良市エリア
@@ -297,14 +327,17 @@ class SpotSeeder extends Seeder
         // 簡易的に、各クラスターの代表的な画像を最初のスポットに紐付ける
         $images = DB::table('images')->select('id', 'file_name')->get()->keyBy('file_name');
         $spotImageMappings = [
-            'kobe-harborland' => 'kobe_harborland.jpg',
-            'osaka-castle' => 'osaka_castle.jpg',
-            'kiyomizu-dera' => 'kyoto_temple.jpg',
-            'nara-park' => 'nara_deer.jpg',
-            'himeji-castle' => 'himeji_castle.jpg',
-            'byodoin' => 'uji_matcha.jpg',
-            'wakayama-castle' => 'wakayama_castle.jpg',
-            'biwako' => 'otsu_biwako.jpg',
+            'kobe-harborland' => 'kobe-harbor.png',
+            'arima-onsen' => 'arima-onsen.png',
+            'osaka-castle' => 'osaka_castle.png',
+            'kiyomizu-dera' => 'kyoto_temple.png',
+            'arashiyama' => 'arashiyama.png',
+            'togetsukyo' => 'togetsukyo.png',
+            'nara-park' => 'nara-park-deer.png',
+            'himeji-castle' => 'himeji_castle.png',
+            'byodoin' => 'uji_matcha.png',
+            'wakayama-castle' => 'wakayama_castle.png',
+            'biwako' => 'otsu_biwako.png',
         ];
 
         foreach ($spotImageMappings as $slug => $fileName) {

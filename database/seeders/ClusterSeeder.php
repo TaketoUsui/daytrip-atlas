@@ -30,8 +30,8 @@ class ClusterSeeder extends Seeder
         $clustersData = [
             [
                 'name' => '兵庫県神戸市',
-                'lat' => 35.0036,
-                'lon' => 135.7800,
+                'lat' => 34.6901,
+                'lon' => 135.1955,
             ],
             [
                 'name' => '大阪府大阪市',

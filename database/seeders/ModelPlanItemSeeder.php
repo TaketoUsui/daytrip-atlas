@@ -34,7 +34,7 @@ class ModelPlanItemSeeder extends Seeder
          * travel_mode: 移動手段
          */
         $planItems = [
-            // 神戸港めぐり満喫プラン
+            // 神戸港と有馬温泉満喫プラン
             '兵庫県神戸市' => [
                 [
                     'spot_slug' => 'kobe-harborland',
@@ -48,9 +48,17 @@ class ModelPlanItemSeeder extends Seeder
                     'spot_slug' => 'nankinmachi',
                     'display_order' => 2,
                     'duration_minutes' => 60,
+                    'travel_time_to_next_minutes' => 45,
+                    'travel_mode' => TravelMode::Train->value,
+                    'description' => '南京町で中華グルメを満喫',
+                ],
+                [
+                    'spot_slug' => 'arima-onsen',
+                    'display_order' => 3,
+                    'duration_minutes' => 180,
                     'travel_time_to_next_minutes' => 0,
                     'travel_mode' => null,
-                    'description' => '南京町で中華グルメを満喫',
+                    'description' => '有馬温泉で日帰り入浴と温泉街散策',
                 ],
             ],
 
@@ -85,12 +93,20 @@ class ModelPlanItemSeeder extends Seeder
                     'description' => '清水寺から京都市街を一望',
                 ],
                 [
-                    'spot_slug' => 'arashiyama',
+                    'spot_slug' => 'togetsukyo',
                     'display_order' => 2,
-                    'duration_minutes' => 150,
+                    'duration_minutes' => 45,
+                    'travel_time_to_next_minutes' => 10,
+                    'travel_mode' => TravelMode::Walk->value,
+                    'description' => '渡月橋で桂川の景色を楽しむ',
+                ],
+                [
+                    'spot_slug' => 'arashiyama',
+                    'display_order' => 3,
+                    'duration_minutes' => 120,
                     'travel_time_to_next_minutes' => 0,
                     'travel_mode' => null,
-                    'description' => '嵐山の竹林と渡月橋を散策',
+                    'description' => '嵐山の竹林散策とカフェタイム',
                 ],
             ],
 
