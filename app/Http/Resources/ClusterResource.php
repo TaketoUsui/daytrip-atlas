@@ -20,6 +20,7 @@ class ClusterResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'name' => $this->name,
+            'key_visual_url' => $this->keyVisualImage?->public_url,
             'description' => $this->description,
         ];
     }

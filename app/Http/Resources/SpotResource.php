@@ -18,8 +18,10 @@ class SpotResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'slug' => $this->slug,
+            'uuid' => $this->slug, // Props定義に合わせてuuidとして返す (実際はslugを使用)
             'name' => $this->name,
+            'latitude' => $this->location?->getLatitude(),
+            'longitude' => $this->location?->getLongitude(),
             'address_detail' => $this->address_detail,
             'prefecture' => $this->prefecture,
             'municipality' => $this->municipality,

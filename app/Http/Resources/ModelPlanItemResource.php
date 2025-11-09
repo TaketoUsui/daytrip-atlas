@@ -21,10 +21,10 @@ class ModelPlanItemResource extends JsonResource
             'display_order' => $this->display_order,
             'spot_name' => $this->spot->name,
             'spot_slug' => $this->spot->slug,
+            'spot_description' => $this->description,
             'duration_minutes' => $this->duration_minutes,
             'travel_time_to_next_minutes' => $this->travel_time_to_next_minutes,
             'travel_mode' => $this->travel_mode?->value,
-            'description' => $this->description,
         ];
     }
 }

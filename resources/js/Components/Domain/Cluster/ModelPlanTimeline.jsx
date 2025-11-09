@@ -27,9 +27,9 @@ export default function ModelPlanTimeline({ items }) {
                                 {item.spot_name}
                             </h4>
 
-                            {item.description && (
+                            {item.spot_description && (
                                 <p className="text-gray-700 text-sm mb-2">
-                                    {item.description}
+                                    {item.spot_description}
                                 </p>
                             )}
 
