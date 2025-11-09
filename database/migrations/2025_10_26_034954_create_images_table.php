@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string("storage_path")->unique();
             $table->string("alt_text")->nullable();
             $table->string("copyright_holder")->nullable();
-            $table->jsonb('metadata')->nullable();
+            $table->text('description')->nullable();
             $table->enum("image_quality_level", \App\Enums\ImageQualityLevel::options());
             $table->timestamp("created_at")->nullable();
         });

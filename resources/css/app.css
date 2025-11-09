@@ -4,8 +4,28 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../**/*.jsx';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /* フォント設定 */
+    --font-sans: 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* カラーパレット */
+    --color-primary: oklch(0.55 0.24 252); /* blue-600相当 */
+    --color-primary-hover: oklch(0.45 0.24 252); /* blue-700相当 */
+    --color-secondary: oklch(0.55 0.18 162); /* emerald-600相当 */
+    --color-accent: oklch(0.80 0.15 85); /* yellow-400相当 */
+
+    /* グレースケール */
+    --color-gray-50: oklch(0.98 0 0);
+    --color-gray-100: oklch(0.96 0 0);
+    --color-gray-200: oklch(0.93 0 0);
+    --color-gray-300: oklch(0.87 0 0);
+    --color-gray-400: oklch(0.71 0 0);
+    --color-gray-500: oklch(0.55 0 0);
+    --color-gray-600: oklch(0.42 0 0);
+    --color-gray-700: oklch(0.35 0 0);
+    --color-gray-800: oklch(0.24 0 0);
+    --color-gray-900: oklch(0.15 0 0);
 }

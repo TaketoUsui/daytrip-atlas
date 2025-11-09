@@ -3,148 +3,132 @@
 namespace App\Jobs;
 
 use App\Enums\SuggestionStatus;
+use App\Models\Image;
 use App\Models\SuggestionSet;
-use App\Models\Tag;
-use App\Services\ClusterSelectionService;
-use App\Services\SuggestionContentService;
+use App\Models\SuggestionSetItem;
+use App\Services\CatchphraseGeneratorService;
+use App\Services\ClusterSelectorService;
+use App\Services\TravelTimeCalculatorService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
+/**
+ * 提案生成ジョブ
+ *
+ * Phase 2: ダミー版（ステータス遷移、ダミーデータで提案生成）
+ * Phase 4: AI統合（Gemini APIでキャッチコピー生成）
+ * Phase 6: PostGISを活用したクラスター選定
+ */
 class GenerateSuggestionsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * ジョブがタイムアウトするまでの秒数
-     * AI APIの呼び出しが複数回発生するため、長めに設定 (5分)
+     * Create a new job instance.
      */
-    public int $timeout = 300;
-
-    /**
-     * ジョブが失敗としてマークされるまでに試行する回数
-     * AIの不調を考慮し、リトライは1回のみとする
-     */
-    public int $tries = 1;
-
     public function __construct(
-        public SuggestionSet $suggestionSet,
-    ){}
+        public SuggestionSet $suggestionSet
+    ) {
+    }
 
     /**
-     * 提案生成ジョブの本体（オーケストレーター）
-     *
-     * @param ClusterSelectionService $clusterSelectionService
-     * @param SuggestionContentService $suggestionContentService
-     * @return void
-     * @see MVP_旅先提案アルゴリズム設計 A. ジョブ
+     * Execute the job.
      */
     public function handle(
-        ClusterSelectionService $clusterSelectionService,
-        SuggestionContentService $suggestionContentService
+        ClusterSelectorService $clusterSelector,
+        TravelTimeCalculatorService $travelTimeCalculator,
+        CatchphraseGeneratorService $catchphraseGenerator
     ): void {
-        // [変更] トランザクションはまだ開始しない
-        // [!code --] DB::beginTransaction();
-
         try {
-            // Step 1: ステータス更新（クラスター選定中）
-            // [変更] この更新を即時コミットするため、トランザクションの外で実行 [!code ++]
-            $tagIds = $this->suggestionSet->input_tags_json ?? [];
-            $tagsMessage = "提案のリクエストを受け付けました...";
-            if (!empty($tagIds)) {
-                $tagNames = Tag::whereIn('id', $tagIds)->pluck('name')->implode('」「');
-                $tagsMessage = "「{$tagNames}」のテーマを検出しました。";
-            }
-
+            // ステータス更新: pending → processing_clusters
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::ProcessingClusters,
-                'processing_details' => ['message' => $tagsMessage . ' あなたに合いそうな観光地を探しています...']
             ]);
 
-            // Step 2: クラスターの選定 (DB読み取りのみなのでトランザクション不要)
-            $selectedClusters = $clusterSelectionService->selectClusters($this->suggestionSet);
+            // Phase 2ではsleep不要だが、リアルなデモのため3秒待機
+            sleep(3);
 
-            if ($selectedClusters->isEmpty()) {
-                Log::warning("[GenerateSuggestionsJob] No clusters found.", [
-                    'suggestion_set_id' => $this->suggestionSet->id
-                ]);
-                // 提案が0件でもジョブは「完了」
-                $this->suggestionSet->update([
-                    'status' => SuggestionStatus::Complete,
-                    'processing_details' => null // 完了時はクリア
-                ]);
-                // [!code --] DB::commit();
-                return;
-            }
+            // 出発地から適切なクラスターを選定（Phase 2はダミー: 最初の3件）
+            $clusters = $clusterSelector->selectClusters(
+                $this->suggestionSet->input_latitude,
+                $this->suggestionSet->input_longitude,
+                3
+            );
 
-            // Step 3: ステータス更新（コンテンツ分析中）
-            // [変更] この更新も即時コミットするため、トランザクションの外で実行 [!code ++]
-            $clusterNames = $selectedClusters->pluck('name')[0];
+            // ステータス更新: processing_clusters → analyzing_items
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::AnalyzingItems,
-                'processing_details' => ['message' => "「{$clusterNames}」など、注目のエリアが見つかりました。おすすめのプランを組み立てています..."]
             ]);
 
-            // [変更] ここからコンテンツ作成（書き込み）が始まるため、トランザクションを開始 [!code ++]
-            DB::beginTransaction(); // [!code ++]
+            // Phase 2ではsleep不要だが、リアルなデモのため3秒待機
+            sleep(3);
 
-            // Step 4: コンテンツの動的生成ループ
-            foreach ($selectedClusters as $index => $cluster) {
-                // SuggestionContentServiceを呼び出し、必要なID群 (DTO) を取得
-                $contentDto = $suggestionContentService->generateContentForCluster(
+            // 各クラスターに対してSuggestionSetItemを作成
+            foreach ($clusters as $index => $cluster) {
+                // キャッチコピー生成（Phase 2はダミー）
+                $catchphrase = $catchphraseGenerator->generateCatchphrase(
                     $cluster,
-                    $this->suggestionSet
+                    $this->suggestionSet->input_latitude,
+                    $this->suggestionSet->input_longitude
                 );
 
-                // Step 5: 提案アイテム (suggestion_set_items) をDBに保存
-                // [変更] この create 処理はトランザクション内で実行される [!code ++]
-                $this->suggestionSet->items()->create([
-                    // 'uuid' は Model boot() で自動生成される
-                    'cluster_id' => $contentDto->clusterId,
-                    'key_visual_image_id' => $contentDto->keyVisualImageId,
-                    'catchphrase_id' => $contentDto->catchphraseId,
-                    'model_plan_id' => $contentDto->modelPlanId,
-                    'display_order' => $index + 1, // 1-based index
-                    // TODO: 本来は出発地とクラスターの距離から移動時間を計算すべき
-                    'generated_travel_time_text' => '車で約1時間30分',
+                // キービジュアル選定（ランダムに取得）
+                $keyVisualImage = Image::inRandomOrder()->first();
+
+                // デフォルトモデルプラン取得
+                $defaultModelPlan = $cluster->defaultModelPlan;
+
+                if (!$defaultModelPlan) {
+                    Log::warning("Cluster {$cluster->id} has no default model plan");
+                    continue;
+                }
+
+                // 移動時間計算
+                $travelTimeMinutes = $travelTimeCalculator->calculateTravelTime(
+                    $this->suggestionSet->input_latitude,
+                    $this->suggestionSet->input_longitude,
+                    $cluster
+                );
+
+                $travelTimeText = $travelTimeCalculator->formatTravelTimeText($travelTimeMinutes);
+
+                // SuggestionSetItem作成
+                SuggestionSetItem::create([
+                    'suggestion_set_id' => $this->suggestionSet->id,
+                    'cluster_id' => $cluster->id,
+                    'key_visual_image_id' => $keyVisualImage->id,
+                    'catchphrase_id' => $catchphrase->id,
+                    'model_plan_id' => $defaultModelPlan->id,
+                    'display_order' => $index + 1,
+                    'generated_travel_time_text' => $travelTimeText,
                 ]);
             }
 
-            DB::commit(); // [!code ++]
-
-            // Step 6: 完了ステータスに更新
-            // [変更] コミットが成功した後、最終ステータスを即時更新 [!code ++]
+            // ステータス更新: analyzing_items → complete
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::Complete,
-                'processing_details' => null // 完了時はクリア
             ]);
 
-            // [!code --] DB::commit();
-
-        } catch (Throwable $e) {
-            // [変更] トランザクションが開始された後（Step 4以降）で失敗した場合にのみロールバック [!code ++]
-            if (DB::transactionLevel() > 0) { // [!code ++]
-                DB::rollBack(); // [!code ++]
-            } // [!code ++]
-
-            Log::error("Suggestion generation failed", [
-                "suggestion_set_id" => $this->suggestionSet->id,
-                "error" => $e->getMessage(),
-                "trace" => $e->getTraceAsString(),
-            ]);
-
-            // ステータスを「失敗」に更新
+        } catch (\Exception $e) {
+            // エラー発生時はステータスをfailedに更新
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::Failed,
-                'processing_details' => ['message' => 'エラーが発生しました: ' . $e->getMessage()]
+                'processing_details' => [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ],
             ]);
 
-            // ジョブを明示的に失敗させ、failed_jobsテーブルに記録
+            Log::error('GenerateSuggestionsJob failed', [
+                'suggestion_set_id' => $this->suggestionSet->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            // ジョブを失敗させる
             $this->fail($e);
         }
     }
