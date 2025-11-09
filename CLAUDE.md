@@ -179,6 +179,35 @@ Primary documentation is in the `documents/` directory:
 
 The proposal emphasizes **"Deep Personalization"** as the core differentiator, using AI to understand latent user preferences and present travel options in the most appealing way for each individual.
 
+### MVP Development Documentation
+
+**Key documents for MVP development:**
+
+- **`mvp/10_DevelopmentPlan.md`**: Comprehensive MVP development strategy
+  - 6-phase development approach (Phase 1: Foundation → Phase 6: PostGIS Integration)
+  - Technical stack details
+  - Development principles and coding standards
+  - Git strategy and commit conventions
+  - Performance targets and security policies
+
+- **`mvp/11_ProgressTracking.md`**: Detailed progress tracking and task management
+  - Phase-by-phase progress summary with completion percentages
+  - Detailed task lists with status indicators (✅ Done, 🔄 In Progress, ❌ Not Started, ⚠️ Needs Review)
+  - Current priority tasks and effort estimates
+  - Issues and blockers tracking
+  - Regular updates on completion of each phase or major milestone
+
+**Progress Management Policy:**
+
+All MVP development work should be tracked using documents 10 and 11:
+- **Before starting tasks**: Check `11_ProgressTracking.md` for current priorities and task status
+- **During development**: Update task status in `11_ProgressTracking.md` as work progresses
+- **After completing tasks**: Mark tasks as completed (✅) and update progress percentages
+- **When plans change**: Update `10_DevelopmentPlan.md` to reflect new strategies or approaches
+- **When issues arise**: Add to the "Issues & Blockers" section in `11_ProgressTracking.md`
+
+These documents serve as the single source of truth for MVP development status and should be kept up-to-date throughout the development process.
+
 ## Development Principles for This Project
 
 ### MVP Focus
