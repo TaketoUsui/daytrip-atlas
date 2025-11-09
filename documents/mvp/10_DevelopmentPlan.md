@@ -17,7 +17,7 @@
 3. **提案結果一覧ページ**（カード表示）
 4. **観光地域詳細ページ**（モデルプラン表示）
 
-### 2.2. MVP除外機能（Phase 1以降で実装）
+### 2.2. MVP除外機能（MVP完了後に実装予定）
 
 - 会員登録・ログイン機能
 - タグによる絞り込み機能
@@ -30,37 +30,37 @@
 
 MVP開発を6つのフェーズに分割し、段階的にリスクを低減しながら実装を進めます。
 
-### Phase 1: 基盤構築 ✅ **[完了]**
+### Phase 1: 基盤構築
 
 **目的:** データベース、モデル、基本アーキテクチャの確立
 
 **成果物:**
-- ✅ データベースマイグレーション全件
-- ✅ Eloquentモデル全件
-- ✅ Enum定義全件
-- ✅ Docker開発環境構築
+- データベースマイグレーション全件
+- Eloquentモデル全件
+- Enum定義全件
+- Docker開発環境構築
 
-### Phase 2: コア機能スケルトン実装 ✅ **[ほぼ完了]**
+### Phase 2: コア機能スケルトン実装
 
 **目的:** 外部API統合なしでエンドツーエンドのフロー確立
 
 **成果物:**
-- ✅ コントローラー実装（TopController, SuggestionController, ClusterController）
-- ✅ ルート定義
-- ✅ Inertia.js統合
-- ✅ フロントエンドページコンポーネント（Top/Index, Suggestion/Show, Cluster/Detail）
-- ✅ ジョブ実装（GenerateSuggestionsJob）
-- ✅ サービス層スケルトン（ClusterSelectorService, TravelTimeCalculatorService, CatchphraseGeneratorService）
-- ⚠️ APIリソース実装（一部要確認）
-- ⚠️ Seederデータ拡充（作業中）
+- コントローラー実装（TopController, SuggestionController, ClusterController）
+- ルート定義
+- Inertia.js統合
+- フロントエンドページコンポーネント（Top/Index, Suggestion/Show, Cluster/Detail）
+- ジョブ実装（GenerateSuggestionsJob）
+- サービス層ダミー実装（ClusterSelectorService, TravelTimeCalculatorService, CatchphraseGeneratorService）
+- APIリソース実装（Props定義準拠）
+- Seederデータ拡充
 
-**現状の動作:**
+**想定される動作:**
 - 出発地（緯度経度）を手動入力
 - ダミーデータで提案生成（固定3件のクラスター）
 - ステータス遷移の動作確認可能
 - モデルプラン表示可能
 
-### Phase 3: UI/UXブラッシュアップ 🔄 **[次のフェーズ]**
+### Phase 3: UI/UXブラッシュアップ
 
 **目的:** ユーザー体験の向上とデザイン完成度の向上
 
@@ -349,14 +349,14 @@ Phase 5の要件に基づき、出発地入力欄にPlaces APIサジェストを
 - 会員機能なしのためセッション・CSRF対策のみ
 - APIキーの適切な管理（.env、環境変数）
 
-### 10.2. チェックリスト
+### 10.2. 実装要件
 
-- ✅ CSRF保護（Laravel標準機能）
-- ✅ SQLインジェクション対策（Eloquent ORM使用）
-- ✅ XSS対策（React自動エスケープ、Laravel Blade使用時は手動対策）
-- ⚠️ 入力バリデーション（各Controllerで実装）
-- ⚠️ レート制限（Phase 5以降でAPI保護）
-- ❌ 認証・認可（MVP対象外、Phase 1以降）
+- CSRF保護（Laravel標準機能）
+- SQLインジェクション対策（Eloquent ORM使用）
+- XSS対策（React自動エスケープ、Laravel Blade使用時は手動対策）
+- 入力バリデーション（各Controllerで実装）
+- レート制限（Phase 5以降でAPI保護）
+- 認証・認可（MVP対象外、将来実装予定）
 
 ## 11. デプロイ戦略（検討中）
 
@@ -379,11 +379,13 @@ Phase 5の要件に基づき、出発地入力欄にPlaces APIサジェストを
 
 **決定タイミング:** Phase 6完了後、MVP動作確認完了時
 
-## 12. 次のアクション
+## 12. 実装の流れ
 
-1. **Phase 3タスクの詳細化** → `11_ProgressTracking.md` 参照
-2. **未完了のPhase 2タスク完了**（Seeder、Resourceクラス検証）
-3. **Phase 3開始判断**（現状の動作確認・デモ）
+各フェーズは以下の流れで進めることを推奨します：
+
+1. **フェーズ開始前**: `11_ProgressTracking.md` でタスクを詳細化
+2. **実装中**: 進捗を `11_ProgressTracking.md` に記録
+3. **フェーズ完了時**: 完了条件を満たしているか確認し、次フェーズへ移行判断
 
 ---
 

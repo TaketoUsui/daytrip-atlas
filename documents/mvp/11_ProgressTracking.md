@@ -20,7 +20,7 @@
 | フェーズ | 状態 | 進捗率 | 開始日 | 完了予定日 | 実完了日 |
 |---------|------|--------|--------|-----------|----------|
 | Phase 1: 基盤構築 | ✅ 完了 | 100% | 2025-10-25 | - | 2025-11-08 |
-| Phase 2: スケルトン実装 | 🔄 進行中 | 85% | 2025-11-08 | 2025-11-10 | - |
+| Phase 2: スケルトン実装 | ✅ 完了 | 100% | 2025-11-08 | 2025-11-10 | 2025-11-09 |
 | Phase 3: UI/UXブラッシュアップ | ❌ 未着手 | 0% | 2025-11-11 | 2025-11-15 | - |
 | Phase 4: AI統合 | ❌ 未着手 | 0% | 2025-11-16 | 2025-11-20 | - |
 | Phase 5: 位置情報統合 | ❌ 未着手 | 0% | 2025-11-21 | 2025-11-25 | - |
@@ -53,7 +53,7 @@
 
 ---
 
-## 4. Phase 2: コア機能スケルトン実装 🔄 **[進行中: 85%]**
+## 4. Phase 2: コア機能スケルトン実装 ✅ **[完了: 100%]**
 
 ### 4.1. バックエンドタスク
 
@@ -65,15 +65,15 @@
 | 2.4 | ClusterController実装 | - | ✅ | `app/Http/Controllers/ClusterController.php` | show |
 | 2.5 | GenerateSuggestionsJob実装 | - | ✅ | `app/Jobs/GenerateSuggestionsJob.php` | ステータス遷移、ダミーデータ生成 |
 | 2.6 | ClusterSelectorService（ダミー版） | - | ✅ | `app/Services/ClusterSelectorService.php` | 固定3件返却 |
-| 2.7 | TravelTimeCalculatorService（ダミー版） | - | ⚠️ | `app/Services/TravelTimeCalculatorService.php` | 実装要確認 |
-| 2.8 | CatchphraseGeneratorService（ダミー版） | - | ⚠️ | `app/Services/CatchphraseGeneratorService.php` | 実装要確認 |
+| 2.7 | TravelTimeCalculatorService（ダミー版） | - | ✅ | `app/Services/TravelTimeCalculatorService.php` | ハバーサイン公式で距離計算実装済み |
+| 2.8 | CatchphraseGeneratorService（ダミー版） | - | ✅ | `app/Services/CatchphraseGeneratorService.php` | クラスター名含むダミー生成 |
 | 2.9 | SuggestionSetResource実装 | - | ✅ | `app/Http/Resources/SuggestionSetResource.php` | Props定義準拠 |
-| 2.10 | SuggestionSetItemResource実装 | - | ⚠️ | `app/Http/Resources/SuggestionSetItemResource.php` | Props定義準拠確認必要 |
-| 2.11 | ClusterResource実装 | - | ⚠️ | `app/Http/Resources/ClusterResource.php` | Props定義準拠確認必要 |
-| 2.12 | ModelPlanResource実装 | - | ⚠️ | `app/Http/Resources/ModelPlanResource.php` | Props定義準拠確認必要 |
-| 2.13 | ModelPlanItemResource実装 | - | ⚠️ | `app/Http/Resources/ModelPlanItemResource.php` | Props定義準拠確認必要 |
-| 2.14 | SpotResource実装 | - | ⚠️ | `app/Http/Resources/SpotResource.php` | Props定義準拠確認必要 |
-| 2.15 | Seederデータ拡充 | - | 🔄 | `database/seeders/*.php` | git statusで変更検出、未コミット |
+| 2.10 | SuggestionSetItemResource実装 | - | ✅ | `app/Http/Resources/SuggestionSetItemResource.php` | Props定義準拠確認済み |
+| 2.11 | ClusterResource実装 | - | ✅ | `app/Http/Resources/ClusterResource.php` | key_visual_url追加、Props定義準拠 |
+| 2.12 | ModelPlanResource実装 | - | ✅ | `app/Http/Resources/ModelPlanResource.php` | Props定義準拠確認済み |
+| 2.13 | ModelPlanItemResource実装 | - | ✅ | `app/Http/Resources/ModelPlanItemResource.php` | spot_description修正、Props定義準拠 |
+| 2.14 | SpotResource実装 | - | ✅ | `app/Http/Resources/SpotResource.php` | uuid, latitude, longitude追加 |
+| 2.15 | Seederデータ拡充 | - | ✅ | `database/seeders/*.php` | 十分なデモデータ投入済み |
 
 **未完了タスク詳細:**
 
@@ -170,9 +170,9 @@ M database/seeders/SpotSeeder.php
 | 2.18 | Top/Indexページ | - | ✅ | `resources/js/Pages/Top/Index.jsx` | 緯度経度手動入力フォーム |
 | 2.19 | Suggestion/Showページ | - | ✅ | `resources/js/Pages/Suggestion/Show.jsx` | ポーリング・条件分岐 |
 | 2.20 | Cluster/Detailページ | - | ✅ | `resources/js/Pages/Cluster/Detail.jsx` | 基本レイアウト |
-| 2.21 | SuggestionLoadingコンポーネント | - | ⚠️ | `resources/js/Components/Domain/Suggestion/SuggestionLoading.jsx` | 存在確認・実装確認必要 |
-| 2.22 | SuggestionCardコンポーネント | - | ⚠️ | `resources/js/Components/Domain/Suggestion/SuggestionCard.jsx` | 存在確認・実装確認必要 |
-| 2.23 | ModelPlanTimelineコンポーネント | - | ⚠️ | `resources/js/Components/Domain/Cluster/ModelPlanTimeline.jsx` | 存在確認・実装確認必要 |
+| 2.21 | SuggestionLoadingコンポーネント | - | ✅ | `resources/js/Components/Domain/Suggestion/SuggestionLoading.jsx` | 実装済み・動作確認済み |
+| 2.22 | SuggestionCardコンポーネント | - | ✅ | `resources/js/Components/Domain/Suggestion/SuggestionCard.jsx` | 実装済み・動作確認済み |
+| 2.23 | ModelPlanTimelineコンポーネント | - | ✅ | `resources/js/Components/Domain/Cluster/ModelPlanTimeline.jsx` | spot_description修正済み |
 
 **未完了タスク詳細:**
 
@@ -188,18 +188,22 @@ M database/seeders/SpotSeeder.php
 
 **動作確認項目:**
 
-- [ ] トップページで緯度経度を入力し、提案リクエストを送信できる
-- [ ] 提案待機ページが表示され、3秒ごとにステータスがポーリングされる
-- [ ] ステータスが `pending` → `processing_clusters` → `analyzing_items` → `complete` と遷移する
-- [ ] 提案完了後、3件の提案カードが表示される
-- [ ] 提案カードをクリックすると、クラスター詳細ページに遷移する
-- [ ] クラスター詳細ページでモデルプランのタイムラインが表示される
-- [ ] キューワーカーが正常に動作し、Jobが処理される
+- [x] トップページで緯度経度を入力し、提案リクエストを送信できる
+- [x] 提案待機ページが表示され、3秒ごとにステータスがポーリングされる
+- [x] ステータスが `pending` → `processing_clusters` → `analyzing_items` → `complete` と遷移する
+- [x] 提案完了後、3件の提案カードが表示される
+- [x] 提案カードをクリックすると、クラスター詳細ページに遷移する
+- [x] クラスター詳細ページでモデルプランのタイムラインが表示される
+- [x] キューワーカーが正常に動作し、Jobが処理される
 
-**未解決の課題:**
-- ResourceクラスがProps定義と完全に一致しているか未検証
-- Domainコンポーネント（SuggestionCard等）の実装状況不明
-- Seederの変更内容が未コミット
+**完了日:** 2025-11-09
+
+**Phase 2で実施した作業:**
+- ✅ 全Resourceクラスが6_PagePropsDefinition.mdに完全準拠
+- ✅ サービス層（TravelTimeCalculatorService, CatchphraseGeneratorService）の実装完了
+- ✅ 全Domainコンポーネント（SuggestionLoading, SuggestionCard, ModelPlanTimeline）実装済み
+- ✅ エンドツーエンドの動作確認完了（Jobが正常に3件の提案を生成）
+- ✅ キューワーカー正常動作確認
 
 ---
 
@@ -469,6 +473,6 @@ LIMIT 10;
 
 ---
 
-**最終更新:** 2025-11-09
+**最終更新:** 2025-11-09 17:05 (Phase 2完了)
 **作成者:** Claude Code
 **レビュー:** 未実施
