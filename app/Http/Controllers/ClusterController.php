@@ -23,8 +23,8 @@ class ClusterController extends Controller
         ]);
 
         return Inertia::render('Cluster/Detail', [
-            'cluster' => new ClusterResource($cluster),
-            'modelPlan' => new ModelPlanResource($cluster->defaultModelPlan),
+            'cluster' => (new ClusterResource($cluster))->resolve(),
+            'modelPlan' => (new ModelPlanResource($cluster->defaultModelPlan))->resolve(),
         ]);
     }
 }

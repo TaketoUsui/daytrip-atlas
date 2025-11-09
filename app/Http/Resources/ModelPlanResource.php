@@ -21,7 +21,7 @@ class ModelPlanResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'total_duration_minutes' => $this->total_duration_minutes,
-            'items' => ModelPlanItemResource::collection($this->whenLoaded('items')),
+            'items' => ModelPlanItemResource::collection($this->whenLoaded('items'))->resolve(),
         ];
     }
 }

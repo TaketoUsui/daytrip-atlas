@@ -24,7 +24,7 @@ class SuggestionController extends Controller
         ]);
 
         return Inertia::render('Suggestion/Show', [
-            'suggestionSet' => new SuggestionSetResource($suggestionSet),
+            'suggestionSet' => (new SuggestionSetResource($suggestionSet))->resolve(),
         ]);
     }
 }
