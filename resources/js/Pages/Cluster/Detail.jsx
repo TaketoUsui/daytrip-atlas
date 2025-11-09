@@ -5,7 +5,7 @@ import ModelPlanTimeline from '../../Components/Domain/Cluster/ModelPlanTimeline
 export default function Detail({ cluster, modelPlan }) {
     return (
         <AppLayout>
-            <div className="max-w-4xl mx-auto px-4 py-12">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* 戻るリンク */}
                 <Link
                     href="/"
@@ -28,8 +28,8 @@ export default function Detail({ cluster, modelPlan }) {
                 </Link>
 
                 {/* クラスター情報 */}
-                <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
                         {cluster.name}
                     </h1>
 
@@ -42,9 +42,9 @@ export default function Detail({ cluster, modelPlan }) {
 
                 {/* モデルプラン */}
                 {modelPlan && (
-                    <div className="bg-white rounded-lg shadow-md p-8">
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+                        <div className="mb-6 sm:mb-8">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                                 {modelPlan.name}
                             </h2>
 

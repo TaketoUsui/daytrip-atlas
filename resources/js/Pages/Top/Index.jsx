@@ -58,66 +58,78 @@ export default function Index() {
 
     return (
         <AppLayout>
-            <div className="max-w-2xl mx-auto px-4 py-12">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* ヘッダー */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                <div className="text-center mb-8 sm:mb-12">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
                         日帰り旅行の目的地を探しましょう
                     </h1>
-                    <p className="text-lg text-gray-600">
+                    <p className="text-base sm:text-lg text-gray-600 px-2">
                         出発地の緯度・経度を入力して、おすすめの日帰り旅行先を見つけましょう
                     </p>
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-2">
                         ※Phase 5でGoogle Places/GPS機能を統合予定
                     </p>
                 </div>
 
                 {/* フォーム */}
-                <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8">
+                <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 sm:p-8" aria-label="出発地入力フォーム">
                     {/* 緯度入力 */}
                     <div className="mb-6">
                         <label htmlFor="latitude" className="block text-sm font-medium text-gray-700 mb-2">
-                            緯度
+                            緯度 <span className="text-red-500" aria-label="必須">*</span>
                         </label>
                         <input
                             type="text"
                             id="latitude"
+                            name="latitude"
                             value={latitude}
                             onChange={(e) => setLatitude(e.target.value)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                 errors.latitude ? 'border-red-500' : 'border-gray-300'
                             }`}
                             placeholder="例: 35.6812"
+                            aria-required="true"
+                            aria-invalid={!!errors.latitude}
+                            aria-describedby={errors.latitude ? 'latitude-error' : undefined}
                         />
                         {errors.latitude && (
-                            <p className="mt-1 text-sm text-red-600">{errors.latitude}</p>
+                            <p id="latitude-error" className="mt-1 text-sm text-red-600" role="alert">
+                                {errors.latitude}
+                            </p>
                         )}
                     </div>
 
                     {/* 経度入力 */}
                     <div className="mb-6">
                         <label htmlFor="longitude" className="block text-sm font-medium text-gray-700 mb-2">
-                            経度
+                            経度 <span className="text-red-500" aria-label="必須">*</span>
                         </label>
                         <input
                             type="text"
                             id="longitude"
+                            name="longitude"
                             value={longitude}
                             onChange={(e) => setLongitude(e.target.value)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                 errors.longitude ? 'border-red-500' : 'border-gray-300'
                             }`}
                             placeholder="例: 139.7671"
+                            aria-required="true"
+                            aria-invalid={!!errors.longitude}
+                            aria-describedby={errors.longitude ? 'longitude-error' : undefined}
                         />
                         {errors.longitude && (
-                            <p className="mt-1 text-sm text-red-600">{errors.longitude}</p>
+                            <p id="longitude-error" className="mt-1 text-sm text-red-600" role="alert">
+                                {errors.longitude}
+                            </p>
                         )}
                     </div>
 
                     {/* サンプル座標ボタン */}
                     <div className="mb-6">
                         <p className="text-sm font-medium text-gray-700 mb-2">サンプル座標:</p>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
                             <button
                                 type="button"
                                 onClick={() => setSampleLocation(34.6937, 135.5023, '大阪')}
