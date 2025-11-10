@@ -20,512 +20,467 @@ class ChibaSeeder extends Seeder
      */
     public function run(): void
     {
-        $clusters = array (
-  0 => 
-  array (
-    'admin_code' => 12101,
-    'name' => '千葉県千葉市中央区',
-    'lat' => 35.609001,
-    'lon' => 140.124589,
-    'office_count' => 3,
-    'main_office_count' => 1,
-  ),
-  1 => 
-  array (
-    'admin_code' => 12102,
-    'name' => '千葉県千葉市花見川区',
-    'lat' => 35.662876,
-    'lon' => 140.069061,
-    'office_count' => 3,
-    'main_office_count' => 1,
-  ),
-  2 => 
-  array (
-    'admin_code' => 12103,
-    'name' => '千葉県千葉市稲毛区',
-    'lat' => 35.636202,
-    'lon' => 140.107106,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  3 => 
-  array (
-    'admin_code' => 12104,
-    'name' => '千葉県千葉市若葉区',
-    'lat' => 35.634016,
-    'lon' => 140.155653,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  4 => 
-  array (
-    'admin_code' => 12105,
-    'name' => '千葉県千葉市緑区',
-    'lat' => 35.560501,
-    'lon' => 140.176153,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  5 => 
-  array (
-    'admin_code' => 12106,
-    'name' => '千葉県千葉市美浜区',
-    'lat' => 35.640552,
-    'lon' => 140.06304,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  6 => 
-  array (
-    'admin_code' => 12202,
-    'name' => '千葉県銚子市',
-    'lat' => 35.734667,
-    'lon' => 140.826791,
-    'office_count' => 4,
-    'main_office_count' => 1,
-  ),
-  7 => 
-  array (
-    'admin_code' => 12203,
-    'name' => '千葉県市川市',
-    'lat' => 35.721914,
-    'lon' => 139.931013,
-    'office_count' => 6,
-    'main_office_count' => 1,
-  ),
-  8 => 
-  array (
-    'admin_code' => 12204,
-    'name' => '千葉県船橋市',
-    'lat' => 35.694711,
-    'lon' => 139.982621,
-    'office_count' => 13,
-    'main_office_count' => 1,
-  ),
-  9 => 
-  array (
-    'admin_code' => 12205,
-    'name' => '千葉県館山市',
-    'lat' => 34.996608,
-    'lon' => 139.870085,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  10 => 
-  array (
-    'admin_code' => 12206,
-    'name' => '千葉県木更津市',
-    'lat' => 35.375969,
-    'lon' => 139.916884,
-    'office_count' => 11,
-    'main_office_count' => 1,
-  ),
-  11 => 
-  array (
-    'admin_code' => 12207,
-    'name' => '千葉県松戸市',
-    'lat' => 35.787652,
-    'lon' => 139.903226,
-    'office_count' => 9,
-    'main_office_count' => 1,
-  ),
-  12 => 
-  array (
-    'admin_code' => 12208,
-    'name' => '千葉県野田市',
-    'lat' => 35.955106,
-    'lon' => 139.874828,
-    'office_count' => 5,
-    'main_office_count' => 1,
-  ),
-  13 => 
-  array (
-    'admin_code' => 12211,
-    'name' => '千葉県成田市',
-    'lat' => 35.776605,
-    'lon' => 140.318781,
-    'office_count' => 5,
-    'main_office_count' => 1,
-  ),
-  14 => 
-  array (
-    'admin_code' => 12212,
-    'name' => '千葉県佐倉市',
-    'lat' => 35.723441,
-    'lon' => 140.223972,
-    'office_count' => 7,
-    'main_office_count' => 1,
-  ),
-  15 => 
-  array (
-    'admin_code' => 12213,
-    'name' => '千葉県東金市',
-    'lat' => 35.559932,
-    'lon' => 140.366115,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  16 => 
-  array (
-    'admin_code' => 12215,
-    'name' => '千葉県旭市',
-    'lat' => 35.720454,
-    'lon' => 140.64659,
-    'office_count' => 4,
-    'main_office_count' => 1,
-  ),
-  17 => 
-  array (
-    'admin_code' => 12216,
-    'name' => '千葉県習志野市',
-    'lat' => 35.682932,
-    'lon' => 140.024384,
-    'office_count' => 4,
-    'main_office_count' => 1,
-  ),
-  18 => 
-  array (
-    'admin_code' => 12217,
-    'name' => '千葉県柏市',
-    'lat' => 35.868295,
-    'lon' => 139.976199,
-    'office_count' => 12,
-    'main_office_count' => 1,
-  ),
-  19 => 
-  array (
-    'admin_code' => 12218,
-    'name' => '千葉県勝浦市',
-    'lat' => 35.152211,
-    'lon' => 140.320868,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  20 => 
-  array (
-    'admin_code' => 12219,
-    'name' => '千葉県市原市',
-    'lat' => 35.497897,
-    'lon' => 140.115594,
-    'office_count' => 11,
-    'main_office_count' => 1,
-  ),
-  21 => 
-  array (
-    'admin_code' => 12221,
-    'name' => '千葉県八千代市',
-    'lat' => 35.722381,
-    'lon' => 140.099915,
-    'office_count' => 8,
-    'main_office_count' => 1,
-  ),
-  22 => 
-  array (
-    'admin_code' => 12222,
-    'name' => '千葉県我孫子市',
-    'lat' => 35.864162,
-    'lon' => 140.028225,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  23 => 
-  array (
-    'admin_code' => 12223,
-    'name' => '千葉県鴨川市',
-    'lat' => 35.114017,
-    'lon' => 140.098805,
-    'office_count' => 5,
-    'main_office_count' => 1,
-  ),
-  24 => 
-  array (
-    'admin_code' => 12224,
-    'name' => '千葉県鎌ケ谷市',
-    'lat' => 35.776765,
-    'lon' => 140.000736,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  25 => 
-  array (
-    'admin_code' => 12225,
-    'name' => '千葉県君津市',
-    'lat' => 35.330424,
-    'lon' => 139.902561,
-    'office_count' => 5,
-    'main_office_count' => 1,
-  ),
-  26 => 
-  array (
-    'admin_code' => 12226,
-    'name' => '千葉県富津市',
-    'lat' => 35.30414,
-    'lon' => 139.857113,
-    'office_count' => 8,
-    'main_office_count' => 1,
-  ),
-  27 => 
-  array (
-    'admin_code' => 12227,
-    'name' => '千葉県浦安市',
-    'lat' => 35.653988,
-    'lon' => 139.902187,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  28 => 
-  array (
-    'admin_code' => 12228,
-    'name' => '千葉県四街道市',
-    'lat' => 35.669713,
-    'lon' => 140.167957,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  29 => 
-  array (
-    'admin_code' => 12229,
-    'name' => '千葉県袖ケ浦市',
-    'lat' => 35.429945,
-    'lon' => 139.954353,
-    'office_count' => 3,
-    'main_office_count' => 1,
-  ),
-  30 => 
-  array (
-    'admin_code' => 12231,
-    'name' => '千葉県印西市',
-    'lat' => 35.832332,
-    'lon' => 140.145765,
-    'office_count' => 10,
-    'main_office_count' => 1,
-  ),
-  31 => 
-  array (
-    'admin_code' => 12232,
-    'name' => '千葉県白井市',
-    'lat' => 35.791503,
-    'lon' => 140.056372,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  32 => 
-  array (
-    'admin_code' => 12233,
-    'name' => '千葉県富里市',
-    'lat' => 35.72681,
-    'lon' => 140.343071,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  33 => 
-  array (
-    'admin_code' => 12234,
-    'name' => '千葉県南房総市',
-    'lat' => 35.043147,
-    'lon' => 139.839997,
-    'office_count' => 7,
-    'main_office_count' => 1,
-  ),
-  34 => 
-  array (
-    'admin_code' => 12235,
-    'name' => '千葉県匝瑳市',
-    'lat' => 35.707914,
-    'lon' => 140.564356,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  35 => 
-  array (
-    'admin_code' => 12236,
-    'name' => '千葉県香取市',
-    'lat' => 35.89773,
-    'lon' => 140.499248,
-    'office_count' => 4,
-    'main_office_count' => 1,
-  ),
-  36 => 
-  array (
-    'admin_code' => 12237,
-    'name' => '千葉県山武市',
-    'lat' => 35.602992,
-    'lon' => 140.413531,
-    'office_count' => 4,
-    'main_office_count' => 1,
-  ),
-  37 => 
-  array (
-    'admin_code' => 12238,
-    'name' => '千葉県いすみ市',
-    'lat' => 35.253887,
-    'lon' => 140.385117,
-    'office_count' => 3,
-    'main_office_count' => 1,
-  ),
-  38 => 
-  array (
-    'admin_code' => 12322,
-    'name' => '千葉県酒々井町',
-    'lat' => 35.724751,
-    'lon' => 140.269483,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  39 => 
-  array (
-    'admin_code' => 12329,
-    'name' => '千葉県栄町',
-    'lat' => 35.840866,
-    'lon' => 140.243945,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  40 => 
-  array (
-    'admin_code' => 12342,
-    'name' => '千葉県神崎町',
-    'lat' => 35.901611,
-    'lon' => 140.405326,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  41 => 
-  array (
-    'admin_code' => 12347,
-    'name' => '千葉県多古町',
-    'lat' => 35.735592,
-    'lon' => 140.467727,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  42 => 
-  array (
-    'admin_code' => 12349,
-    'name' => '千葉県東庄町',
-    'lat' => 35.83715,
-    'lon' => 140.668786,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  43 => 
-  array (
-    'admin_code' => 12239,
-    'name' => '千葉県大網白里市',
-    'lat' => 35.521708,
-    'lon' => 140.320963,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  44 => 
-  array (
-    'admin_code' => 12403,
-    'name' => '千葉県九十九里町',
-    'lat' => 35.535065,
-    'lon' => 140.44025,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  45 => 
-  array (
-    'admin_code' => 12409,
-    'name' => '千葉県芝山町',
-    'lat' => 35.693064,
-    'lon' => 140.414255,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  46 => 
-  array (
-    'admin_code' => 12410,
-    'name' => '千葉県横芝光町',
-    'lat' => 35.665609,
-    'lon' => 140.504396,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  47 => 
-  array (
-    'admin_code' => 12421,
-    'name' => '千葉県一宮町',
-    'lat' => 35.372812,
-    'lon' => 140.368734,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  48 => 
-  array (
-    'admin_code' => 12422,
-    'name' => '千葉県睦沢町',
-    'lat' => 35.361091,
-    'lon' => 140.319275,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  49 => 
-  array (
-    'admin_code' => 12423,
-    'name' => '千葉県長生村',
-    'lat' => 35.412179,
-    'lon' => 140.354058,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  50 => 
-  array (
-    'admin_code' => 12424,
-    'name' => '千葉県白子町',
-    'lat' => 35.45434,
-    'lon' => 140.374253,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  51 => 
-  array (
-    'admin_code' => 12426,
-    'name' => '千葉県長柄町',
-    'lat' => 35.431152,
-    'lon' => 140.227073,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  52 => 
-  array (
-    'admin_code' => 12427,
-    'name' => '千葉県長南町',
-    'lat' => 35.386423,
-    'lon' => 140.237039,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  53 => 
-  array (
-    'admin_code' => 12441,
-    'name' => '千葉県大多喜町',
-    'lat' => 35.284822,
-    'lon' => 140.245419,
-    'office_count' => 3,
-    'main_office_count' => 1,
-  ),
-  54 => 
-  array (
-    'admin_code' => 12443,
-    'name' => '千葉県御宿町',
-    'lat' => 35.191484,
-    'lon' => 140.348785,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  55 => 
-  array (
-    'admin_code' => 12463,
-    'name' => '千葉県鋸南町',
-    'lat' => 35.111131,
-    'lon' => 139.835645,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-);
+        $clusters = array(
+            0 =>
+                array(
+                    'admin_code' => '12202',
+                    'name' => '千葉県銚子市',
+                    'lat' => 35.734667,
+                    'lon' => 140.826791,
+                    'office_count' => 4,
+                    'main_office_count' => 1,
+                ),
+            1 =>
+                array(
+                    'admin_code' => '12203',
+                    'name' => '千葉県市川市',
+                    'lat' => 35.721914,
+                    'lon' => 139.931013,
+                    'office_count' => 6,
+                    'main_office_count' => 1,
+                ),
+            2 =>
+                array(
+                    'admin_code' => '12204',
+                    'name' => '千葉県船橋市',
+                    'lat' => 35.694711,
+                    'lon' => 139.982621,
+                    'office_count' => 13,
+                    'main_office_count' => 1,
+                ),
+            3 =>
+                array(
+                    'admin_code' => '12205',
+                    'name' => '千葉県館山市',
+                    'lat' => 34.996608,
+                    'lon' => 139.870085,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            4 =>
+                array(
+                    'admin_code' => '12206',
+                    'name' => '千葉県木更津市',
+                    'lat' => 35.375969,
+                    'lon' => 139.916884,
+                    'office_count' => 11,
+                    'main_office_count' => 1,
+                ),
+            5 =>
+                array(
+                    'admin_code' => '12207',
+                    'name' => '千葉県松戸市',
+                    'lat' => 35.787652,
+                    'lon' => 139.903226,
+                    'office_count' => 9,
+                    'main_office_count' => 1,
+                ),
+            6 =>
+                array(
+                    'admin_code' => '12208',
+                    'name' => '千葉県野田市',
+                    'lat' => 35.955106,
+                    'lon' => 139.874828,
+                    'office_count' => 5,
+                    'main_office_count' => 1,
+                ),
+            7 =>
+                array(
+                    'admin_code' => '12211',
+                    'name' => '千葉県成田市',
+                    'lat' => 35.776605,
+                    'lon' => 140.318781,
+                    'office_count' => 5,
+                    'main_office_count' => 1,
+                ),
+            8 =>
+                array(
+                    'admin_code' => '12212',
+                    'name' => '千葉県佐倉市',
+                    'lat' => 35.723441,
+                    'lon' => 140.223972,
+                    'office_count' => 7,
+                    'main_office_count' => 1,
+                ),
+            9 =>
+                array(
+                    'admin_code' => '12213',
+                    'name' => '千葉県東金市',
+                    'lat' => 35.559932,
+                    'lon' => 140.366115,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            10 =>
+                array(
+                    'admin_code' => '12215',
+                    'name' => '千葉県旭市',
+                    'lat' => 35.720454,
+                    'lon' => 140.64659,
+                    'office_count' => 4,
+                    'main_office_count' => 1,
+                ),
+            11 =>
+                array(
+                    'admin_code' => '12216',
+                    'name' => '千葉県習志野市',
+                    'lat' => 35.682932,
+                    'lon' => 140.024384,
+                    'office_count' => 4,
+                    'main_office_count' => 1,
+                ),
+            12 =>
+                array(
+                    'admin_code' => '12217',
+                    'name' => '千葉県柏市',
+                    'lat' => 35.868295,
+                    'lon' => 139.976199,
+                    'office_count' => 12,
+                    'main_office_count' => 1,
+                ),
+            13 =>
+                array(
+                    'admin_code' => '12218',
+                    'name' => '千葉県勝浦市',
+                    'lat' => 35.152211,
+                    'lon' => 140.320868,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            14 =>
+                array(
+                    'admin_code' => '12219',
+                    'name' => '千葉県市原市',
+                    'lat' => 35.497897,
+                    'lon' => 140.115594,
+                    'office_count' => 11,
+                    'main_office_count' => 1,
+                ),
+            15 =>
+                array(
+                    'admin_code' => '12221',
+                    'name' => '千葉県八千代市',
+                    'lat' => 35.722381,
+                    'lon' => 140.099915,
+                    'office_count' => 8,
+                    'main_office_count' => 1,
+                ),
+            16 =>
+                array(
+                    'admin_code' => '12222',
+                    'name' => '千葉県我孫子市',
+                    'lat' => 35.864162,
+                    'lon' => 140.028225,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            17 =>
+                array(
+                    'admin_code' => '12223',
+                    'name' => '千葉県鴨川市',
+                    'lat' => 35.114017,
+                    'lon' => 140.098805,
+                    'office_count' => 5,
+                    'main_office_count' => 1,
+                ),
+            18 =>
+                array(
+                    'admin_code' => '12224',
+                    'name' => '千葉県鎌ケ谷市',
+                    'lat' => 35.776765,
+                    'lon' => 140.000736,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            19 =>
+                array(
+                    'admin_code' => '12225',
+                    'name' => '千葉県君津市',
+                    'lat' => 35.330424,
+                    'lon' => 139.902561,
+                    'office_count' => 5,
+                    'main_office_count' => 1,
+                ),
+            20 =>
+                array(
+                    'admin_code' => '12226',
+                    'name' => '千葉県富津市',
+                    'lat' => 35.30414,
+                    'lon' => 139.857113,
+                    'office_count' => 8,
+                    'main_office_count' => 1,
+                ),
+            21 =>
+                array(
+                    'admin_code' => '12227',
+                    'name' => '千葉県浦安市',
+                    'lat' => 35.653988,
+                    'lon' => 139.902187,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            22 =>
+                array(
+                    'admin_code' => '12228',
+                    'name' => '千葉県四街道市',
+                    'lat' => 35.669713,
+                    'lon' => 140.167957,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            23 =>
+                array(
+                    'admin_code' => '12229',
+                    'name' => '千葉県袖ケ浦市',
+                    'lat' => 35.429945,
+                    'lon' => 139.954353,
+                    'office_count' => 3,
+                    'main_office_count' => 1,
+                ),
+            24 =>
+                array(
+                    'admin_code' => '12231',
+                    'name' => '千葉県印西市',
+                    'lat' => 35.832332,
+                    'lon' => 140.145765,
+                    'office_count' => 10,
+                    'main_office_count' => 1,
+                ),
+            25 =>
+                array(
+                    'admin_code' => '12232',
+                    'name' => '千葉県白井市',
+                    'lat' => 35.791503,
+                    'lon' => 140.056372,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            26 =>
+                array(
+                    'admin_code' => '12233',
+                    'name' => '千葉県富里市',
+                    'lat' => 35.72681,
+                    'lon' => 140.343071,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            27 =>
+                array(
+                    'admin_code' => '12234',
+                    'name' => '千葉県南房総市',
+                    'lat' => 35.043147,
+                    'lon' => 139.839997,
+                    'office_count' => 7,
+                    'main_office_count' => 1,
+                ),
+            28 =>
+                array(
+                    'admin_code' => '12235',
+                    'name' => '千葉県匝瑳市',
+                    'lat' => 35.707914,
+                    'lon' => 140.564356,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            29 =>
+                array(
+                    'admin_code' => '12236',
+                    'name' => '千葉県香取市',
+                    'lat' => 35.89773,
+                    'lon' => 140.499248,
+                    'office_count' => 4,
+                    'main_office_count' => 1,
+                ),
+            30 =>
+                array(
+                    'admin_code' => '12237',
+                    'name' => '千葉県山武市',
+                    'lat' => 35.602992,
+                    'lon' => 140.413531,
+                    'office_count' => 4,
+                    'main_office_count' => 1,
+                ),
+            31 =>
+                array(
+                    'admin_code' => '12238',
+                    'name' => '千葉県いすみ市',
+                    'lat' => 35.253887,
+                    'lon' => 140.385117,
+                    'office_count' => 3,
+                    'main_office_count' => 1,
+                ),
+            32 =>
+                array(
+                    'admin_code' => '12322',
+                    'name' => '千葉県酒々井町',
+                    'lat' => 35.724751,
+                    'lon' => 140.269483,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            33 =>
+                array(
+                    'admin_code' => '12329',
+                    'name' => '千葉県栄町',
+                    'lat' => 35.840866,
+                    'lon' => 140.243945,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            34 =>
+                array(
+                    'admin_code' => '12342',
+                    'name' => '千葉県神崎町',
+                    'lat' => 35.901611,
+                    'lon' => 140.405326,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            35 =>
+                array(
+                    'admin_code' => '12347',
+                    'name' => '千葉県多古町',
+                    'lat' => 35.735592,
+                    'lon' => 140.467727,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            36 =>
+                array(
+                    'admin_code' => '12349',
+                    'name' => '千葉県東庄町',
+                    'lat' => 35.83715,
+                    'lon' => 140.668786,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            37 =>
+                array(
+                    'admin_code' => '12239',
+                    'name' => '千葉県大網白里市',
+                    'lat' => 35.521708,
+                    'lon' => 140.320963,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            38 =>
+                array(
+                    'admin_code' => '12403',
+                    'name' => '千葉県九十九里町',
+                    'lat' => 35.535065,
+                    'lon' => 140.44025,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            39 =>
+                array(
+                    'admin_code' => '12409',
+                    'name' => '千葉県芝山町',
+                    'lat' => 35.693064,
+                    'lon' => 140.414255,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            40 =>
+                array(
+                    'admin_code' => '12410',
+                    'name' => '千葉県横芝光町',
+                    'lat' => 35.665609,
+                    'lon' => 140.504396,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            41 =>
+                array(
+                    'admin_code' => '12421',
+                    'name' => '千葉県一宮町',
+                    'lat' => 35.372812,
+                    'lon' => 140.368734,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            42 =>
+                array(
+                    'admin_code' => '12422',
+                    'name' => '千葉県睦沢町',
+                    'lat' => 35.361091,
+                    'lon' => 140.319275,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            43 =>
+                array(
+                    'admin_code' => '12423',
+                    'name' => '千葉県長生村',
+                    'lat' => 35.412179,
+                    'lon' => 140.354058,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            44 =>
+                array(
+                    'admin_code' => '12424',
+                    'name' => '千葉県白子町',
+                    'lat' => 35.45434,
+                    'lon' => 140.374253,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            45 =>
+                array(
+                    'admin_code' => '12426',
+                    'name' => '千葉県長柄町',
+                    'lat' => 35.431152,
+                    'lon' => 140.227073,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            46 =>
+                array(
+                    'admin_code' => '12427',
+                    'name' => '千葉県長南町',
+                    'lat' => 35.386423,
+                    'lon' => 140.237039,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            47 =>
+                array(
+                    'admin_code' => '12441',
+                    'name' => '千葉県大多喜町',
+                    'lat' => 35.284822,
+                    'lon' => 140.245419,
+                    'office_count' => 3,
+                    'main_office_count' => 1,
+                ),
+            48 =>
+                array(
+                    'admin_code' => '12443',
+                    'name' => '千葉県御宿町',
+                    'lat' => 35.191484,
+                    'lon' => 140.348785,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            49 =>
+                array(
+                    'admin_code' => '12463',
+                    'name' => '千葉県鋸南町',
+                    'lat' => 35.111131,
+                    'lon' => 139.835645,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            50 =>
+                array(
+                    'admin_code' => '12100',
+                    'name' => '千葉県千葉市',
+                    'lat' => 35.607331,
+                    'lon' => 140.10638,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+        );
 
         $now = Carbon::now();
 

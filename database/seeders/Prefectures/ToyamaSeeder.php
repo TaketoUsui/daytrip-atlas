@@ -20,134 +20,134 @@ class ToyamaSeeder extends Seeder
      */
     public function run(): void
     {
-        $clusters = array (
-  0 => 
-  array (
-    'admin_code' => 16201,
-    'name' => '富山県富山市',
-    'lat' => 36.695982,
-    'lon' => 137.213449,
-    'office_count' => 7,
-    'main_office_count' => 1,
-  ),
-  1 => 
-  array (
-    'admin_code' => 16202,
-    'name' => '富山県高岡市',
-    'lat' => 36.754099,
-    'lon' => 137.025717,
-    'office_count' => 5,
-    'main_office_count' => 1,
-  ),
-  2 => 
-  array (
-    'admin_code' => 16204,
-    'name' => '富山県魚津市',
-    'lat' => 36.827367,
-    'lon' => 137.40919,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  3 => 
-  array (
-    'admin_code' => 16205,
-    'name' => '富山県氷見市',
-    'lat' => 36.855978,
-    'lon' => 136.972868,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  4 => 
-  array (
-    'admin_code' => 16206,
-    'name' => '富山県滑川市',
-    'lat' => 36.764394,
-    'lon' => 137.34118,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  5 => 
-  array (
-    'admin_code' => 16207,
-    'name' => '富山県黒部市',
-    'lat' => 36.87359,
-    'lon' => 137.449095,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  6 => 
-  array (
-    'admin_code' => 16208,
-    'name' => '富山県砺波市',
-    'lat' => 36.647467,
-    'lon' => 136.962167,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  7 => 
-  array (
-    'admin_code' => 16209,
-    'name' => '富山県小矢部市',
-    'lat' => 36.675531,
-    'lon' => 136.868653,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  8 => 
-  array (
-    'admin_code' => 16211,
-    'name' => '富山県射水市',
-    'lat' => 36.712222,
-    'lon' => 137.099559,
-    'office_count' => 6,
-    'main_office_count' => 1,
-  ),
-  9 => 
-  array (
-    'admin_code' => 16321,
-    'name' => '富山県舟橋村',
-    'lat' => 36.703525,
-    'lon' => 137.307372,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  10 => 
-  array (
-    'admin_code' => 16322,
-    'name' => '富山県上市町',
-    'lat' => 36.698429,
-    'lon' => 137.362586,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  11 => 
-  array (
-    'admin_code' => 16323,
-    'name' => '富山県立山町',
-    'lat' => 36.663346,
-    'lon' => 137.313658,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-  12 => 
-  array (
-    'admin_code' => 16342,
-    'name' => '富山県入善町',
-    'lat' => 36.933578,
-    'lon' => 137.502128,
-    'office_count' => 2,
-    'main_office_count' => 1,
-  ),
-  13 => 
-  array (
-    'admin_code' => 16343,
-    'name' => '富山県朝日町',
-    'lat' => 36.946179,
-    'lon' => 137.559868,
-    'office_count' => 1,
-    'main_office_count' => 1,
-  ),
-);
+        $clusters = array(
+            0 =>
+                array(
+                    'admin_code' => '16201',
+                    'name' => '富山県富山市',
+                    'lat' => 36.695982,
+                    'lon' => 137.213449,
+                    'office_count' => 7,
+                    'main_office_count' => 1,
+                ),
+            1 =>
+                array(
+                    'admin_code' => '16202',
+                    'name' => '富山県高岡市',
+                    'lat' => 36.754099,
+                    'lon' => 137.025717,
+                    'office_count' => 5,
+                    'main_office_count' => 1,
+                ),
+            2 =>
+                array(
+                    'admin_code' => '16204',
+                    'name' => '富山県魚津市',
+                    'lat' => 36.827367,
+                    'lon' => 137.40919,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            3 =>
+                array(
+                    'admin_code' => '16205',
+                    'name' => '富山県氷見市',
+                    'lat' => 36.855978,
+                    'lon' => 136.972868,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            4 =>
+                array(
+                    'admin_code' => '16206',
+                    'name' => '富山県滑川市',
+                    'lat' => 36.764394,
+                    'lon' => 137.34118,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            5 =>
+                array(
+                    'admin_code' => '16207',
+                    'name' => '富山県黒部市',
+                    'lat' => 36.87359,
+                    'lon' => 137.449095,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            6 =>
+                array(
+                    'admin_code' => '16208',
+                    'name' => '富山県砺波市',
+                    'lat' => 36.647467,
+                    'lon' => 136.962167,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            7 =>
+                array(
+                    'admin_code' => '16209',
+                    'name' => '富山県小矢部市',
+                    'lat' => 36.675531,
+                    'lon' => 136.868653,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            8 =>
+                array(
+                    'admin_code' => '16211',
+                    'name' => '富山県射水市',
+                    'lat' => 36.712222,
+                    'lon' => 137.099559,
+                    'office_count' => 6,
+                    'main_office_count' => 1,
+                ),
+            9 =>
+                array(
+                    'admin_code' => '16321',
+                    'name' => '富山県舟橋村',
+                    'lat' => 36.703525,
+                    'lon' => 137.307372,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            10 =>
+                array(
+                    'admin_code' => '16322',
+                    'name' => '富山県上市町',
+                    'lat' => 36.698429,
+                    'lon' => 137.362586,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            11 =>
+                array(
+                    'admin_code' => '16323',
+                    'name' => '富山県立山町',
+                    'lat' => 36.663346,
+                    'lon' => 137.313658,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+            12 =>
+                array(
+                    'admin_code' => '16342',
+                    'name' => '富山県入善町',
+                    'lat' => 36.933578,
+                    'lon' => 137.502128,
+                    'office_count' => 2,
+                    'main_office_count' => 1,
+                ),
+            13 =>
+                array(
+                    'admin_code' => '16343',
+                    'name' => '富山県朝日町',
+                    'lat' => 36.946179,
+                    'lon' => 137.559868,
+                    'office_count' => 1,
+                    'main_office_count' => 1,
+                ),
+        );
 
         $now = Carbon::now();
 
