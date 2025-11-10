@@ -59,9 +59,15 @@ class GenerateSuggestionsJob implements ShouldQueue
                 3
             );
 
+            // 見つかったクラスター名を保存
+            $clusterNames = $clusters->pluck('name')->toArray();
+
             // ステータス更新: processing_clusters → analyzing_items
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::AnalyzingItems,
+                'processing_details' => [
+                    'found_clusters' => $clusterNames,
+                ],
             ]);
 
             // Phase 2ではsleep不要だが、リアルなデモのため3秒待機
