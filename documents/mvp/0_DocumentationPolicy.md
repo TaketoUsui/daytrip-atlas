@@ -124,11 +124,11 @@
                         * `key_visual_url`: (string)
                         * `catchphrase_content`: (string)
                         * `travel_time_text`: (string)
-        * **Component:** `Cluster/Detail` (観光地域詳細ページ)
+        * **Component:** `Suggestion/Detail` (提案アイテム詳細ページ)
             * Props:
+                * `suggestionSetItem`: (Object)
                 * `cluster`: (Object)
                 * `modelPlan`: (Object)
-                * `spots`: (Array\<Object\>)
 * **オーナー:** バックエンド開発者 / フロントエンド開発者
 * **こだわりポイント:**
     * データの型、必須/任意（Null許容性）を厳密に定義する。

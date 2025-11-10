@@ -72,19 +72,25 @@ interface SharedProps {
 
 -----
 
-### 3.3. 観光地域詳細ページ
+### 3.3. 提案アイテム詳細ページ
 
-* **Component:** `Cluster/Detail`
-* **Controller:** `ClusterController@show` (仮)
-* **説明:** 提案結果一覧から選択された、個別の観光地域（クラスター）の詳細ページ。モデルプランやスポット情報を表示する。
+* **Component:** `Suggestion/Detail`
+* **Controller:** `SuggestionSetItemController@show`
+* **Route:** `/suggestions/detail/{suggestionSetItem:uuid}`
+* **説明:** 提案結果一覧から選択された、パーソナライズされた観光地提案の詳細ページ。キービジュアル、キャッチコピー、モデルプランやスポット情報を表示する。
 
 | Prop名 | データ型 | 説明 |
 | --- | --- | --- |
-| `cluster` | Object | 観光地域（`clusters`）の基本情報。 |
+| `suggestionSetItem` | Object | 提案アイテム（`suggestion_set_items`）の情報。 |
+| `suggestionSetItem.uuid` | string | 提案アイテムのUUID。 |
+| `suggestionSetItem.suggestion_set_uuid` | string | 親提案セットのUUID（「提案一覧に戻る」リンク用）。 |
+| `suggestionSetItem.cluster_name` | string | クラスター名（例: "鎌倉エリア"）。 |
+| `suggestionSetItem.key_visual_url` | string | null | パーソナライズされたキービジュアル画像URL。 |
+| `suggestionSetItem.catchphrase` | string | null | AI生成されたキャッチコピー。 |
+| `suggestionSetItem.generated_travel_time_text` | string | null | 移動時間テキスト（例: "車で約1時間30分"）。 |
+| `cluster` | Object | クラスター基本情報（内部的な参照用）。 |
 | `cluster.uuid` | string | クラスターのUUID。 |
-| `cluster.name` | string | クラスター名（例: "鎌倉エリア"）。 |
-| `cluster.key_visual_url` | string | (新設) 詳細ページのヘッダー画像用。`suggestionSet.items` と同じ、または別の画像URL。 |
-| `cluster.description` | string | null | (新設) クラスターの概要説明文（あれば）。 |
+| `cluster.name` | string | クラスター名。 |
 | `modelPlan` | Object | このクラスターの代表モデルプラン（`model_plans`）の情報。 |
 | `modelPlan.name` | string | プラン名（例: "鎌倉王道 満喫プラン"）。 |
 | `modelPlan.description` | string | null | プランの概要説明文。 |

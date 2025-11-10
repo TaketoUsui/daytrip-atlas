@@ -21,7 +21,7 @@
 |---------|------|--------|--------|-----------|----------|
 | Phase 1: 基盤構築 | ✅ 完了 | 100% | 2025-10-25 | - | 2025-11-08 |
 | Phase 2: スケルトン実装 | ✅ 完了 | 100% | 2025-11-08 | 2025-11-10 | 2025-11-09 |
-| Phase 3: UI/UXブラッシュアップ | 🔄 進行中 | 60% | 2025-11-09 | 2025-11-15 | - |
+| Phase 3: UI/UXブラッシュアップ | 🔄 進行中 | 75% | 2025-11-09 | 2025-11-15 | - |
 | Phase 4: AI統合 | ❌ 未着手 | 0% | 2025-11-16 | 2025-11-20 | - |
 | Phase 5: 位置情報統合 | ❌ 未着手 | 0% | 2025-11-21 | 2025-11-25 | - |
 | Phase 6: PostGIS統合 | ❌ 未着手 | 0% | 2025-11-26 | 2025-11-30 | - |
@@ -62,7 +62,7 @@
 | 2.1 | ルート定義 | - | ✅ | `routes/web.php` | 全4ルート定義済み |
 | 2.2 | TopController実装 | - | ✅ | `app/Http/Controllers/TopController.php` | index, store |
 | 2.3 | SuggestionController実装 | - | ✅ | `app/Http/Controllers/SuggestionController.php` | show |
-| 2.4 | ClusterController実装 | - | ✅ | `app/Http/Controllers/ClusterController.php` | show |
+| 2.4 | SuggestionSetItemController実装 | - | ✅ | `app/Http/Controllers/SuggestionSetItemController.php` | show (パーソナライズされた提案詳細) |
 | 2.5 | GenerateSuggestionsJob実装 | - | ✅ | `app/Jobs/GenerateSuggestionsJob.php` | ステータス遷移、ダミーデータ生成 |
 | 2.6 | ClusterSelectorService（ダミー版） | - | ✅ | `app/Services/ClusterSelectorService.php` | 固定3件返却 |
 | 2.7 | TravelTimeCalculatorService（ダミー版） | - | ✅ | `app/Services/TravelTimeCalculatorService.php` | ハバーサイン公式で距離計算実装済み |
@@ -169,7 +169,7 @@ M database/seeders/SpotSeeder.php
 | 2.17 | Buttonコンポーネント | - | ✅ | `resources/js/Components/Shared/Button.jsx` | 再利用可能ボタン |
 | 2.18 | Top/Indexページ | - | ✅ | `resources/js/Pages/Top/Index.jsx` | 緯度経度手動入力フォーム |
 | 2.19 | Suggestion/Showページ | - | ✅ | `resources/js/Pages/Suggestion/Show.jsx` | ポーリング・条件分岐 |
-| 2.20 | Cluster/Detailページ | - | ✅ | `resources/js/Pages/Cluster/Detail.jsx` | 基本レイアウト |
+| 2.20 | Suggestion/Detailページ | - | ✅ | `resources/js/Pages/Suggestion/Detail.jsx` | パーソナライズされた提案詳細ページ |
 | 2.21 | SuggestionLoadingコンポーネント | - | ✅ | `resources/js/Components/Domain/Suggestion/SuggestionLoading.jsx` | 実装済み・動作確認済み |
 | 2.22 | SuggestionCardコンポーネント | - | ✅ | `resources/js/Components/Domain/Suggestion/SuggestionCard.jsx` | 実装済み・動作確認済み |
 | 2.23 | ModelPlanTimelineコンポーネント | - | ✅ | `resources/js/Components/Domain/Cluster/ModelPlanTimeline.jsx` | spot_description修正済み |
@@ -221,6 +221,9 @@ M database/seeders/SpotSeeder.php
 | 3.4 | Cardコンポーネント作成 | 中 | 2h | ✅ | 既存実装確認済み（ホバーサポート） |
 | 3.5 | Badgeコンポーネント作成 | 低 | 1h | ❌ | タグ表示用バッジ（Phase 4で検討） |
 | 3.6 | Iconコンポーネント統合 | 低 | 2h | ❌ | SVG直接使用で対応中（追加統合は後回し） |
+| 3.6a | フッター存在感の軽減 | 中 | 0.5h | ✅ | 背景色を薄く、パディング削減実装済み (2025-11-09) |
+| 3.6b | 待機ページ進捗表示改善 | 高 | 2h | ✅ | 見つかったクラスター名表示実装済み (2025-11-09) |
+| 3.6c | 設計修正: Cluster詳細→Suggestion詳細 | 高 | 4h | ✅ | パーソナライズされた提案詳細ページへ設計変更 (2025-11-09) |
 
 #### B. レスポンシブデザイン対応
 
@@ -228,7 +231,7 @@ M database/seeders/SpotSeeder.php
 |---|--------|--------|----------|------|------|
 | 3.7 | トップページ - モバイル対応 | 高 | 2h | ✅ | レスポンシブフォント、パディング、グリッド最適化 |
 | 3.8 | 提案結果一覧 - モバイル対応 | 高 | 3h | ✅ | カード1カラム表示、sm:2カラム、lg:3カラム |
-| 3.9 | クラスター詳細 - モバイル対応 | 高 | 3h | ✅ | レスポンシブパディング、タイムライン最適化 |
+| 3.9 | 提案詳細 - モバイル対応 | 高 | 3h | ✅ | レスポンシブパディング、タイムライン最適化 |
 | 3.10 | タブレット対応 | 中 | 2h | ✅ | sm/mdブレークポイントで2カラム対応済み |
 | 3.11 | デスクトップ対応 | 低 | 1h | ✅ | lgブレークポイントで3カラム対応済み |
 
@@ -489,7 +492,7 @@ LIMIT 10;
 - ✅ SuggestionLoading: パルスエフェクト付きローディング表示
 
 **B. レスポンシブデザイン対応:**
-- ✅ 全ページ（Top, Suggestion/Show, Cluster/Detail）でモバイル・タブレット・デスクトップ対応
+- ✅ 全ページ（Top, Suggestion/Show, Suggestion/Detail）でモバイル・タブレット・デスクトップ対応
 - ✅ レスポンシブフォントサイズ（text-sm sm:text-base lg:text-lg等）
 - ✅ レスポンシブパディング（p-4 sm:p-6 lg:p-8等）
 - ✅ グリッドレイアウト（grid-cols-1 sm:grid-cols-2 lg:grid-cols-3）

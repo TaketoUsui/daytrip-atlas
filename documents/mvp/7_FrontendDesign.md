@@ -85,11 +85,11 @@ resources/js/
 | `item.key_visual_url` | string | `items[].key_visual_url` | キービジュアルURL |
 | `item.catchphrase_content` | string | `items[].catchphrase_content` | キャッチコピー |
 | `item.generated_travel_time_text` | string | `items[].generated_travel_time_text` | 移動時間テキスト |
-| `href` | string | (派生) `items[].cluster_uuid` から生成 | カード全体のリンク先URL |
+| `href` | string | (派生) `items[].uuid` から生成 | カード全体のリンク先URL (`/suggestions/detail/{uuid}`) |
 
 #### `Components/Domain/Cluster/ModelPlanTimeline.jsx`
 
-詳細ページ（`Pages/Cluster/Detail.jsx`）で使用されるタイムラインコンポーネント。
+提案詳細ページ（`Pages/Suggestion/Detail.jsx`）で使用されるタイムラインコンポーネント。
 
 | Prop名 | データ型 | `ドキュメント6` の対応箇所 | 説明 |
 | --- | --- | --- | --- |
