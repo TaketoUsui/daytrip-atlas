@@ -30,49 +30,87 @@ export default function Detail({ suggestionSetItem, modelPlan }) {
 
                 {/* 提案情報 */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 sm:mb-8">
-                    {/* キービジュアル */}
-                    {suggestionSetItem.key_visual_url && (
-                        <div className="w-full h-48 sm:h-64 md:h-80 overflow-hidden">
+                    {/* キービジュアル with オーバーレイ */}
+                    {suggestionSetItem.key_visual_url ? (
+                        <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden">
+                            {/* 背景画像 */}
                             <img
                                 src={suggestionSetItem.key_visual_url}
                                 alt={suggestionSetItem.cluster_name}
                                 className="w-full h-full object-cover"
                             />
+
+                            {/* グラデーションオーバーレイ */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+
+                            {/* テキストオーバーレイ */}
+                            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 drop-shadow-lg">
+                                    {suggestionSetItem.cluster_name}
+                                </h1>
+
+                                {/* キャッチコピー */}
+                                {suggestionSetItem.catchphrase && (
+                                    <p className="text-white text-base sm:text-lg font-medium mb-4 leading-relaxed italic drop-shadow-md">
+                                        {suggestionSetItem.catchphrase}
+                                    </p>
+                                )}
+
+                                {/* 移動時間 */}
+                                {suggestionSetItem.generated_travel_time_text && (
+                                    <div className="flex items-center text-white text-sm sm:text-base drop-shadow-md">
+                                        <svg
+                                            className="w-5 h-5 mr-2 flex-shrink-0"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
+                                        </svg>
+                                        <span>{suggestionSetItem.generated_travel_time_text}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-6 sm:p-8">
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+                                {suggestionSetItem.cluster_name}
+                            </h1>
+
+                            {/* キャッチコピー */}
+                            {suggestionSetItem.catchphrase && (
+                                <p className="text-gray-700 text-base sm:text-lg font-medium mb-4 leading-relaxed italic">
+                                    {suggestionSetItem.catchphrase}
+                                </p>
+                            )}
+
+                            {/* 移動時間 */}
+                            {suggestionSetItem.generated_travel_time_text && (
+                                <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                                    <svg
+                                        className="w-5 h-5 mr-2 flex-shrink-0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                    <span>{suggestionSetItem.generated_travel_time_text}</span>
+                                </div>
+                            )}
                         </div>
                     )}
-
-                    <div className="p-6 sm:p-8">
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-                            {suggestionSetItem.cluster_name}
-                        </h1>
-
-                        {/* キャッチコピー */}
-                        {suggestionSetItem.catchphrase && (
-                            <p className="text-gray-700 text-base sm:text-lg font-medium mb-4 leading-relaxed italic">
-                                {suggestionSetItem.catchphrase}
-                            </p>
-                        )}
-
-                        {/* 移動時間 */}
-                        {suggestionSetItem.generated_travel_time_text && (
-                            <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                                <svg
-                                    className="w-5 h-5 mr-2 flex-shrink-0"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                                <span>{suggestionSetItem.generated_travel_time_text}</span>
-                            </div>
-                        )}
-                    </div>
                 </div>
 
                 {/* モデルプラン */}
