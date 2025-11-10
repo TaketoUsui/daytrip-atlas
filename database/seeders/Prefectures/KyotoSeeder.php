@@ -1,0 +1,345 @@
+<?php
+
+namespace Database\Seeders\Prefectures;
+
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+/**
+ * 京都府のクラスターデータをシードする
+ *
+ * このファイルは scripts/generate_prefecture_seeders.php によって自動生成されました。
+ * XMLファイルから抽出したデータがハードコードされています。
+ */
+class KyotoSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $clusters = array (
+  0 => 
+  array (
+    'admin_code' => 26101,
+    'name' => '京都府京都市北区',
+    'lat' => 35.04097,
+    'lon' => 135.753991,
+    'office_count' => 4,
+    'main_office_count' => 1,
+  ),
+  1 => 
+  array (
+    'admin_code' => 26102,
+    'name' => '京都府京都市上京区',
+    'lat' => 35.02953,
+    'lon' => 135.756697,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  2 => 
+  array (
+    'admin_code' => 26103,
+    'name' => '京都府京都市左京区',
+    'lat' => 35.04858,
+    'lon' => 135.778575,
+    'office_count' => 7,
+    'main_office_count' => 1,
+  ),
+  3 => 
+  array (
+    'admin_code' => 26104,
+    'name' => '京都府京都市中京区',
+    'lat' => 35.010404,
+    'lon' => 135.751433,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  4 => 
+  array (
+    'admin_code' => 26105,
+    'name' => '京都府京都市東山区',
+    'lat' => 34.997082,
+    'lon' => 135.776282,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  5 => 
+  array (
+    'admin_code' => 26106,
+    'name' => '京都府京都市下京区',
+    'lat' => 34.98756,
+    'lon' => 135.755469,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  6 => 
+  array (
+    'admin_code' => 26107,
+    'name' => '京都府京都市南区',
+    'lat' => 34.976756,
+    'lon' => 135.746418,
+    'office_count' => 2,
+    'main_office_count' => 1,
+  ),
+  7 => 
+  array (
+    'admin_code' => 26108,
+    'name' => '京都府京都市右京区',
+    'lat' => 35.010116,
+    'lon' => 135.715996,
+    'office_count' => 5,
+    'main_office_count' => 1,
+  ),
+  8 => 
+  array (
+    'admin_code' => 26109,
+    'name' => '京都府京都市伏見区',
+    'lat' => 34.935546,
+    'lon' => 135.761321,
+    'office_count' => 5,
+    'main_office_count' => 1,
+  ),
+  9 => 
+  array (
+    'admin_code' => 26111,
+    'name' => '京都府京都市西京区',
+    'lat' => 34.985027,
+    'lon' => 135.693108,
+    'office_count' => 2,
+    'main_office_count' => 1,
+  ),
+  10 => 
+  array (
+    'admin_code' => 26201,
+    'name' => '京都府福知山市',
+    'lat' => 35.296725,
+    'lon' => 135.126532,
+    'office_count' => 4,
+    'main_office_count' => 1,
+  ),
+  11 => 
+  array (
+    'admin_code' => 26202,
+    'name' => '京都府舞鶴市',
+    'lat' => 35.474797,
+    'lon' => 135.385992,
+    'office_count' => 3,
+    'main_office_count' => 1,
+  ),
+  12 => 
+  array (
+    'admin_code' => 26203,
+    'name' => '京都府綾部市',
+    'lat' => 35.298916,
+    'lon' => 135.258812,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  13 => 
+  array (
+    'admin_code' => 26204,
+    'name' => '京都府宇治市',
+    'lat' => 34.8844,
+    'lon' => 135.79978,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  14 => 
+  array (
+    'admin_code' => 26205,
+    'name' => '京都府宮津市',
+    'lat' => 35.535577,
+    'lon' => 135.195567,
+    'office_count' => 10,
+    'main_office_count' => 1,
+  ),
+  15 => 
+  array (
+    'admin_code' => 26206,
+    'name' => '京都府亀岡市',
+    'lat' => 35.013475,
+    'lon' => 135.573512,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  16 => 
+  array (
+    'admin_code' => 26207,
+    'name' => '京都府城陽市',
+    'lat' => 34.852958,
+    'lon' => 135.780074,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  17 => 
+  array (
+    'admin_code' => 26208,
+    'name' => '京都府向日市',
+    'lat' => 34.948699,
+    'lon' => 135.698319,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  18 => 
+  array (
+    'admin_code' => 26209,
+    'name' => '京都府長岡京市',
+    'lat' => 34.926782,
+    'lon' => 135.695685,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  19 => 
+  array (
+    'admin_code' => 26211,
+    'name' => '京都府京田辺市',
+    'lat' => 34.814442,
+    'lon' => 135.767842,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  20 => 
+  array (
+    'admin_code' => 26212,
+    'name' => '京都府京丹後市',
+    'lat' => 35.624169,
+    'lon' => 135.060997,
+    'office_count' => 6,
+    'main_office_count' => 1,
+  ),
+  21 => 
+  array (
+    'admin_code' => 26213,
+    'name' => '京都府南丹市',
+    'lat' => 35.10739,
+    'lon' => 135.470239,
+    'office_count' => 4,
+    'main_office_count' => 1,
+  ),
+  22 => 
+  array (
+    'admin_code' => 26214,
+    'name' => '京都府木津川市',
+    'lat' => 34.737179,
+    'lon' => 135.820058,
+    'office_count' => 4,
+    'main_office_count' => 1,
+  ),
+  23 => 
+  array (
+    'admin_code' => 26303,
+    'name' => '京都府大山崎町',
+    'lat' => 34.902795,
+    'lon' => 135.688476,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  24 => 
+  array (
+    'admin_code' => 26322,
+    'name' => '京都府久御山町',
+    'lat' => 34.881502,
+    'lon' => 135.732564,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  25 => 
+  array (
+    'admin_code' => 26343,
+    'name' => '京都府井手町',
+    'lat' => 34.798373,
+    'lon' => 135.803308,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  26 => 
+  array (
+    'admin_code' => 26344,
+    'name' => '京都府宇治田原町',
+    'lat' => 34.852665,
+    'lon' => 135.85685,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  27 => 
+  array (
+    'admin_code' => 26364,
+    'name' => '京都府笠置町',
+    'lat' => 34.760497,
+    'lon' => 135.93938,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  28 => 
+  array (
+    'admin_code' => 26365,
+    'name' => '京都府和束町',
+    'lat' => 34.795726,
+    'lon' => 135.904866,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  29 => 
+  array (
+    'admin_code' => 26366,
+    'name' => '京都府精華町',
+    'lat' => 34.760819,
+    'lon' => 135.785686,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  30 => 
+  array (
+    'admin_code' => 26367,
+    'name' => '京都府南山城村',
+    'lat' => 34.772787,
+    'lon' => 135.993665,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  31 => 
+  array (
+    'admin_code' => 26407,
+    'name' => '京都府京丹波町',
+    'lat' => 35.16435,
+    'lon' => 135.423267,
+    'office_count' => 3,
+    'main_office_count' => 1,
+  ),
+  32 => 
+  array (
+    'admin_code' => 26463,
+    'name' => '京都府伊根町',
+    'lat' => 35.675172,
+    'lon' => 135.272853,
+    'office_count' => 1,
+    'main_office_count' => 1,
+  ),
+  33 => 
+  array (
+    'admin_code' => 26465,
+    'name' => '京都府与謝野町',
+    'lat' => 35.565375,
+    'lon' => 135.152916,
+    'office_count' => 3,
+    'main_office_count' => 1,
+  ),
+);
+
+        $now = Carbon::now();
+
+        foreach ($clusters as $cluster) {
+            DB::table('clusters')->insert([
+                'uuid' => Str::uuid()->toString(),
+                'name' => $cluster['name'],
+                'location' => DB::raw("ST_GeogFromText('POINT({$cluster['lon']} {$cluster['lat']})')"),
+                'status' => 'published',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+    }
+}
