@@ -1,3 +1,5 @@
+import { formatDuration } from '../../../utils/timeFormat';
+
 export default function ModelPlanTimeline({ items }) {
     const getTravelModeIcon = (travelMode) => {
         const icons = {
@@ -53,7 +55,7 @@ export default function ModelPlanTimeline({ items }) {
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                 </svg>
-                                <span>滞在時間: {item.duration_minutes}分</span>
+                                <span>滞在時間: {formatDuration(item.duration_minutes)}</span>
                             </div>
                         </div>
                     </div>
@@ -65,7 +67,7 @@ export default function ModelPlanTimeline({ items }) {
                                 <span className="text-base sm:text-lg" role="img" aria-label={`${item.travel_mode}で移動`}>
                                     {getTravelModeIcon(item.travel_mode)}
                                 </span>
-                                <span className="text-xs sm:text-sm font-medium">{item.travel_time_to_next_minutes}分</span>
+                                <span className="text-xs sm:text-sm font-medium">{formatDuration(item.travel_time_to_next_minutes)}</span>
                             </div>
                         </div>
                     )}

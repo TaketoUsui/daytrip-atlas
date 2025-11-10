@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import AppLayout from '../../Components/Shared/AppLayout';
 import ModelPlanTimeline from '../../Components/Domain/Cluster/ModelPlanTimeline';
+import { formatDuration } from '../../utils/timeFormat';
 
 export default function Detail({ suggestionSetItem, modelPlan }) {
     return (
@@ -102,7 +103,7 @@ export default function Detail({ suggestionSetItem, modelPlan }) {
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                 </svg>
-                                <span>総所要時間: 約{modelPlan.total_duration_minutes}分</span>
+                                <span>総所要時間: 約{formatDuration(modelPlan.total_duration_minutes)}</span>
                             </div>
                         </div>
 
