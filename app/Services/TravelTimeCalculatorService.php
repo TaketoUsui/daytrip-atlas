@@ -3,17 +3,35 @@
 namespace App\Services;
 
 use App\Models\Cluster;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 出発地からクラスターまでの移動時間を計算するサービス
+ *
+ * Phase 6: PostGISを使用した距離ベース推定アルゴリズム
+ * - ST_Distanceで正確な距離計算
+ * - 道路状況を考慮した補正係数適用
+ * - 現実的な平均時速で移動時間を推定
  */
 class TravelTimeCalculatorService
 {
+    // 平均時速（km/h）: 高速道路と一般道の混在を想定
+    private const AVERAGE_SPEED_KMH = 60;
+
+    // 道路距離補正係数: 直線距離×1.3が実際の走行距離に近い
+    private const ROAD_DISTANCE_MULTIPLIER = 1.3;
+
+    // 出発準備時間（分）
+    private const PREPARATION_TIME_MINUTES = 15;
+
     /**
      * 出発地からクラスターまでの移動時間（分）を計算
      *
-     * Phase 2: 簡易計算（直線距離ベース）
-     * Phase 6: より精緻な計算に改善予定（Google Distance Matrix API検討）
+     * アルゴリズム:
+     * 1. PostGIS ST_Distanceで直線距離を計算
+     * 2. 道路距離補正係数（1.3倍）を適用
+     * 3. 平均時速60km/hで移動時間を計算
+     * 4. 出発準備時間（15分）を加算
      *
      * @param float $fromLatitude 出発地の緯度
      * @param float $fromLongitude 出発地の経度
@@ -30,19 +48,54 @@ class TravelTimeCalculatorService
             return 60;
         }
 
-        // 直線距離を計算（ハバーサイン公式）
-        $distanceKm = $this->calculateHaversineDistance(
+        // PostGISを使用して直線距離を計算（メートル単位）
+        $distanceMeters = $this->calculateDistanceWithPostGIS(
             $fromLatitude,
             $fromLongitude,
-            $clusterLocation->getLatitude(),
-            $clusterLocation->getLongitude()
+            $clusterLocation
         );
 
-        // 距離を移動時間に変換（時速40kmと仮定）
-        $travelTimeMinutes = (int)round(($distanceKm / 40) * 60);
+        // メートルをキロメートルに変換
+        $straightDistanceKm = $distanceMeters / 1000;
 
-        // 最小15分、最大180分で制限
-        return min(max($travelTimeMinutes, 15), 180);
+        // 道路距離を推定（直線距離×1.3）
+        $roadDistanceKm = $straightDistanceKm * self::ROAD_DISTANCE_MULTIPLIER;
+
+        // 移動時間を計算（時速60km）
+        $drivingTimeMinutes = ($roadDistanceKm / self::AVERAGE_SPEED_KMH) * 60;
+
+        // 出発準備時間を加算
+        $totalTimeMinutes = $drivingTimeMinutes + self::PREPARATION_TIME_MINUTES;
+
+        // 整数に丸める
+        $travelTimeMinutes = (int)round($totalTimeMinutes);
+
+        // 最小20分、最大240分（4時間）で制限
+        return min(max($travelTimeMinutes, 20), 240);
+    }
+
+    /**
+     * PostGISを使用して2地点間の距離を計算（メートル単位）
+     *
+     * @param float $fromLatitude 出発地の緯度
+     * @param float $fromLongitude 出発地の経度
+     * @param mixed $toLocation 目的地のlocation（Point型）
+     * @return float 距離（メートル）
+     */
+    private function calculateDistanceWithPostGIS(float $fromLatitude, float $fromLongitude, $toLocation): float
+    {
+        $result = DB::selectOne("
+            SELECT ST_Distance(
+                ST_MakePoint(?, ?)::geography,
+                ?::geography
+            ) as distance
+        ", [
+            $fromLongitude,
+            $fromLatitude,
+            $toLocation
+        ]);
+
+        return $result->distance ?? 0.0;
     }
 
     /**

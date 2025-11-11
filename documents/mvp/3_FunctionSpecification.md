@@ -152,12 +152,12 @@ Feature: 3. 提案結果の閲覧と比較
       | 観光地域名 | `clusters.name` (items経由) |
       | 移動時間 | `suggestion_set_items.generated_travel_time_text` |
       | タグ | `cluster.tags` |
-    And   各カードは、観光地域詳細ページ (機能4) へのリンクを持っている
+    And   各カードは、提案アイテム詳細ページ (機能4) へのリンクを持っている
 
   Scenario: ユーザーが特定の提案カードをクリックする
     When  ユーザーが "鎌倉" の観光地域カードをクリックする
-    Then  ユーザーは "鎌倉" の観光地域詳細ページ (Component: Cluster/Detail) に遷移する
-    And   遷移先のURLには`suggestion_set_items.uuid`が含まれる
+    Then  ユーザーは "鎌倉" の提案アイテム詳細ページ (Component: Suggestion/Detail) に遷移する
+    And   遷移先のURLには`suggestion_set_items.uuid`が含まれる (例: /suggestions/detail/{uuid})
 
   Scenario: 提案結果が0件だった場合
     When  バックエンド処理の結果、`suggestionSet.items` 配列が空 (0件) である
@@ -166,29 +166,32 @@ Feature: 3. 提案結果の閲覧と比較
 
 -----
 
-### 3.4. 機能 4: 観光地域詳細ページ（モデルプラン表示）
+### 3.4. 機能 4: 提案アイテム詳細ページ（パーソナライズされたモデルプラン表示）
 
-`1_proposal.md` (5.1.) に基づく、提案された個別の観光地域の詳細機能です。
+`1_proposal.md` (5.1.) に基づく、ユーザー専用にパーソナライズされた観光地域提案の詳細機能です。
 
 #### ユーザーストーリー
 
-* **As a** 提案結果一覧から特定の観光地域（クラスター）に興味を持ったユーザー
-* **I want to** タイムライン形式のモデルプランや、プランに含まれる主要スポットの情報を確認できる
-* **So that** 実際にその場所へ旅行した際の具体的なイメージを膨らませ、「行きたい」という気持ちを固めることができる（[1\_proposal.md] 2.2.）
+* **As a** 提案結果一覧から特定の観光地域に興味を持ったユーザー
+* **I want to** パーソナライズされたキャッチコピー、キービジュアル、タイムライン形式のモデルプラン、移動時間などの情報を確認できる
+* **So that** 自分にぴったりの旅行プランを具体的にイメージし、「行きたい」という気持ちを固めることができる（[1\_proposal.md] 2.2.）
 
 #### BDDシナリオ (Gherkin記法)
 
 ```gherkin
-Feature: 4. 観光地域の詳細とモデルプランの確認
+Feature: 4. パーソナライズされた提案アイテムの詳細確認
 
   Background:
     Given ユーザーが提案結果一覧ページ (機能3) から特定の観光地域カードをクリックした
-    And   ユーザーは観光地域詳細ページ (Component: Cluster/Detail) を表示している
-    And   バックエンドから `cluster`, `modelPlan`, `spots` (プラン内の) といった情報がPropsとして渡されている (`0_DocumentationPolicy.md` 6. ページプロパティ定義 参照)
+    And   ユーザーは提案アイテム詳細ページ (Component: Suggestion/Detail) を表示している
+    And   バックエンドから `suggestionSetItem`, `cluster`, `modelPlan` といった情報がPropsとして渡されている (`0_DocumentationPolicy.md` 6. ページプロパティ定義 参照)
 
-  Scenario: 観光地域の基本情報とモデルプランが表示される
+  Scenario: パーソナライズされた提案情報とモデルプランが表示される
     When  ページが表示される
-    Then  画面上部には `cluster.name` (例: "鎌倉") やキービジュアルが表示される
+    Then  画面上部には `suggestionSetItem.key_visual_url` (パーソナライズされたキービジュアル) が表示される
+    And   `suggestionSetItem.cluster_name` (例: "鎌倉エリア") が表示される
+    And   `suggestionSetItem.catchphrase` (AI生成されたキャッチコピー) が表示される
+    And   `suggestionSetItem.generated_travel_time_text` (出発地からの移動時間) が表示される
     And   `modelPlan.name` (例: "鎌倉王道 満喫プラン") と `modelPlan.description` が表示される
     And   `modelPlan` に紐づく `model_plan_items` がタイムライン形式で表示される
 

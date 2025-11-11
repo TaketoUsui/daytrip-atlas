@@ -239,3 +239,24 @@ While AI features are core to the vision, current implementation may be foundati
 - **PostGIS**: Database extensions must be enabled for geographic features
 - **HMR Configuration**: Vite configured for Docker with host `0.0.0.0` and HMR host `localhost`
 - **Japanese Language**: Documentation and comments are primarily in Japanese
+
+## Git Workflow Policy
+
+**IMPORTANT: Claude Code should NEVER execute `git commit` commands.**
+
+- All git commits are performed manually by the developer
+- Claude Code may:
+  - Run `git status` to check current state
+  - Run `git diff` to review changes
+  - Run `git log` to check history
+  - Suggest commit messages if requested
+- Claude Code must NOT:
+  - Execute `git add` commands
+  - Execute `git commit` commands
+  - Execute `git push` commands
+  - Create commits automatically
+
+When implementation work is complete, Claude Code should:
+1. Inform the user that changes are ready
+2. Show a summary of modified files (via `git status`)
+3. Wait for the user to manually commit the changes

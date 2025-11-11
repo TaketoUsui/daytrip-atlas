@@ -22,9 +22,9 @@ export default function AppLayout({ children }) {
             </main>
 
             {/* フッター */}
-            <footer className="bg-gray-800 text-white mt-auto" role="contentinfo">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <p className="text-center text-xs sm:text-sm text-gray-400">
+            <footer className="bg-gray-100 mt-auto" role="contentinfo">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                    <p className="text-center text-xs text-gray-500">
                         &copy; {new Date().getFullYear()} 日帰り地図帳. All rights reserved.
                     </p>
                 </div>

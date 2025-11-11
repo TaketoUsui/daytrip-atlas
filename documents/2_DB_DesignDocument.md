@@ -192,7 +192,7 @@ erDiagram
     clusters ||--o{ model_plans : "has"
     model_plans ||--o{ model_plan_items : "consists of"
     spots }o--|| model_plan_items : "is part of"
-    
+
     spots ||--|{ spot_images : "has gallery of"
     images ||--o{ spot_images : "is part of"
     

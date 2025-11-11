@@ -3,7 +3,7 @@ import Card from '../../Shared/Card';
 
 export default function SuggestionCard({ item }) {
     return (
-        <Link href={`/clusters/${item.cluster_uuid}`} className="block h-full group">
+        <Link href={`/suggestions/detail/${item.uuid}`} className="block h-full group">
             <Card hover className="h-full flex flex-col transition-all duration-300">
                 {/* キービジュアル */}
                 {item.key_visual_url && (

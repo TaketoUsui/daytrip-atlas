@@ -27,18 +27,15 @@ export default function Show({ suggestionSet }) {
         return () => clearTimeout(timer);
     }, [isProcessing, suggestionSet]);
 
-    console.log(suggestionSet);
-    console.log(suggestionSet.status);
-    console.log(isProcessing);
-    console.log(isComplete);
-    console.log(isFailed);
-
     return (
         <AppLayout>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* 処理中 */}
                 {isProcessing && (
-                    <SuggestionLoading statusMessage={suggestionSet.status_message} />
+                    <SuggestionLoading
+                        statusMessage={suggestionSet.status_message}
+                        processingDetails={suggestionSet.processing_details}
+                    />
                 )}
 
                 {/* 完了 */}

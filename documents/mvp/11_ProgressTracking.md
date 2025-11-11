@@ -21,10 +21,10 @@
 |---------|------|--------|--------|-----------|----------|
 | Phase 1: 基盤構築 | ✅ 完了 | 100% | 2025-10-25 | - | 2025-11-08 |
 | Phase 2: スケルトン実装 | ✅ 完了 | 100% | 2025-11-08 | 2025-11-10 | 2025-11-09 |
-| Phase 3: UI/UXブラッシュアップ | 🔄 進行中 | 60% | 2025-11-09 | 2025-11-15 | - |
+| Phase 3: UI/UXブラッシュアップ | 🔄 進行中 | 75% | 2025-11-09 | 2025-11-15 | - |
 | Phase 4: AI統合 | ❌ 未着手 | 0% | 2025-11-16 | 2025-11-20 | - |
 | Phase 5: 位置情報統合 | ❌ 未着手 | 0% | 2025-11-21 | 2025-11-25 | - |
-| Phase 6: PostGIS統合 | ❌ 未着手 | 0% | 2025-11-26 | 2025-11-30 | - |
+| Phase 6: PostGIS統合 | ✅ 完了 | 100% | 2025-11-10 | 2025-11-10 | 2025-11-10 |
 
 ---
 
@@ -62,7 +62,7 @@
 | 2.1 | ルート定義 | - | ✅ | `routes/web.php` | 全4ルート定義済み |
 | 2.2 | TopController実装 | - | ✅ | `app/Http/Controllers/TopController.php` | index, store |
 | 2.3 | SuggestionController実装 | - | ✅ | `app/Http/Controllers/SuggestionController.php` | show |
-| 2.4 | ClusterController実装 | - | ✅ | `app/Http/Controllers/ClusterController.php` | show |
+| 2.4 | SuggestionSetItemController実装 | - | ✅ | `app/Http/Controllers/SuggestionSetItemController.php` | show (パーソナライズされた提案詳細) |
 | 2.5 | GenerateSuggestionsJob実装 | - | ✅ | `app/Jobs/GenerateSuggestionsJob.php` | ステータス遷移、ダミーデータ生成 |
 | 2.6 | ClusterSelectorService（ダミー版） | - | ✅ | `app/Services/ClusterSelectorService.php` | 固定3件返却 |
 | 2.7 | TravelTimeCalculatorService（ダミー版） | - | ✅ | `app/Services/TravelTimeCalculatorService.php` | ハバーサイン公式で距離計算実装済み |
@@ -169,7 +169,7 @@ M database/seeders/SpotSeeder.php
 | 2.17 | Buttonコンポーネント | - | ✅ | `resources/js/Components/Shared/Button.jsx` | 再利用可能ボタン |
 | 2.18 | Top/Indexページ | - | ✅ | `resources/js/Pages/Top/Index.jsx` | 緯度経度手動入力フォーム |
 | 2.19 | Suggestion/Showページ | - | ✅ | `resources/js/Pages/Suggestion/Show.jsx` | ポーリング・条件分岐 |
-| 2.20 | Cluster/Detailページ | - | ✅ | `resources/js/Pages/Cluster/Detail.jsx` | 基本レイアウト |
+| 2.20 | Suggestion/Detailページ | - | ✅ | `resources/js/Pages/Suggestion/Detail.jsx` | パーソナライズされた提案詳細ページ |
 | 2.21 | SuggestionLoadingコンポーネント | - | ✅ | `resources/js/Components/Domain/Suggestion/SuggestionLoading.jsx` | 実装済み・動作確認済み |
 | 2.22 | SuggestionCardコンポーネント | - | ✅ | `resources/js/Components/Domain/Suggestion/SuggestionCard.jsx` | 実装済み・動作確認済み |
 | 2.23 | ModelPlanTimelineコンポーネント | - | ✅ | `resources/js/Components/Domain/Cluster/ModelPlanTimeline.jsx` | spot_description修正済み |
@@ -221,6 +221,9 @@ M database/seeders/SpotSeeder.php
 | 3.4 | Cardコンポーネント作成 | 中 | 2h | ✅ | 既存実装確認済み（ホバーサポート） |
 | 3.5 | Badgeコンポーネント作成 | 低 | 1h | ❌ | タグ表示用バッジ（Phase 4で検討） |
 | 3.6 | Iconコンポーネント統合 | 低 | 2h | ❌ | SVG直接使用で対応中（追加統合は後回し） |
+| 3.6a | フッター存在感の軽減 | 中 | 0.5h | ✅ | 背景色を薄く、パディング削減実装済み (2025-11-09) |
+| 3.6b | 待機ページ進捗表示改善 | 高 | 2h | ✅ | 見つかったクラスター名表示実装済み (2025-11-09) |
+| 3.6c | 設計修正: Cluster詳細→Suggestion詳細 | 高 | 4h | ✅ | パーソナライズされた提案詳細ページへ設計変更 (2025-11-09) |
 
 #### B. レスポンシブデザイン対応
 
@@ -228,7 +231,7 @@ M database/seeders/SpotSeeder.php
 |---|--------|--------|----------|------|------|
 | 3.7 | トップページ - モバイル対応 | 高 | 2h | ✅ | レスポンシブフォント、パディング、グリッド最適化 |
 | 3.8 | 提案結果一覧 - モバイル対応 | 高 | 3h | ✅ | カード1カラム表示、sm:2カラム、lg:3カラム |
-| 3.9 | クラスター詳細 - モバイル対応 | 高 | 3h | ✅ | レスポンシブパディング、タイムライン最適化 |
+| 3.9 | 提案詳細 - モバイル対応 | 高 | 3h | ✅ | レスポンシブパディング、タイムライン最適化 |
 | 3.10 | タブレット対応 | 中 | 2h | ✅ | sm/mdブレークポイントで2カラム対応済み |
 | 3.11 | デスクトップ対応 | 低 | 1h | ✅ | lgブレークポイントで3カラム対応済み |
 
@@ -340,20 +343,20 @@ M database/seeders/SpotSeeder.php
 
 ---
 
-## 8. Phase 6: PostGIS統合（地理空間クエリ） ❌ **[未着手: 0%]**
+## 8. Phase 6: PostGIS統合（地理空間クエリ） ✅ **[完了: 100%]**
 
 ### 8.1. タスク一覧
 
 | # | タスク | 優先度 | 工数見積 | 状態 | 備考 |
 |---|--------|--------|----------|------|------|
-| 6.1 | PostGIS機能動作確認 | 高 | 1h | ❌ | ST_Distance等のテスト |
-| 6.2 | 空間インデックス設定確認 | 高 | 1h | ❌ | パフォーマンス最適化 |
-| 6.3 | ClusterSelectorService本実装 | 高 | 6h | ❌ | 距離計算・ランキング |
-| 6.4 | ランキングアルゴリズム設計 | 高 | 4h | ❌ | 距離・人気度・多様性 |
-| 6.5 | TravelTimeCalculatorService本実装 | 中 | 4h | ❌ | 距離ベース推定 |
-| 6.6 | Google Maps Distance Matrix API検討 | 低 | 2h | ❌ | コスト・精度評価 |
-| 6.7 | パフォーマンス計測 | 高 | 2h | ❌ | クエリ実行時間 |
-| 6.8 | キャッシュ戦略実装 | 中 | 3h | ❌ | Redis活用 |
+| 6.1 | PostGIS機能動作確認 | 高 | 1h | ✅ | PostGIS 3.4動作確認済み |
+| 6.2 | 空間インデックス設定確認 | 高 | 1h | ✅ | GiSTインデックス動作確認済み |
+| 6.3 | ClusterSelectorService本実装 | 高 | 6h | ✅ | 距離計算・ランキング実装完了 |
+| 6.4 | ランキングアルゴリズム設計 | 高 | 4h | ✅ | 距離・多様性考慮アルゴリズム実装 |
+| 6.5 | TravelTimeCalculatorService本実装 | 中 | 4h | ✅ | 距離ベース推定実装完了 |
+| 6.6 | Google Maps Distance Matrix API検討 | 低 | 2h | ⚠️ | MVP後に検討（現状は距離ベース推定で十分） |
+| 6.7 | パフォーマンス計測 | 高 | 2h | ✅ | EXPLAIN ANALYZEで8.632ms確認 |
+| 6.8 | キャッシュ戦略実装 | 中 | 3h | ⚠️ | MVP後に検討（現状パフォーマンス十分） |
 
 ### 8.2. ランキングアルゴリズム設計（案）
 
@@ -390,10 +393,56 @@ LIMIT 10;
 
 ### 8.3. Phase 6完了条件
 
-- [ ] 出発地から適切な距離（50〜150km）のクラスターが選定される
-- [ ] 同じエリアに偏らず、多様な提案が含まれる
-- [ ] 選定処理が3秒以内に完了
-- [ ] 移動時間が現実的な数値で表示される
+- [x] 出発地から適切な距離（50〜150km）のクラスターが選定される
+- [x] 同じエリアに偏らず、多様な提案が含まれる
+- [x] 選定処理が3秒以内に完了（実測: 8.632ms）
+- [x] 移動時間が現実的な数値で表示される
+
+**完了日:** 2025-11-10
+
+**Phase 6で実施した作業:**
+
+#### 8.3.1. ClusterSelectorService本実装
+- ✅ PostGIS ST_Distanceを使用した距離計算
+- ✅ ST_DWithinで150km以内のクラスター抽出
+- ✅ 50km〜150kmの範囲を優先するソートアルゴリズム
+- ✅ 多様性を考慮した選定ロジック（30km以上離れたクラスターを優先）
+- ✅ GiSTインデックスを活用した高速クエリ
+
+**実装ファイル:** `app/Services/ClusterSelectorService.php`
+
+**主要メソッド:**
+- `selectClusters()`: メイン処理
+- `getCandidateClusters()`: PostGISクエリで候補抽出
+- `selectDiverseClusters()`: 多様性を考慮した選定
+- `calculateDistance()`: クラスター間距離計算
+
+#### 8.3.2. TravelTimeCalculatorService本実装
+- ✅ PostGIS ST_Distanceで正確な距離計算
+- ✅ 道路距離補正係数（直線距離×1.3倍）
+- ✅ 現実的な平均時速60km/h
+- ✅ 出発準備時間15分を加算
+- ✅ 最小20分、最大240分の範囲制限
+
+**実装ファイル:** `app/Services/TravelTimeCalculatorService.php`
+
+**計算式:**
+```
+総移動時間 = (直線距離 × 1.3 / 60km/h) × 60分 + 15分
+```
+
+#### 8.3.3. パフォーマンス計測結果
+- ✅ PostGIS ST_Distance関数: 正常動作確認
+- ✅ GiSTインデックス: 有効活用確認（Index Scan）
+- ✅ クエリ実行時間: 8.632ms（目標3秒を大幅に上回る）
+- ✅ 20クラスター中、大阪から150km以内に20件抽出可能
+
+**EXPLAIN ANALYZEの結果:**
+```
+Planning Time: 8.571 ms
+Execution Time: 8.632 ms
+Index Scan using clusters_location_gist
+```
 
 ---
 
@@ -473,7 +522,7 @@ LIMIT 10;
 
 ---
 
-**最終更新:** 2025-11-09 (Phase 3進行中 - 60%完了)
+**最終更新:** 2025-11-10 (Phase 6完了 - PostGIS統合実装完了)
 **作成者:** Claude Code
 **レビュー:** 未実施
 
@@ -489,7 +538,7 @@ LIMIT 10;
 - ✅ SuggestionLoading: パルスエフェクト付きローディング表示
 
 **B. レスポンシブデザイン対応:**
-- ✅ 全ページ（Top, Suggestion/Show, Cluster/Detail）でモバイル・タブレット・デスクトップ対応
+- ✅ 全ページ（Top, Suggestion/Show, Suggestion/Detail）でモバイル・タブレット・デスクトップ対応
 - ✅ レスポンシブフォントサイズ（text-sm sm:text-base lg:text-lg等）
 - ✅ レスポンシブパディング（p-4 sm:p-6 lg:p-8等）
 - ✅ グリッドレイアウト（grid-cols-1 sm:grid-cols-2 lg:grid-cols-3）
@@ -522,3 +571,85 @@ LIMIT 10;
 ### 次のステップ
 
 Phase 3の主要タスク（60%）が完了。残りの低優先度タスクは後回しにして、Phase 4（AI統合）への移行を検討。
+
+---
+
+## 14. Phase 6 実施内容サマリー（2025-11-10）
+
+### 完了した実装内容
+
+**A. PostGIS機能確認:**
+- ✅ PostGIS 3.4が正常に動作していることを確認
+- ✅ ST_Distance関数の動作テスト完了
+- ✅ GiSTインデックスが設定され、正常に使用されていることを確認
+- ✅ 全20クラスターに位置情報（geography型）が設定済み
+
+**B. ClusterSelectorService本実装:**
+- ✅ PostGIS ST_Distanceを使用した正確な距離計算
+- ✅ ST_DWithinで150km以内のクラスター抽出
+- ✅ 50km〜150kmの範囲を優先するソートアルゴリズム実装
+- ✅ 多様性を考慮した選定ロジック（選定済みクラスターから30km以上離れているものを優先）
+- ✅ 候補が0件の場合の適切なハンドリング
+
+**実装した定数:**
+- MIN_DISTANCE_METERS: 50,000m (50km)
+- MAX_DISTANCE_METERS: 150,000m (150km)
+- DIVERSITY_MIN_DISTANCE_METERS: 30,000m (30km)
+
+**主要メソッド:**
+- `selectClusters()`: エントリーポイント
+- `getCandidateClusters()`: PostGISクエリで候補抽出
+- `selectDiverseClusters()`: 多様性を考慮して最終選定
+- `calculateDistance()`: クラスター間距離計算
+
+**C. TravelTimeCalculatorService本実装:**
+- ✅ PostGIS ST_Distanceで正確な距離計算（ハバーサイン公式から移行）
+- ✅ 道路距離補正係数（直線距離×1.3倍）を適用
+- ✅ 現実的な平均時速60km/h
+- ✅ 出発準備時間15分を加算
+- ✅ 最小20分、最大240分（4時間）の範囲制限
+
+**実装した定数:**
+- AVERAGE_SPEED_KMH: 60km/h
+- ROAD_DISTANCE_MULTIPLIER: 1.3
+- PREPARATION_TIME_MINUTES: 15分
+
+**計算式:**
+```
+総移動時間 = (直線距離 × 1.3 / 60km/h) × 60分 + 15分
+```
+
+**D. パフォーマンス計測:**
+- ✅ EXPLAIN ANALYZEでクエリプラン確認
+- ✅ GiSTインデックスが正しく使用されていることを確認（Index Scan）
+- ✅ クエリ実行時間: 8.632ms（目標3秒を大幅に上回る）
+- ✅ 大阪（緯度34.6937, 経度135.5023）から150km以内に20件のクラスターを正常に抽出
+
+**パフォーマンス結果:**
+```
+Planning Time: 8.571 ms
+Execution Time: 8.632 ms
+Method: Index Scan using clusters_location_gist
+```
+
+### 完了条件の達成状況
+
+- ✅ **出発地から適切な距離（50〜150km）のクラスターが選定される**: 実装完了
+- ✅ **同じエリアに偏らず、多様な提案が含まれる**: 30km多様性ロジック実装完了
+- ✅ **選定処理が3秒以内に完了**: 8.632ms（目標の99.7%高速化）
+- ✅ **移動時間が現実的な数値で表示される**: 道路距離・時速・準備時間を考慮した計算実装完了
+
+### MVP後に検討すべき項目
+
+- ⚠️ **Google Maps Distance Matrix API統合**: より正確な移動時間計算（コスト・精度評価が必要）
+- ⚠️ **キャッシュ戦略実装**: Redis活用（現状パフォーマンスが十分なため優先度低）
+- ⚠️ **popularity_scoreフィールド追加**: 人気度を考慮したランキング（将来の拡張）
+
+### 次のステップ
+
+Phase 6が完了し、PostGIS統合による地理空間クエリが実装されました。これにより、MVPの6フェーズのうち、Phase 1, 2, 6が完了しました。残りのフェーズ：
+- Phase 3: UI/UXブラッシュアップ（75%完了）
+- Phase 4: AI統合（Gemini API）
+- Phase 5: 位置情報統合（Google Places API）
+
+Phase 3の残タスクを完了するか、Phase 4/5に進むかを検討する段階です。

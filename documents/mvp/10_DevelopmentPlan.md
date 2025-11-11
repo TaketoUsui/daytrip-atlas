@@ -45,10 +45,10 @@ MVP開発を6つのフェーズに分割し、段階的にリスクを低減し�
 **目的:** 外部API統合なしでエンドツーエンドのフロー確立
 
 **成果物:**
-- コントローラー実装（TopController, SuggestionController, ClusterController）
+- コントローラー実装（TopController, SuggestionController, SuggestionSetItemController）
 - ルート定義
 - Inertia.js統合
-- フロントエンドページコンポーネント（Top/Index, Suggestion/Show, Cluster/Detail）
+- フロントエンドページコンポーネント（Top/Index, Suggestion/Show, Suggestion/Detail）
 - ジョブ実装（GenerateSuggestionsJob）
 - サービス層ダミー実装（ClusterSelectorService, TravelTimeCalculatorService, CatchphraseGeneratorService）
 - APIリソース実装（Props定義準拠）

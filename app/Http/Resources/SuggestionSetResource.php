@@ -22,6 +22,7 @@ class SuggestionSetResource extends JsonResource
             'uuid' => $this->uuid,
             'status' => $this->status->value,
             'status_message' => $this->status->getMessage(),
+            'processing_details' => $this->processing_details,
 
             // statusがcompleteの場合のみitemsを含める
             'items' => $this->when(
