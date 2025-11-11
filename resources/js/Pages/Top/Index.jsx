@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 import AppLayout from '../../Components/Shared/AppLayout';
 import Button from '../../Components/Shared/Button';
@@ -8,16 +8,14 @@ import { useGeolocation } from '../../hooks/useGeolocation';
 import { reverseGeocode } from '../../utils/geocoding';
 
 export default function Index() {
+    const placesAutocompleteRef = useRef(null);
     const [locationName, setLocationName] = useState('');
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    // Google Maps APIローダー
     const { isLoaded: isGoogleMapsLoaded, loadError: googleMapsLoadError } = useGoogleMapsLoader();
-
-    // Geolocation APIフック
     const { getCurrentPosition, loading: geoLoading, error: geoError } = useGeolocation();
 
     const handleSubmit = (e) => {
@@ -63,29 +61,27 @@ export default function Index() {
         setErrors({});
     };
 
-    // 現在地取得ボタン
     const handleGetCurrentLocation = () => {
         getCurrentPosition(async (lat, lng) => {
             setLatitude(lat);
             setLongitude(lng);
 
-            // 逆ジオコーディングで地名を取得
             try {
                 const placeName = await reverseGeocode(lat, lng);
-                setLocationName(placeName);
+                placesAutocompleteRef.current?.setProgrammaticValue(placeName);
                 setErrors({});
             } catch (error) {
                 console.error('Reverse geocoding failed:', error);
-                setLocationName(`緯度: ${lat.toFixed(6)}, 経度: ${lng.toFixed(6)}`);
+                const fallbackName = `緯度: ${lat.toFixed(6)}, 経度: ${lng.toFixed(6)}`;
+                placesAutocompleteRef.current?.setProgrammaticValue(fallbackName);
             }
         });
     };
 
-    // デモ用のサンプル座標ボタン
     const setSampleLocation = async (sampleLat, sampleLon, locationName) => {
         setLatitude(sampleLat);
         setLongitude(sampleLon);
-        setLocationName(locationName);
+        placesAutocompleteRef.current?.setProgrammaticValue(locationName);
         setErrors({});
     };
 
@@ -119,6 +115,7 @@ export default function Index() {
                             出発地 <span className="text-red-500" aria-label="必須">*</span>
                         </label>
                         <PlacesAutocomplete
+                            ref={placesAutocompleteRef}
                             value={locationName}
                             onChange={setLocationName}
                             onPlaceSelected={handlePlaceSelected}
