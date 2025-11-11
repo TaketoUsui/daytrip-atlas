@@ -142,6 +142,40 @@ The system separates user preferences from AI-generated content:
 - **User Interactions**: Tracked in `user_action_logs` for future ML training
 - **Suggestion Sets**: Complete user request context stored in `suggestion_sets` table
 
+### JSONB Schema Management
+
+**Important**: All JSONB columns use `spatie/laravel-data` for type-safe schema management:
+
+**Data Classes** (`app/Data/`):
+- `UserPreferencesData`: Schema for `user_profiles.preferences`
+- `ProcessingDetailsData`: Schema for `suggestion_sets.processing_details`
+- `InputTagsData`: Schema for `suggestion_sets.input_tags_json`
+- `SourceAnalysisData`: Schema for `catchphrases.source_analysis`
+
+**Usage Pattern**:
+```php
+// Creating with Data objects
+$suggestionSet->update([
+    'processing_details' => new ProcessingDetailsData(
+        found_clusters: ['Cluster A', 'Cluster B']
+    )
+]);
+
+// Accessing typed properties
+$clusters = $suggestionSet->processing_details->found_clusters; // string[]
+```
+
+**Benefits**:
+- Type safety and IDE autocomplete
+- Validation at the Data class level
+- Consistent schema across the application
+- Easy migration when schema evolves
+
+Models using this pattern:
+- `UserProfile` (with `WithData` trait)
+- `SuggestionSet` (with `WithData` trait)
+- `Catchphrase` (with `WithData` trait)
+
 ### Key Models
 
 Located in `app/Models/`:

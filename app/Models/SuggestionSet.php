@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Data\InputTagsData;
+use App\Data\ProcessingDetailsData;
 use App\Enums\SuggestionStatus;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Spatie\LaravelData\WithData;
 
 /**
  * @property int $id
@@ -18,10 +21,10 @@ use Illuminate\Support\Str;
  * @property string $session_id
  * @property int|null $user_id
  * @property SuggestionStatus $status
- * @property array<array-key, mixed>|null $processing_details
+ * @property ProcessingDetailsData|null $processing_details
  * @property float $input_latitude
  * @property float $input_longitude
- * @property array<array-key, mixed>|null $input_tags_json
+ * @property InputTagsData|null $input_tags_json
  * @property Carbon|null $created_at
  * @property-read Collection<int, SuggestionSetItem> $items
  * @property-read int|null $items_count
@@ -43,6 +46,8 @@ use Illuminate\Support\Str;
  */
 class SuggestionSet extends Model
 {
+    use WithData;
+
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -59,8 +64,8 @@ class SuggestionSet extends Model
     {
         return [
             "status" => SuggestionStatus::class,
-            "processing_details" => "array",
-            "input_tags_json" => "array",
+            "processing_details" => ProcessingDetailsData::class,
+            "input_tags_json" => InputTagsData::class,
             "input_latitude" => "float",
             "input_longitude" => "float",
         ];

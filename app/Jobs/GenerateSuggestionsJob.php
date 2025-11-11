@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Data\ProcessingDetailsData;
 use App\Enums\SuggestionStatus;
 use App\Models\Image;
 use App\Models\SuggestionSet;
@@ -65,9 +66,9 @@ class GenerateSuggestionsJob implements ShouldQueue
             // ステータス更新: processing_clusters → analyzing_items
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::AnalyzingItems,
-                'processing_details' => [
-                    'found_clusters' => $clusterNames,
-                ],
+                'processing_details' => new ProcessingDetailsData(
+                    found_clusters: $clusterNames
+                ),
             ]);
 
             // Phase 2ではsleep不要だが、リアルなデモのため3秒待機
@@ -123,10 +124,10 @@ class GenerateSuggestionsJob implements ShouldQueue
             // エラー発生時はステータスをfailedに更新
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::Failed,
-                'processing_details' => [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ],
+                'processing_details' => new ProcessingDetailsData(
+                    error: $e->getMessage(),
+                    trace: $e->getTraceAsString()
+                ),
             ]);
 
             Log::error('GenerateSuggestionsJob failed', [

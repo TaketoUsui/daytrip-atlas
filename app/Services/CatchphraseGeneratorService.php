@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Data\SourceAnalysisData;
 use App\Models\Catchphrase;
 use App\Models\Cluster;
 use Gemini;
@@ -32,13 +33,9 @@ class CatchphraseGeneratorService
             // 生成成功：データベースに保存
             return Catchphrase::create([
                 'content' => $content,
-                'context_data' => [
-                    'cluster_id' => $cluster->id,
-                    'cluster_name' => $cluster->name,
-                    'input_location' => [$fromLatitude, $fromLongitude],
-                    'generated_at' => now()->toIso8601String(),
-                    'generation_method' => 'gemini_api',
-                ],
+                'source_analysis' => new SourceAnalysisData(
+                    cluster: $cluster->name
+                ),
             ]);
         } catch (Exception $e) {
             // エラー発生時はログに記録してフォールバック
@@ -143,13 +140,9 @@ PROMPT;
 
         return Catchphrase::create([
             'content' => $content,
-            'context_data' => [
-                'cluster_id' => $cluster->id,
-                'cluster_name' => $cluster->name,
-                'input_location' => [$fromLatitude, $fromLongitude],
-                'generated_at' => now()->toIso8601String(),
-                'generation_method' => 'fallback',
-            ],
+            'source_analysis' => new SourceAnalysisData(
+                cluster: $cluster->name
+            ),
         ]);
     }
 }

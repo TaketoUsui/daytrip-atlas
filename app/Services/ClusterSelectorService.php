@@ -64,7 +64,7 @@ class ClusterSelectorService
             'clusters.*',
             DB::raw("
                 ST_Distance(
-                    ST_MakePoint(?, ?)::geography,
+                    ST_MakePoint({$longitude}, {$latitude})::geography,
                     location::geography
                 ) as distance_meters
             ")
@@ -78,10 +78,6 @@ class ClusterSelectorService
                 ?
             )
         ", [$longitude, $latitude, self::MAX_DISTANCE_METERS])
-        ->setBindings([
-            $longitude, $latitude,  // SELECT句のST_MakePoint用
-            $longitude, $latitude, self::MAX_DISTANCE_METERS  // WHERE句のST_DWithin用
-        ])
         ->get();
 
         // 50km〜150kmの範囲を優先してソート

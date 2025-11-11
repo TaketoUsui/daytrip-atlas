@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use App\Data\UserPreferencesData;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Spatie\LaravelData\WithData;
 
 /**
  * @property int $user_id
- * @property array<array-key, mixed>|null $preferences
+ * @property UserPreferencesData|null $preferences
  * @property Carbon|null $updated_at
  * @property-read User $user
  * @method static Builder<static>|UserProfile newModelQuery()
@@ -23,6 +25,8 @@ use Illuminate\Support\Carbon;
  */
 class UserProfile extends Model
 {
+    use WithData;
+
     protected $primaryKey = 'user_id';
 
     public $incrementing = false;
@@ -37,7 +41,7 @@ class UserProfile extends Model
     protected function casts(): array
     {
         return [
-            'preferences' => 'array',
+            'preferences' => UserPreferencesData::class,
         ];
     }
 

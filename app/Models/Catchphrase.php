@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Data\SourceAnalysisData;
 use Eloquent;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\LaravelData\WithData;
 
 /**
  * @property int $id
  * @property string $content
- * @property array<array-key, mixed>|null $source_analysis
+ * @property SourceAnalysisData|null $source_analysis
  * @property int|null $performance_score
  * @property Carbon|null $created_at
  * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
@@ -29,6 +31,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Catchphrase extends Model
 {
+    use WithData;
+
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -38,7 +42,7 @@ class Catchphrase extends Model
     ];
 
     protected $casts = [
-        "source_analysis" => "array",
+        "source_analysis" => SourceAnalysisData::class,
         "performance_score" => "integer",
     ];
 

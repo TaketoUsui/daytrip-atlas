@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\InputTagsData;
 use App\Enums\SuggestionStatus;
 use App\Jobs\GenerateSuggestionsJob;
 use App\Models\SuggestionSet;
@@ -51,7 +52,9 @@ class TopController extends Controller
             'status' => SuggestionStatus::Pending,
             'input_latitude' => $validated['input_latitude'],
             'input_longitude' => $validated['input_longitude'],
-            'input_tags_json' => $validated['input_tags'] ?? null,
+            'input_tags_json' => isset($validated['input_tags'])
+                ? InputTagsData::fromArray($validated['input_tags'])
+                : null,
         ]);
 
         // 非同期ジョブのディスパッチ
