@@ -111,8 +111,8 @@ erDiagram
         VARCHAR prefecture "都道府県"
         VARCHAR municipality "市区町村"
         VARCHAR address_detail "詳細住所"
-        INTEGER min_duration_minutes
-        INTEGER max_duration_minutes
+        INTEGER min_duration_minutes "推奨最小滞在時間（分）"
+        INTEGER max_duration_minutes "推奨最大滞在時間（分）"
         ENUM spot_role "'main_destination', 'sub_destination', 'connector_spot'"
         ENUM coordinate_reliability "'manually_verified', 'open_data_sourced', 'llm_estimated'"
         TIMESTAMP created_at
