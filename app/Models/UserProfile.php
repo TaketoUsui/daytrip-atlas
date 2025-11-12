@@ -15,12 +15,14 @@ use Spatie\LaravelData\WithData;
  * @property UserPreferencesData|null $preferences
  * @property Carbon|null $updated_at
  * @property-read User $user
+ *
  * @method static Builder<static>|UserProfile newModelQuery()
  * @method static Builder<static>|UserProfile newQuery()
  * @method static Builder<static>|UserProfile query()
  * @method static Builder<static>|UserProfile wherePreferences($value)
  * @method static Builder<static>|UserProfile whereUpdatedAt($value)
  * @method static Builder<static>|UserProfile whereUserId($value)
+ *
  * @mixin Eloquent
  */
 class UserProfile extends Model
@@ -45,7 +47,8 @@ class UserProfile extends Model
         ];
     }
 
-    public function user(): BelongsTo{
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 }

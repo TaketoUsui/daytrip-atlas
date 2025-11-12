@@ -20,206 +20,184 @@ class HiroshimaSeeder extends Seeder
      */
     public function run(): void
     {
-        $clusters = array(
-            0 =>
-                array(
-                    'admin_code' => '34202',
-                    'name' => '広島県呉市',
-                    'lat' => 34.249254,
-                    'lon' => 132.565805,
-                    'office_count' => 18,
-                    'main_office_count' => 1,
-                ),
-            1 =>
-                array(
-                    'admin_code' => '34203',
-                    'name' => '広島県竹原市',
-                    'lat' => 34.341794,
-                    'lon' => 132.907091,
-                    'office_count' => 4,
-                    'main_office_count' => 1,
-                ),
-            2 =>
-                array(
-                    'admin_code' => '34204',
-                    'name' => '広島県三原市',
-                    'lat' => 34.39747,
-                    'lon' => 133.078525,
-                    'office_count' => 4,
-                    'main_office_count' => 1,
-                ),
-            3 =>
-                array(
-                    'admin_code' => '34205',
-                    'name' => '広島県尾道市',
-                    'lat' => 34.408891,
-                    'lon' => 133.204966,
-                    'office_count' => 8,
-                    'main_office_count' => 1,
-                ),
-            4 =>
-                array(
-                    'admin_code' => '34207',
-                    'name' => '広島県福山市',
-                    'lat' => 34.485927,
-                    'lon' => 133.36234,
-                    'office_count' => 15,
-                    'main_office_count' => 1,
-                ),
-            5 =>
-                array(
-                    'admin_code' => '34208',
-                    'name' => '広島県府中市',
-                    'lat' => 34.568349,
-                    'lon' => 133.236323,
-                    'office_count' => 2,
-                    'main_office_count' => 1,
-                ),
-            6 =>
-                array(
-                    'admin_code' => '34209',
-                    'name' => '広島県三次市',
-                    'lat' => 34.805627,
-                    'lon' => 132.85179,
-                    'office_count' => 8,
-                    'main_office_count' => 1,
-                ),
-            7 =>
-                array(
-                    'admin_code' => '34211',
-                    'name' => '広島県大竹市',
-                    'lat' => 34.237952,
-                    'lon' => 132.222361,
-                    'office_count' => 5,
-                    'main_office_count' => 1,
-                ),
-            8 =>
-                array(
-                    'admin_code' => '34212',
-                    'name' => '広島県東広島市',
-                    'lat' => 34.426787,
-                    'lon' => 132.743746,
-                    'office_count' => 9,
-                    'main_office_count' => 1,
-                ),
-            9 =>
-                array(
-                    'admin_code' => '34213',
-                    'name' => '広島県廿日市市',
-                    'lat' => 34.348416,
-                    'lon' => 132.331541,
-                    'office_count' => 5,
-                    'main_office_count' => 1,
-                ),
-            10 =>
-                array(
-                    'admin_code' => '34214',
-                    'name' => '広島県安芸高田市',
-                    'lat' => 34.666099,
-                    'lon' => 132.703977,
-                    'office_count' => 6,
-                    'main_office_count' => 1,
-                ),
-            11 =>
-                array(
-                    'admin_code' => '34215',
-                    'name' => '広島県江田島市',
-                    'lat' => 34.222941,
-                    'lon' => 132.443794,
-                    'office_count' => 15,
-                    'main_office_count' => 1,
-                ),
-            12 =>
-                array(
-                    'admin_code' => '34302',
-                    'name' => '広島県府中町',
-                    'lat' => 34.392589,
-                    'lon' => 132.504544,
-                    'office_count' => 1,
-                    'main_office_count' => 1,
-                ),
-            13 =>
-                array(
-                    'admin_code' => '34304',
-                    'name' => '広島県海田町',
-                    'lat' => 34.372159,
-                    'lon' => 132.536155,
-                    'office_count' => 1,
-                    'main_office_count' => 1,
-                ),
-            14 =>
-                array(
-                    'admin_code' => '34307',
-                    'name' => '広島県熊野町',
-                    'lat' => 34.335783,
-                    'lon' => 132.584604,
-                    'office_count' => 4,
-                    'main_office_count' => 1,
-                ),
-            15 =>
-                array(
-                    'admin_code' => '34309',
-                    'name' => '広島県坂町',
-                    'lat' => 34.341282,
-                    'lon' => 132.513639,
-                    'office_count' => 3,
-                    'main_office_count' => 1,
-                ),
-            16 =>
-                array(
-                    'admin_code' => '34368',
-                    'name' => '広島県安芸太田町',
-                    'lat' => 34.576731,
-                    'lon' => 132.227141,
-                    'office_count' => 4,
-                    'main_office_count' => 1,
-                ),
-            17 =>
-                array(
-                    'admin_code' => '34369',
-                    'name' => '広島県北広島町',
-                    'lat' => 34.674541,
-                    'lon' => 132.538427,
-                    'office_count' => 6,
-                    'main_office_count' => 1,
-                ),
-            18 =>
-                array(
-                    'admin_code' => '34431',
-                    'name' => '広島県大崎上島町',
-                    'lat' => 34.269552,
-                    'lon' => 132.914963,
-                    'office_count' => 3,
-                    'main_office_count' => 1,
-                ),
-            19 =>
-                array(
-                    'admin_code' => '34462',
-                    'name' => '広島県世羅町',
-                    'lat' => 34.586837,
-                    'lon' => 133.056631,
-                    'office_count' => 2,
-                    'main_office_count' => 1,
-                ),
-            20 =>
-                array(
-                    'admin_code' => '34545',
-                    'name' => '広島県神石高原町',
-                    'lat' => 34.703654,
-                    'lon' => 133.247642,
-                    'office_count' => 4,
-                    'main_office_count' => 1,
-                ),
-            21 =>
-                array(
-                    'admin_code' => '34100',
-                    'name' => '広島県広島市',
-                    'lat' => 34.385253,
-                    'lon' => 132.455337,
-                    'office_count' => 1,
-                    'main_office_count' => 1,
-                ),
-        );
+        $clusters = [
+            0 => [
+                'admin_code' => '34202',
+                'name' => '広島県呉市',
+                'lat' => 34.249254,
+                'lon' => 132.565805,
+                'office_count' => 18,
+                'main_office_count' => 1,
+            ],
+            1 => [
+                'admin_code' => '34203',
+                'name' => '広島県竹原市',
+                'lat' => 34.341794,
+                'lon' => 132.907091,
+                'office_count' => 4,
+                'main_office_count' => 1,
+            ],
+            2 => [
+                'admin_code' => '34204',
+                'name' => '広島県三原市',
+                'lat' => 34.39747,
+                'lon' => 133.078525,
+                'office_count' => 4,
+                'main_office_count' => 1,
+            ],
+            3 => [
+                'admin_code' => '34205',
+                'name' => '広島県尾道市',
+                'lat' => 34.408891,
+                'lon' => 133.204966,
+                'office_count' => 8,
+                'main_office_count' => 1,
+            ],
+            4 => [
+                'admin_code' => '34207',
+                'name' => '広島県福山市',
+                'lat' => 34.485927,
+                'lon' => 133.36234,
+                'office_count' => 15,
+                'main_office_count' => 1,
+            ],
+            5 => [
+                'admin_code' => '34208',
+                'name' => '広島県府中市',
+                'lat' => 34.568349,
+                'lon' => 133.236323,
+                'office_count' => 2,
+                'main_office_count' => 1,
+            ],
+            6 => [
+                'admin_code' => '34209',
+                'name' => '広島県三次市',
+                'lat' => 34.805627,
+                'lon' => 132.85179,
+                'office_count' => 8,
+                'main_office_count' => 1,
+            ],
+            7 => [
+                'admin_code' => '34211',
+                'name' => '広島県大竹市',
+                'lat' => 34.237952,
+                'lon' => 132.222361,
+                'office_count' => 5,
+                'main_office_count' => 1,
+            ],
+            8 => [
+                'admin_code' => '34212',
+                'name' => '広島県東広島市',
+                'lat' => 34.426787,
+                'lon' => 132.743746,
+                'office_count' => 9,
+                'main_office_count' => 1,
+            ],
+            9 => [
+                'admin_code' => '34213',
+                'name' => '広島県廿日市市',
+                'lat' => 34.348416,
+                'lon' => 132.331541,
+                'office_count' => 5,
+                'main_office_count' => 1,
+            ],
+            10 => [
+                'admin_code' => '34214',
+                'name' => '広島県安芸高田市',
+                'lat' => 34.666099,
+                'lon' => 132.703977,
+                'office_count' => 6,
+                'main_office_count' => 1,
+            ],
+            11 => [
+                'admin_code' => '34215',
+                'name' => '広島県江田島市',
+                'lat' => 34.222941,
+                'lon' => 132.443794,
+                'office_count' => 15,
+                'main_office_count' => 1,
+            ],
+            12 => [
+                'admin_code' => '34302',
+                'name' => '広島県府中町',
+                'lat' => 34.392589,
+                'lon' => 132.504544,
+                'office_count' => 1,
+                'main_office_count' => 1,
+            ],
+            13 => [
+                'admin_code' => '34304',
+                'name' => '広島県海田町',
+                'lat' => 34.372159,
+                'lon' => 132.536155,
+                'office_count' => 1,
+                'main_office_count' => 1,
+            ],
+            14 => [
+                'admin_code' => '34307',
+                'name' => '広島県熊野町',
+                'lat' => 34.335783,
+                'lon' => 132.584604,
+                'office_count' => 4,
+                'main_office_count' => 1,
+            ],
+            15 => [
+                'admin_code' => '34309',
+                'name' => '広島県坂町',
+                'lat' => 34.341282,
+                'lon' => 132.513639,
+                'office_count' => 3,
+                'main_office_count' => 1,
+            ],
+            16 => [
+                'admin_code' => '34368',
+                'name' => '広島県安芸太田町',
+                'lat' => 34.576731,
+                'lon' => 132.227141,
+                'office_count' => 4,
+                'main_office_count' => 1,
+            ],
+            17 => [
+                'admin_code' => '34369',
+                'name' => '広島県北広島町',
+                'lat' => 34.674541,
+                'lon' => 132.538427,
+                'office_count' => 6,
+                'main_office_count' => 1,
+            ],
+            18 => [
+                'admin_code' => '34431',
+                'name' => '広島県大崎上島町',
+                'lat' => 34.269552,
+                'lon' => 132.914963,
+                'office_count' => 3,
+                'main_office_count' => 1,
+            ],
+            19 => [
+                'admin_code' => '34462',
+                'name' => '広島県世羅町',
+                'lat' => 34.586837,
+                'lon' => 133.056631,
+                'office_count' => 2,
+                'main_office_count' => 1,
+            ],
+            20 => [
+                'admin_code' => '34545',
+                'name' => '広島県神石高原町',
+                'lat' => 34.703654,
+                'lon' => 133.247642,
+                'office_count' => 4,
+                'main_office_count' => 1,
+            ],
+            21 => [
+                'admin_code' => '34100',
+                'name' => '広島県広島市',
+                'lat' => 34.385253,
+                'lon' => 132.455337,
+                'office_count' => 1,
+                'main_office_count' => 1,
+            ],
+        ];
 
         $now = Carbon::now();
 

@@ -23,6 +23,7 @@ use Illuminate\Support\Str;
  * @property-read Image $keyVisualImage
  * @property-read ModelPlan $modelPlan
  * @property-read SuggestionSet $suggestionSet
+ *
  * @method static Builder<static>|SuggestionSetItem newModelQuery()
  * @method static Builder<static>|SuggestionSetItem newQuery()
  * @method static Builder<static>|SuggestionSetItem query()
@@ -35,6 +36,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|SuggestionSetItem whereModelPlanId($value)
  * @method static Builder<static>|SuggestionSetItem whereSuggestionSetId($value)
  * @method static Builder<static>|SuggestionSetItem whereUuid($value)
+ *
  * @mixin Eloquent
  */
 class SuggestionSetItem extends Model
@@ -42,17 +44,17 @@ class SuggestionSetItem extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        "suggestion_set_id",
-        "cluster_id",
-        "key_visual_image_id",
-        "catchphrase_id",
-        "model_plan_id",
-        "display_order",
-        "generated_travel_time_text",
+        'suggestion_set_id',
+        'cluster_id',
+        'key_visual_image_id',
+        'catchphrase_id',
+        'model_plan_id',
+        'display_order',
+        'generated_travel_time_text',
     ];
 
     protected $casts = [
-        "display_order" => "integer",
+        'display_order' => 'integer',
     ];
 
     protected static function booted(): void
@@ -62,27 +64,33 @@ class SuggestionSetItem extends Model
         });
     }
 
-    public function getRouteKeyName(): string{
-        return "uuid";
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
-    public function suggestionSet(): BelongsTo{
+    public function suggestionSet(): BelongsTo
+    {
         return $this->belongsTo(SuggestionSet::class);
     }
 
-    public function cluster(): BelongsTo{
+    public function cluster(): BelongsTo
+    {
         return $this->belongsTo(Cluster::class);
     }
 
-    public function keyVisualImage(): BelongsTo{
+    public function keyVisualImage(): BelongsTo
+    {
         return $this->belongsTo(Image::class, 'key_visual_image_id');
     }
 
-    public function catchphrase(): BelongsTo{
+    public function catchphrase(): BelongsTo
+    {
         return $this->belongsTo(Catchphrase::class);
     }
 
-    public function modelPlan(): BelongsTo{
+    public function modelPlan(): BelongsTo
+    {
         return $this->belongsTo(ModelPlan::class);
     }
 }

@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Enums\SpotRole;
 use App\Enums\CoordinateReliability;
+use App\Enums\SpotRole;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * 関西圏の観光スポットを登録する

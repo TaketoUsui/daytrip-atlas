@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cluster_spot', function (Blueprint $table) {
-            $table->foreignId("cluster_id")
-                ->constrained("clusters")
+            $table->foreignId('cluster_id')
+                ->constrained('clusters')
                 ->cascadeOnDelete();
-            $table->foreignId("spot_id")
-                ->constrained("spots")
+            $table->foreignId('spot_id')
+                ->constrained('spots')
                 ->cascadeOnDelete();
-            $table->primary(["cluster_id", "spot_id"]);
+            $table->primary(['cluster_id', 'spot_id']);
         });
     }
 

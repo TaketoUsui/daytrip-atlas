@@ -29,6 +29,7 @@ use Spatie\LaravelData\WithData;
  * @property-read Collection<int, SuggestionSetItem> $items
  * @property-read int|null $items_count
  * @property-read User|null $user
+ *
  * @method static Builder<static>|SuggestionSet newModelQuery()
  * @method static Builder<static>|SuggestionSet newQuery()
  * @method static Builder<static>|SuggestionSet query()
@@ -42,6 +43,7 @@ use Spatie\LaravelData\WithData;
  * @method static Builder<static>|SuggestionSet whereStatus($value)
  * @method static Builder<static>|SuggestionSet whereUserId($value)
  * @method static Builder<static>|SuggestionSet whereUuid($value)
+ *
  * @mixin Eloquent
  */
 class SuggestionSet extends Model
@@ -51,41 +53,53 @@ class SuggestionSet extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        "session_id",
-        "user_id",
-        "status",
-        "processing_details",
-        "input_latitude",
-        "input_longitude",
-        "input_tags_json",
+        'session_id',
+        'user_id',
+        'status',
+        'processing_details',
+        'input_latitude',
+        'input_longitude',
+        'input_tags_json',
     ];
 
     protected function casts(): array
     {
         return [
-            "status" => SuggestionStatus::class,
-            "processing_details" => ProcessingDetailsData::class,
-            "input_tags_json" => InputTagsData::class,
-            "input_latitude" => "float",
-            "input_longitude" => "float",
+            'status' => SuggestionStatus::class,
+            'processing_details' => ProcessingDetailsData::class,
+            'input_tags_json' => InputTagsData::class,
+            'input_latitude' => 'float',
+            'input_longitude' => 'float',
         ];
     }
 
-    protected static function booted(): void{
+    protected static function booted(): void
+    {
         static::creating(function (self $suggestionSet) {
             $suggestionSet->uuid = $suggestionSet->uuid ?? (string) Str::uuid();
         });
     }
 
-    public function getRouteKeyName(): string{
+    public function getRouteKeyName(): string
+    {
         return 'uuid';
     }
 
-    public function user(): BelongsTo{
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function items(): HasMany{
-        return $this->hasMany(SuggestionSetItem::class)->orderBy("display_order");
+    public function items(): HasMany
+    {
+        return $this->hasMany(SuggestionSetItem::class)->orderBy('display_order');
+    }
+
+    /**
+     * ステータスメッセージを取得するアクセサ
+     */
+    public function getStatusMessageAttribute(): string
+    {
+        return $this->status->getMessage();
     }
 }

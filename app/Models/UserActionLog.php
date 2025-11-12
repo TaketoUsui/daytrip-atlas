@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\UserActionType;
-
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property-read Model|Eloquent $target
  * @property-read User|null $user
+ *
  * @method static Builder<static>|UserActionLog newModelQuery()
  * @method static Builder<static>|UserActionLog newQuery()
  * @method static Builder<static>|UserActionLog query()
@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|UserActionLog whereTargetId($value)
  * @method static Builder<static>|UserActionLog whereTargetType($value)
  * @method static Builder<static>|UserActionLog whereUserId($value)
+ *
  * @mixin Eloquent
  */
 class UserActionLog extends Model

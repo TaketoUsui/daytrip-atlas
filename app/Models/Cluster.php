@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
  * @property-read int|null $spots_count
  * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
  * @property-read int|null $suggestion_set_items_count
+ *
  * @method static Builder<static>|Cluster newModelQuery()
  * @method static Builder<static>|Cluster newQuery()
  * @method static Builder<static>|Cluster query()
@@ -39,25 +40,28 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Cluster whereStatus($value)
  * @method static Builder<static>|Cluster whereUpdatedAt($value)
  * @method static Builder<static>|Cluster whereUuid($value)
+ *
  * @mixin Eloquent
  */
 class Cluster extends Model
 {
     protected $fillable = [
-        "name",
-        "location",
-        "status",
+        'name',
+        'location',
+        'status',
+        'tourism_value',
     ];
 
     protected function casts(): array
     {
         return [
-            "location" => Point::class,
-            "status" => ClusterStatus::class,
+            'location' => Point::class,
+            'status' => ClusterStatus::class,
         ];
     }
 
-    protected static function booted(): void{
+    protected static function booted(): void
+    {
         static::creating(function (self $cluster) {
             $cluster->uuid = $cluster->uuid ?? (string) Str::uuid();
         });
@@ -68,18 +72,23 @@ class Cluster extends Model
         return 'uuid';
     }
 
-    public function modelPlans(): HasMany{
+    public function modelPlans(): HasMany
+    {
         return $this->hasMany(ModelPlan::class);
     }
-    public function defaultModelPlan(): HasOne{
-        return $this->hasOne(ModelPlan::class)->where("is_default", true);
+
+    public function defaultModelPlan(): HasOne
+    {
+        return $this->hasOne(ModelPlan::class)->where('is_default', true);
     }
 
-    public function suggestionSetItems(): HasMany{
+    public function suggestionSetItems(): HasMany
+    {
         return $this->hasMany(SuggestionSetItem::class);
     }
 
-    public function spots(): BelongsToMany{
+    public function spots(): BelongsToMany
+    {
         return $this->belongsToMany(Spot::class);
     }
 }

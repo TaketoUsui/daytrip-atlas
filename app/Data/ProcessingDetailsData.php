@@ -25,6 +25,5 @@ class ProcessingDetailsData extends Data
 
         /** @var string|null スタックトレース（失敗時のみ） */
         public ?string $trace = null,
-    ) {
-    }
+    ) {}
 }

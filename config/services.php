@@ -42,7 +42,7 @@ return [
         'retry' => [
             'times' => 3,
             'sleep_milliseconds' => 1000,
-        ]
-    ]
+        ],
+    ],
 
 ];

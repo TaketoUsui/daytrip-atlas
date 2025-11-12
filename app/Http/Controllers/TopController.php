@@ -39,7 +39,7 @@ class TopController extends Controller
 
         // セッションIDの取得または生成
         $sessionId = $request->session()->getId();
-        if (!$sessionId) {
+        if (! $sessionId) {
             $sessionId = Str::uuid()->toString();
             $request->session()->setId($sessionId);
             $request->session()->start();

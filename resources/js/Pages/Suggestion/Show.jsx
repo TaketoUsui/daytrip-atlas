@@ -5,7 +5,15 @@ import SuggestionLoading from '../../Components/Domain/Suggestion/SuggestionLoad
 import SuggestionCard from '../../Components/Domain/Suggestion/SuggestionCard';
 
 export default function Show({ suggestionSet }) {
-    const isProcessing = ['pending', 'processing_clusters', 'analyzing_items'].includes(suggestionSet.status);
+    const isProcessing = [
+        'pending',
+        'processing_clusters',
+        'listing_spots',
+        'analyzing_spots',
+        'generating_content',
+        'evaluating_clusters',
+        'analyzing_items'  // 旧形式との互換性のため残す
+    ].includes(suggestionSet.status);
     const isComplete = suggestionSet.status === 'complete';
     const isFailed = suggestionSet.status === 'failed';
 

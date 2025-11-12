@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('catchphrases', function (Blueprint $table) {
             $table->id();
-            $table->text("content");
-            $table->jsonb("source_analysis")->nullable(); // 生成根拠 (例: {'source_tags': [1, 5]})
-            $table->integer("performance_score")->nullable()->default(0)->index();
-            $table->timestamp("created_at")->nullable();
+            $table->text('content');
+            $table->jsonb('source_analysis')->nullable(); // 生成根拠 (例: {'source_tags': [1, 5]})
+            $table->integer('performance_score')->nullable()->default(0)->index();
+            $table->timestamp('created_at')->nullable();
         });
     }
 

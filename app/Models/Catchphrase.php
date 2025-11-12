@@ -4,11 +4,11 @@ namespace App\Models;
 
 use App\Data\SourceAnalysisData;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\LaravelData\WithData;
 
 /**
@@ -19,6 +19,7 @@ use Spatie\LaravelData\WithData;
  * @property Carbon|null $created_at
  * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
  * @property-read int|null $suggestion_set_items_count
+ *
  * @method static Builder<static>|Catchphrase newModelQuery()
  * @method static Builder<static>|Catchphrase newQuery()
  * @method static Builder<static>|Catchphrase query()
@@ -27,6 +28,7 @@ use Spatie\LaravelData\WithData;
  * @method static Builder<static>|Catchphrase whereId($value)
  * @method static Builder<static>|Catchphrase wherePerformanceScore($value)
  * @method static Builder<static>|Catchphrase whereSourceAnalysis($value)
+ *
  * @mixin Eloquent
  */
 class Catchphrase extends Model
@@ -36,17 +38,18 @@ class Catchphrase extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        "content",
-        "source_analysis",
-        "performance_score",
+        'content',
+        'source_analysis',
+        'performance_score',
     ];
 
     protected $casts = [
-        "source_analysis" => SourceAnalysisData::class,
-        "performance_score" => "integer",
+        'source_analysis' => SourceAnalysisData::class,
+        'performance_score' => 'integer',
     ];
 
-    public function suggestionSetItems(): HasMany{
+    public function suggestionSetItems(): HasMany
+    {
         return $this->hasMany(SuggestionSetItem::class);
     }
 }

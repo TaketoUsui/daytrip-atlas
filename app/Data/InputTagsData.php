@@ -15,8 +15,7 @@ class InputTagsData extends Data
     public function __construct(
         /** @var string[] タグ文字列の配列 */
         public array $tags = [],
-    ) {
-    }
+    ) {}
 
     /**
      * 配列から直接インスタンス化する際の便利メソッド

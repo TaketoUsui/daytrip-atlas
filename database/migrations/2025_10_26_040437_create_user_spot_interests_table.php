@@ -13,15 +13,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_spot_interests', function (Blueprint $table) {
-            $table->foreignId("user_id")
-                ->constrained("users")
+            $table->foreignId('user_id')
+                ->constrained('users')
                 ->cascadeOnDelete();
-            $table->foreignId("spot_id")
-                ->constrained("spots")
+            $table->foreignId('spot_id')
+                ->constrained('spots')
                 ->cascadeOnDelete();
-            $table->enum("status", UserSpotInterestStatus::options());
-            $table->timestamp("created_at");
-            $table->primary(["user_id", "spot_id"]);
+            $table->enum('status', UserSpotInterestStatus::options());
+            $table->timestamp('created_at');
+            $table->primary(['user_id', 'spot_id']);
         });
     }
 

@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
-            $table->string("file_name");
-            $table->string("storage_path")->unique();
-            $table->string("alt_text")->nullable();
-            $table->string("copyright_holder")->nullable();
+            $table->string('file_name');
+            $table->string('storage_path')->unique();
+            $table->string('category')->nullable()->comment('画像のカテゴリ（神社、寺、城、自然景観など）');
+            $table->string('alt_text')->nullable();
+            $table->string('copyright_holder')->nullable();
             $table->text('description')->nullable();
-            $table->enum("image_quality_level", \App\Enums\ImageQualityLevel::options());
-            $table->timestamp("created_at")->nullable();
+            $table->enum('image_quality_level', \App\Enums\ImageQualityLevel::options());
+            $table->timestamp('created_at')->nullable();
         });
     }
 

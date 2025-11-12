@@ -16,8 +16,7 @@ class UserPreferencesData extends Data
         // 現在は具体的なフィールドなし（将来の拡張用）
         // 例: public ?string $preferredTransportation = null,
         // 例: public ?array $favoriteCategories = null,
-    ) {
-    }
+    ) {}
 
     /**
      * 任意の追加プロパティを許容する設定

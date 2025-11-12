@@ -26,6 +26,5 @@ class SourceAnalysisData extends Data
         /** @var int[]|null 元となるタグIDの配列（将来的な使用） */
         #[ArrayType]
         public ?array $source_tags = null,
-    ) {
-    }
+    ) {}
 }

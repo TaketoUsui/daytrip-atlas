@@ -2,13 +2,15 @@
 
 namespace App\Enums;
 
-enum ImageQualityLevel: string{
-    case ManuallyVerifiedPhoto = "manually_verified_photo";
-    case AiGeneric = "ai_generic";
+enum ImageQualityLevel: string
+{
+    case ManuallyVerifiedPhoto = 'manually_verified_photo';
+    case AiGeneric = 'ai_generic';
 
-    public static function options(): array{
+    public static function options(): array
+    {
         return collect(self::cases())
-            ->map(fn(self $case) => [$case->value])
+            ->map(fn (self $case) => [$case->value])
             ->all();
     }
 }
