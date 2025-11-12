@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ClusterSeeder::class,
             TagSeeder::class,
             DemoImageSeeder::class,
+            DefaultImageSeeder::class,
 
             // 2. スポットデータ（クラスターとタグに依存）
             SpotSeeder::class,
