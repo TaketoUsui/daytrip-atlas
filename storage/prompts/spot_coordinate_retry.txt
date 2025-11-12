@@ -22,15 +22,9 @@ JSON形式で以下のように出力してください。説明や補足は不�
 ```json
 {
   "latitude": 35.6812,
-  "longitude": 139.7671,
-  "coordinate_reliability": "high"
+  "longitude": 139.7671
 }
 ```
-
-# coordinate_reliability の判定基準
-- **high**: 施設の公式情報や地図サービスで正確な位置が確認できる場合
-- **medium**: エリア全体の中心座標を使用する場合
-- **low**: 正確な位置情報が不明で、おおよその推定位置の場合
 
 # 重要な注意事項
 - 座標は必ず {{prefecture}}{{municipality}} の範囲内にある実在の座標を出力してください

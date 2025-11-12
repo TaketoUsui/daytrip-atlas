@@ -18,10 +18,6 @@
    - "main_destination": メインの目的地（観光の中心となる場所）
    - "sub_destination": サブの目的地（補助的な観光地）
    - "connector_spot": 接続スポット（食事、休憩、移動の中継点）
-7. **coordinate_reliability** (必須): 座標の信頼性。以下のいずれか:
-   - "high": 高精度（正確な施設の位置）
-   - "medium": 中精度（エリアの中心付近）
-   - "low": 低精度（おおよその位置）
 
 # 判定基準
 
@@ -39,11 +35,6 @@
 - レストラン・カフェ: 45-90分
 - 商店街・市場: 30-90分
 
-## coordinate_reliability の判定基準
-- **high**: 施設の公式情報や地図サービスで正確な位置が確認できる場合
-- **medium**: エリア全体の中心座標を使用する場合（例: 商店街、伝統的町並み）
-- **low**: 正確な位置情報が不明で、おおよその推定位置の場合
-
 # 出力形式
 JSON形式で以下のように出力してください。説明や補足は不要です。
 
@@ -54,8 +45,7 @@ JSON形式で以下のように出力してください。説明や補足は不�
   "address_detail": "〇〇町1-2-3",
   "min_duration_minutes": 30,
   "max_duration_minutes": 90,
-  "spot_role": "main_destination",
-  "coordinate_reliability": "high"
+  "spot_role": "main_destination"
 }
 ```
 

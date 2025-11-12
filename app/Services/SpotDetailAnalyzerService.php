@@ -99,12 +99,15 @@ class SpotDetailAnalyzerService
         $data = $this->geminiClient->parseJsonResponse($response);
 
         // 必須フィールドのバリデーション
-        $requiredFields = ['latitude', 'longitude', 'min_duration_minutes', 'max_duration_minutes', 'spot_role', 'coordinate_reliability'];
+        $requiredFields = ['latitude', 'longitude', 'min_duration_minutes', 'max_duration_minutes', 'spot_role'];
         foreach ($requiredFields as $field) {
             if (! isset($data[$field])) {
                 throw new Exception("Missing required field: {$field}");
             }
         }
+
+        // AI生成スポットのため、coordinate_reliabilityは常にllm_estimated
+        $data['coordinate_reliability'] = CoordinateReliability::LlmEstimated->value;
 
         return $data;
     }
@@ -174,7 +177,7 @@ class SpotDetailAnalyzerService
         $originalDetails = $this->fetchSpotDetails($spot);
         $originalDetails['latitude'] = $data['latitude'];
         $originalDetails['longitude'] = $data['longitude'];
-        $originalDetails['coordinate_reliability'] = $data['coordinate_reliability'];
+        // coordinate_reliabilityは既にfetchSpotDetailsで設定済み
 
         // 再度検証
         if (! $this->validateCoordinates($spot, $cluster, $data['latitude'], $data['longitude'])) {

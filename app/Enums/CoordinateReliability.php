@@ -3,15 +3,15 @@
 namespace App\Enums;
 
 /**
- * 座標の信頼性レベル
+ * 座標情報の信頼度レベル
  *
- * AI生成時の座標精度を示す
+ * 座標データの出典と信頼性を示す
  */
 enum CoordinateReliability: string
 {
-    case High = 'high';
-    case Medium = 'medium';
-    case Low = 'low';
+    case ManuallyVerified = 'manually_verified';
+    case OpenDataSourced = 'open_data_sourced';
+    case LlmEstimated = 'llm_estimated';
 
     public static function options(): array
     {
@@ -26,9 +26,9 @@ enum CoordinateReliability: string
     public function getDescription(): string
     {
         return match ($this) {
-            self::High => '高精度（正確な施設の位置）',
-            self::Medium => '中精度（エリアの中心付近）',
-            self::Low => '低精度（おおよその位置）',
+            self::ManuallyVerified => '手動確認済み（最も信頼性が高い）',
+            self::OpenDataSourced => 'オープンデータ由来（信頼性が高い）',
+            self::LlmEstimated => 'AI推定（精度は様々）',
         };
     }
 }

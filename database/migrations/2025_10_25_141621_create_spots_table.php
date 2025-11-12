@@ -25,7 +25,7 @@ return new class extends Migration
             $table->unsignedInteger('min_duration_minutes')->nullable();
             $table->unsignedInteger('max_duration_minutes')->nullable();
             $table->enum('spot_role', SpotRole::options())->nullable();
-            $table->enum('coordinate_reliability', CoordinateReliability::options())->nullable()->comment('high, medium, low, または旧形式');
+            $table->enum('coordinate_reliability', CoordinateReliability::options())->nullable()->comment('manually_verified, open_data_sourced, llm_estimated');
             $table->timestamps();
         });
 
