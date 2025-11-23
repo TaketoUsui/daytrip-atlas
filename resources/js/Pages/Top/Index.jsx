@@ -90,25 +90,25 @@ export default function Index() {
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* ヘッダー */}
                 <div className="text-center mb-8 sm:mb-12">
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent mb-3 sm:mb-4 drop-shadow-sm">
                         日帰り旅行の目的地を探しましょう
                     </h1>
-                    <p className="text-base sm:text-lg text-gray-600 px-2">
+                    <p className="text-base sm:text-lg text-gray-700 px-2 font-medium">
                         出発地を入力して、おすすめの日帰り旅行先を見つけましょう
                     </p>
                 </div>
 
                 {/* Google Maps API読み込みエラー */}
                 {googleMapsLoadError && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-sm text-red-600">
+                    <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
+                        <p className="text-sm text-red-700 font-medium">
                             Google Maps APIの読み込みに失敗しました。ページを再読み込みしてください。
                         </p>
                     </div>
                 )}
 
                 {/* フォーム */}
-                <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 sm:p-8" aria-label="出発地入力フォーム">
+                <form onSubmit={handleSubmit} className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-primary/20 p-6 sm:p-8 hover:shadow-2xl transition-shadow duration-300" aria-label="出発地入力フォーム">
                     {/* 出発地入力 */}
                     <div className="mb-6">
                         <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
@@ -131,7 +131,7 @@ export default function Index() {
                             type="button"
                             onClick={handleGetCurrentLocation}
                             disabled={geoLoading || !isGoogleMapsLoaded}
-                            className="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                            className="w-full sm:w-auto px-5 py-2.5 bg-nature hover:bg-forest disabled:bg-gray-400 text-white rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 font-medium"
                         >
                             <svg
                                 className="w-5 h-5"
@@ -155,7 +155,7 @@ export default function Index() {
                             {geoLoading ? '現在地を取得中...' : '現在地を使用'}
                         </button>
                         {geoError && (
-                            <p className="mt-2 text-sm text-red-600" role="alert">
+                            <p className="mt-2 text-sm text-red-700 font-medium" role="alert">
                                 {geoError}
                             </p>
                         )}
@@ -163,11 +163,11 @@ export default function Index() {
 
                     {/* 選択中の座標表示 */}
                     {latitude && longitude && (
-                        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-sm text-blue-800">
-                                <span className="font-medium">選択中:</span> {locationName}
+                        <div className="mb-6 p-4 bg-gradient-to-r from-warm-100/20 to-warm-200/20 border-l-4 border-primary rounded-lg shadow-sm">
+                            <p className="text-sm text-gray-800">
+                                <span className="font-bold text-primary">選択中:</span> {locationName}
                             </p>
-                            <p className="text-xs text-blue-600 mt-1">
+                            <p className="text-xs text-gray-600 mt-1">
                                 緯度: {latitude.toFixed(6)}, 経度: {longitude.toFixed(6)}
                             </p>
                         </div>
@@ -175,13 +175,13 @@ export default function Index() {
 
                     {/* サンプル地点ボタン */}
                     <div className="mb-6">
-                        <p className="text-sm font-medium text-gray-700 mb-2">または、サンプル地点から選択:</p>
+                        <p className="text-sm font-medium text-gray-700 mb-3">または、サンプル地点から選択:</p>
                         <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
                             <button
                                 type="button"
                                 onClick={() => setSampleLocation(34.6937, 135.5023, '大阪')}
                                 disabled={!isGoogleMapsLoaded}
-                                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md transition-colors"
+                                className="px-4 py-2 text-sm font-medium bg-white hover:bg-sky-light/20 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 border border-sky/40 hover:border-sky shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 text-sky-900"
                             >
                                 大阪
                             </button>
@@ -189,7 +189,7 @@ export default function Index() {
                                 type="button"
                                 onClick={() => setSampleLocation(35.0116, 135.7681, '京都')}
                                 disabled={!isGoogleMapsLoaded}
-                                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md transition-colors"
+                                className="px-4 py-2 text-sm font-medium bg-white hover:bg-sky-light/20 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 border border-sky/40 hover:border-sky shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 text-sky-900"
                             >
                                 京都
                             </button>
@@ -197,7 +197,7 @@ export default function Index() {
                                 type="button"
                                 onClick={() => setSampleLocation(35.6812, 139.7671, '東京')}
                                 disabled={!isGoogleMapsLoaded}
-                                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md transition-colors"
+                                className="px-4 py-2 text-sm font-medium bg-white hover:bg-sky-light/20 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 border border-sky/40 hover:border-sky shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 text-sky-900"
                             >
                                 東京
                             </button>

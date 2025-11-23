@@ -52,10 +52,10 @@ export default function Show({ suggestionSet }) {
                         {suggestionSet.items && suggestionSet.items.length > 0 ? (
                             <>
                                 <div className="text-center mb-8 sm:mb-12">
-                                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+                                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-accent mb-3 sm:mb-4 drop-shadow-sm">
                                         おすすめの日帰り旅行先
                                     </h1>
-                                    <p className="text-base sm:text-lg text-gray-600 px-2">
+                                    <p className="text-base sm:text-lg text-gray-700 px-2 font-medium">
                                         あなたにぴったりの旅行先を見つけました
                                     </p>
                                 </div>
@@ -70,9 +70,9 @@ export default function Show({ suggestionSet }) {
                         ) : (
                             /* 提案0件の場合 */
                             <div className="text-center py-12 sm:py-20">
-                                <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-yellow-100 mb-4 sm:mb-6">
+                                <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-warm-200/30 border-2 border-warm-300 mb-4 sm:mb-6">
                                     <svg
-                                        className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-600"
+                                        className="w-8 h-8 sm:w-10 sm:h-10 text-warm-300"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -86,16 +86,16 @@ export default function Show({ suggestionSet }) {
                                         />
                                     </svg>
                                 </div>
-                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+                                <h2 className="text-xl sm:text-2xl font-bold text-accent mb-3 sm:mb-4">
                                     おすすめの旅行先が見つかりませんでした
                                 </h2>
-                                <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 px-4">
+                                <p className="text-sm sm:text-base text-gray-700 mb-6 sm:mb-8 px-4">
                                     申し訳ございません。指定された条件に合う旅行先が見つかりませんでした。<br className="hidden sm:block" />
                                     別の出発地で再度お試しください。
                                 </p>
                                 <a
                                     href="/"
-                                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                                    className="inline-flex items-center px-6 py-3 bg-ocean text-white font-medium rounded-lg hover:bg-sky transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
                                 >
                                     <svg
                                         className="w-5 h-5 mr-2"
@@ -121,7 +121,7 @@ export default function Show({ suggestionSet }) {
                 {/* エラー */}
                 {isFailed && (
                     <div className="text-center py-20">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 border-2 border-red-500 mb-4">
                             <svg
                                 className="w-8 h-8 text-red-600"
                                 fill="none"
@@ -136,15 +136,15 @@ export default function Show({ suggestionSet }) {
                                 />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-2xl font-bold text-accent mb-2">
                             エラーが発生しました
                         </h2>
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-gray-700 mb-6">
                             申し訳ございません。提案の生成に失敗しました。
                         </p>
                         <a
                             href="/"
-                            className="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                            className="inline-block px-6 py-3 bg-ocean text-white font-medium rounded-lg hover:bg-sky transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
                         >
                             トップページに戻る
                         </a>
