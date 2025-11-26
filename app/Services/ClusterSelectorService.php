@@ -58,6 +58,8 @@ class ClusterSelectorService
     /**
      * 出発地から150km以内の候補クラスターを取得
      *
+     * モデルプランが存在するクラスターのみを対象とする
+     *
      * @param  float  $latitude  出発地の緯度
      * @param  float  $longitude  出発地の経度
      * @return Collection<int, Cluster>
@@ -76,6 +78,7 @@ class ClusterSelectorService
         ])
             ->where('status', 'published')
             ->whereNotNull('location')
+            ->whereHas('modelPlans') // モデルプランが存在するクラスターのみ
             ->whereRaw('
             ST_DWithin(
                 ST_MakePoint(?, ?)::geography,

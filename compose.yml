@@ -30,6 +30,10 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      # PsySH (tinker) の設定ディレクトリを書き込み可能な場所に設定
+      - HOME=/tmp
+      - XDG_CONFIG_HOME=/tmp
+      - PSYSH_CONFIG_DIR=/tmp/psysh
     networks:
       - app-network
     depends_on:
@@ -53,7 +57,38 @@ services:
           - DB_DATABASE=${DB_DATABASE}
           - DB_USERNAME=${DB_USERNAME}
           - DB_PASSWORD=${DB_PASSWORD}
+          # PsySH (tinker) の設定ディレクトリを書き込み可能な場所に設定
+          - HOME=/tmp
+          - XDG_CONFIG_HOME=/tmp
+          - PSYSH_CONFIG_DIR=/tmp/psysh
       restart: always # ワーカーが何らかの理由で停止した場合に再起動
+      networks:
+          - app-network
+      depends_on:
+          - db
+
+  # Laravel Scheduler Service (runs scheduled tasks like analysis:dispatch)
+  scheduler:
+      build:
+          context: .
+          dockerfile: ./.docker/php/Dockerfile
+      user: "${UID}:${GID}"
+      volumes:
+          - ./:/var/www
+          - ./.docker/php/development.ini:/usr/local/etc/php/conf.d/development.ini
+      command: sh -c "while true; do php /var/www/artisan schedule:run --verbose --no-interaction && sleep 60; done"
+      environment:
+          - DB_CONNECTION=${DB_CONNECTION}
+          - DB_HOST=${DB_HOST}
+          - DB_PORT=${DB_PORT}
+          - DB_DATABASE=${DB_DATABASE}
+          - DB_USERNAME=${DB_USERNAME}
+          - DB_PASSWORD=${DB_PASSWORD}
+          # PsySH (tinker) の設定ディレクトリを書き込み可能な場所に設定
+          - HOME=/tmp
+          - XDG_CONFIG_HOME=/tmp
+          - PSYSH_CONFIG_DIR=/tmp/psysh
+      restart: always
       networks:
           - app-network
       depends_on:

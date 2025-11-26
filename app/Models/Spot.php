@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Enums\CoordinateReliability;
-use App\Enums\SpotRole;
 use App\Enums\UserSpotInterestStatus;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -75,7 +75,11 @@ class Spot extends Model
         'min_duration_minutes',
         'max_duration_minutes',
         'spot_role',
+        'analysis_priority',
         'coordinate_reliability',
+        'detail_analyzed_by_model_id',
+        'detail_analyzing_by_model_id',
+        'detail_analyzing_started_at',
     ];
 
     protected function casts(): array
@@ -83,9 +87,11 @@ class Spot extends Model
         return [
             'min_duration_minutes' => 'integer',
             'max_duration_minutes' => 'integer',
-            'spot_role' => SpotRole::class,
+            'analysis_priority' => 'integer',
             'coordinate_reliability' => CoordinateReliability::class,
             'location' => Point::class,
+            // AI分析タイムスタンプのキャスト
+            'detail_analyzing_started_at' => 'datetime',
         ];
     }
 
@@ -117,6 +123,17 @@ class Spot extends Model
         return $this->belongsToMany(Cluster::class);
     }
 
+    /**
+     * プライマリクラスター（最初のクラスター）を取得
+     *
+     * 非同期AI分析では、スポットは通常1つのクラスターに属するため、
+     * 簡易的に最初のクラスターを返す
+     */
+    public function getClusterAttribute(): ?Cluster
+    {
+        return $this->clusters()->first();
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'spot_category');
@@ -132,5 +149,16 @@ class Spot extends Model
         return $this->belongsToMany(Image::class, 'spot_images')
             ->withPivot('display_order')
             ->orderByPivot('display_order');
+    }
+
+    // AI分析関連のリレーション
+    public function detailAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'detail_analyzed_by_model_id');
+    }
+
+    public function detailAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'detail_analyzing_by_model_id');
     }
 }

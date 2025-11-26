@@ -8,13 +8,10 @@ export default function Show({ suggestionSet }) {
     const isProcessing = [
         'pending',
         'processing_clusters',
-        'listing_spots',
-        'analyzing_spots',
-        'generating_content',
-        'evaluating_clusters',
-        'analyzing_items'  // 旧形式との互換性のため残す
+        'generating_content'
     ].includes(suggestionSet.status);
     const isComplete = suggestionSet.status === 'complete';
+    const isNoResults = suggestionSet.status === 'no_results';
     const isFailed = suggestionSet.status === 'failed';
 
     // ポーリングロジック
@@ -115,6 +112,55 @@ export default function Show({ suggestionSet }) {
                                 </a>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* 結果が見つからなかった場合 */}
+                {isNoResults && (
+                    <div className="text-center py-12 sm:py-20">
+                        <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-warm-200/30 border-2 border-warm-300 mb-4 sm:mb-6">
+                            <svg
+                                className="w-8 h-8 sm:w-10 sm:h-10 text-warm-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                />
+                            </svg>
+                        </div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-accent mb-3 sm:mb-4">
+                            {suggestionSet.status_message || '条件に合う旅行先が見つかりませんでした'}
+                        </h2>
+                        <p className="text-sm sm:text-base text-gray-700 mb-6 sm:mb-8 px-4">
+                            申し訳ございません。現在、ご指定の出発地からの日帰り旅行先が見つかりませんでした。<br className="hidden sm:block" />
+                            別の出発地で再度お試しください。
+                        </p>
+                        <a
+                            href="/"
+                            className="inline-flex items-center px-6 py-3 bg-ocean text-white font-medium rounded-lg hover:bg-sky transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+                        >
+                            <svg
+                                className="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            </svg>
+                            別の出発地で検索する
+                        </a>
                     </div>
                 )}
 

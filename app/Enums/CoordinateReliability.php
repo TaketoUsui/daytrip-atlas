@@ -11,7 +11,7 @@ enum CoordinateReliability: string
 {
     case ManuallyVerified = 'manually_verified';
     case OpenDataSourced = 'open_data_sourced';
-    case LlmEstimated = 'llm_estimated';
+    case AiAnalysis = 'ai_analysis';
 
     public static function options(): array
     {
@@ -28,7 +28,7 @@ enum CoordinateReliability: string
         return match ($this) {
             self::ManuallyVerified => '手動確認済み（最も信頼性が高い）',
             self::OpenDataSourced => 'オープンデータ由来（信頼性が高い）',
-            self::LlmEstimated => 'AI推定（精度は様々）',
+            self::AiAnalysis => 'AI分析（非同期AI分析で取得）',
         };
     }
 }

@@ -58,6 +58,12 @@ class GeminiClientService
                 $attempt++;
                 $lastException = $e;
 
+                // "The model is overloaded" エラーはサーバー側の一時的な過負荷
+                // リトライせずに即座に例外をthrow（グローバルハンドラでログレベル調整）
+                if (stripos($e->getMessage(), 'overloaded') !== false) {
+                    throw new Exception('Gemini model is overloaded', 0, $e);
+                }
+
                 Log::warning("Gemini API call failed (attempt {$attempt}/{$maxRetries})", [
                     'model' => $model,
                     'error' => $e->getMessage(),
@@ -89,6 +95,9 @@ class GeminiClientService
      */
     public function parseJsonResponse(string $response): array
     {
+        // 元のレスポンスを保存（エラー時のログ用）
+        $originalResponse = $response;
+
         // コードブロック（```json ... ```）を除去
         $response = preg_replace('/```json\s*/', '', $response);
         $response = preg_replace('/```\s*$/', '', $response);
@@ -97,7 +106,24 @@ class GeminiClientService
         $decoded = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('Failed to parse JSON response: '.json_last_error_msg());
+            // パースエラー時の詳細情報をログに出力
+            $errorMessage = json_last_error_msg();
+            $responsePreview = mb_substr($originalResponse, 0, 500);
+            $responseLength = mb_strlen($originalResponse);
+
+            Log::error('Failed to parse JSON response from Gemini API', [
+                'error' => $errorMessage,
+                'response_length' => $responseLength,
+                'response_preview' => $responsePreview,
+                'cleaned_response_preview' => mb_substr($response, 0, 500),
+            ]);
+
+            // より詳細なエラーメッセージを含む例外をthrow
+            throw new Exception(
+                "Failed to parse JSON response: {$errorMessage}. ".
+                "Response length: {$responseLength} characters. ".
+                "Preview: ".mb_substr($originalResponse, 0, 200)."..."
+            );
         }
 
         return $decoded;

@@ -178,8 +178,9 @@ Located in `app/Models/`:
 - `Spot`: Individual locations/attractions
 - `Cluster`: Geographic groupings of spots
 - `ModelPlan` & `ModelPlanItem`: Itinerary management
-- `SuggestionSet` & `SuggestionSetItem`: User suggestion requests and results
-- `Catchphrase`: AI-generated marketing copy
+- `SuggestionSet`: User suggestion requests (linked to ModelPlans via pivot table)
+- `Catchphrase`: AI-generated marketing copy (linked to ModelPlan)
+- `AiModel`: AI model management (performance priority, daily limits)
 - `UserProfile`, `UserActionLog`, `UserSpotInterest`: User data and behavior
 
 ### Database & Geographic Features
@@ -253,16 +254,63 @@ Currently in MVP phase prioritizing **development speed** over premature optimiz
 
 ### AI Integration
 
-AI-powered suggestion generation is **fully implemented** as a core feature:
-- **`GenerateSuggestionsJob`** (`app/Jobs/GenerateSuggestionsJob.php`): 7-stage pipeline for complete travel plan generation
-  - Stage 1: Cluster selection (probabilistic weighting)
-  - Stage 2: Spot listing (Gemini API)
-  - Stage 3: Spot detail analysis (Gemini API + coordinate validation)
-  - Stage 4: Catchphrase generation (Gemini API)
-  - Stage 5: Image selection (Gemini API)
-  - Stage 6: Model plan generation (Gemini API)
-  - Stage 7: Cluster re-evaluation
-- **Service Classes** (`app/Services/`): Each AI operation has a dedicated service class
+AI-powered suggestion generation uses a **two-phase architecture** for optimal user experience:
+
+#### Phase 1: Asynchronous AI Analysis (Background Processing)
+
+AI analysis runs continuously in the background, preparing data in advance:
+
+- **`DispatchAsyncAnalysisTasksJob`**: Task dispatcher that selects and dispatches analysis jobs
+  - **A-type tasks (80%)**: Spot-related analysis
+    1. Spot detail analysis (`AnalyzeSpotDetailJob`)
+    2. Spot priority determination (`AnalyzeSpotPriorityJob`)
+    3. Spot listing (`AnalyzeSpotListingJob`)
+  - **B-type tasks (20%)**: Plan-related analysis
+    1. Image selection (`AnalyzeImageSelectionJob`)
+    2. Main spot selection (`AnalyzeMainSpotJob`)
+    3. Model plan generation (`AnalyzeModelPlanJob`)
+    4. Catchphrase generation (`AnalyzeCatchphraseJob`)
+
+- **AI Model Management** (`app/Models/AiModel.php`):
+  - Dynamic model selection based on performance priority
+  - Daily API limit management
+  - Progressive quality improvement (higher-performance models overwrite lower-performance results)
+
+- **Task Selection** (`app/Services/AI/TaskSelector.php`):
+  - Probabilistic task type selection (80% A-type, 20% B-type)
+  - Priority-based task ordering within each type
+  - Concurrent task limit enforcement
+
+- **Lock Management** (`app/Services/AI/LockManager.php`):
+  - Optimistic locking to prevent duplicate analysis
+  - Timeout-based lock release
+  - Support for Cluster, Spot, and ModelPlan models
+
+#### Phase 2: Real-time Suggestion Generation (User Request)
+
+When users request suggestions, the system uses pre-analyzed data:
+
+- **`GenerateSuggestionsJob`** (`app/Jobs/GenerateSuggestionsJob.php`): Simplified pipeline
+  1. Cluster selection (probabilistic weighting from pre-analyzed clusters)
+  2. Model plan selection (from pre-generated plans)
+  3. Travel time calculation
+  4. Result composition via `suggestion_set_model_plans` pivot table
+
+This architecture reduces user wait time from 3-5 minutes to under 1 minute while maintaining high-quality AI-generated content.
+
+#### Supporting Infrastructure
+
+- **Configuration** (`config/ai.php`):
+  - Toggle async analysis on/off
+  - Task selection parameters (probabilities, concurrent limits)
+  - Model selection parameters (interval margins, execution history)
+  - Cache TTL for each task type
+
+- **Prompts** (`storage/prompts/`):
+  - `spot_listing.txt`, `spot_priority_analysis.txt`, `spot_detail_analysis.txt`
+  - `catchphrase_generation.txt`, `model_plan_generation.txt`
+  - `main_spot_selection.txt`, `image_selection.txt`
+
 - **Performance Tracking**: Catchphrases tracked with `performance_score` for A/B testing
 - **User Behavior Logging**: `user_action_logs` table prepared for future ML model training
 

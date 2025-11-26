@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\ModelPlanController;
 use App\Http\Controllers\SuggestionController;
-use App\Http\Controllers\SuggestionSetItemController;
 use App\Http\Controllers\TopController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,5 +18,5 @@ Route::post('/suggestions', [TopController::class, 'store'])->name('suggestions.
 // 提案待機・結果一覧ページ（ポーリング対応）
 Route::get('/suggestions/{suggestionSet:uuid}', [SuggestionController::class, 'show'])->name('suggestions.show');
 
-// 提案アイテム詳細ページ（パーソナライズされた観光地提案の詳細）
-Route::get('/suggestions/detail/{suggestionSetItem:uuid}', [SuggestionSetItemController::class, 'show'])->name('suggestions.detail');
+// モデルプラン詳細ページ
+Route::get('/suggestions/detail/{modelPlan}', [ModelPlanController::class, 'show'])->name('model_plans.show');

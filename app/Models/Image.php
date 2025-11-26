@@ -25,8 +25,6 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property-read Collection<int, Spot> $spots
  * @property-read int|null $spots_count
- * @property-read Collection<int, SuggestionSetItem> $suggestionSetItemsAsKeyVisual
- * @property-read int|null $suggestion_set_items_as_key_visual_count
  *
  * @method static Builder<static>|Image newModelQuery()
  * @method static Builder<static>|Image newQuery()
@@ -76,11 +74,6 @@ class Image extends Model
     public function getRouteKeyName(): string
     {
         return 'uuid';
-    }
-
-    public function suggestionSetItemsAsKeyVisual(): HasMany
-    {
-        return $this->hasMany(SuggestionSetItem::class, 'key_visual_image_id');
     }
 
     public function spots(): BelongsToMany

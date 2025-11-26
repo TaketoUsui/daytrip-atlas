@@ -21,7 +21,42 @@ return new class extends Migration
             $table->enum('status', ClusterStatus::options())
                 ->default(ClusterStatus::Draft->value);
             $table->unsignedInteger('tourism_value')->default(10)->comment('観光地域としての価値（重みづけ用）');
+
+            // AI分析関連カラム
+            $table->unsignedInteger('analyzed_spots_count')->default(0)
+                ->comment('詳細分析が完了したスポット数（キャッチフレーズ生成の開始条件）');
+
+            // スポットリストアップ分析
+            $table->unsignedBigInteger('spot_listing_analyzed_by_model_id')->nullable();
+            $table->unsignedBigInteger('spot_listing_analyzing_by_model_id')->nullable();
+            $table->timestamp('spot_listing_analyzing_started_at')->nullable();
+
+            // スポット分析優先度確定
+            $table->unsignedBigInteger('spot_priority_analyzed_by_model_id')->nullable();
+            $table->unsignedBigInteger('spot_priority_analyzing_by_model_id')->nullable();
+            $table->timestamp('spot_priority_analyzing_started_at')->nullable();
+
+            // メインスポット選定
+            $table->unsignedBigInteger('main_spot_analyzed_by_model_id')->nullable();
+            $table->unsignedBigInteger('main_spot_analyzing_by_model_id')->nullable();
+            $table->timestamp('main_spot_analyzing_started_at')->nullable();
+
+            // 画像選定
+            $table->unsignedBigInteger('image_analyzed_by_model_id')->nullable();
+            $table->unsignedBigInteger('image_analyzing_by_model_id')->nullable();
+            $table->timestamp('image_analyzing_started_at')->nullable();
+
             $table->timestamps();
+
+            // 外部キー制約（ai_modelsテーブルへの参照）
+            $table->foreign('spot_listing_analyzed_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('spot_listing_analyzing_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('spot_priority_analyzed_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('spot_priority_analyzing_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('main_spot_analyzed_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('main_spot_analyzing_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('image_analyzed_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
+            $table->foreign('image_analyzing_by_model_id')->references('id')->on('ai_models')->nullOnDelete();
         });
 
         try {
