@@ -14,23 +14,23 @@ return new class extends Migration
         Schema::create('suggestion_set_items', function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
-            $table->foreignId("suggestion_set_id")
-                ->constrained("suggestion_sets")
+            $table->foreignId('suggestion_set_id')
+                ->constrained('suggestion_sets')
                 ->cascadeOnDelete();
-            $table->foreignId("cluster_id")
-                ->constrained("clusters")
+            $table->foreignId('cluster_id')
+                ->constrained('clusters')
                 ->restrictOnDelete();
-            $table->foreignId("key_visual_image_id")
-                ->constrained("images")
+            $table->foreignId('key_visual_image_id')
+                ->constrained('images')
                 ->restrictOnDelete();
-            $table->foreignId("catchphrase_id")
-                ->constrained("catchphrases")
+            $table->foreignId('catchphrase_id')
+                ->constrained('catchphrases')
                 ->restrictOnDelete();
-            $table->foreignId("model_plan_id")
-                ->constrained("model_plans")
+            $table->foreignId('model_plan_id')
+                ->constrained('model_plans')
                 ->restrictOnDelete();
-            $table->unsignedInteger("display_order")->default(0);
-            $table->string("generated_travel_time_text")->nullable();
+            $table->unsignedInteger('display_order')->default(0);
+            $table->string('generated_travel_time_text')->nullable();
         });
     }
 

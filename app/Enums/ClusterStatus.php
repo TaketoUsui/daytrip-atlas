@@ -2,14 +2,16 @@
 
 namespace App\Enums;
 
-enum ClusterStatus: string{
+enum ClusterStatus: string
+{
     case Draft = 'draft';
     case Published = 'published';
     case Archived = 'archived';
 
-    public static function options(): array{
+    public static function options(): array
+    {
         return collect(self::cases())
-            ->map(fn(self $case) => [$case->value])
+            ->map(fn (self $case) => [$case->value])
             ->all();
     }
 }

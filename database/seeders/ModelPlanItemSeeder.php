@@ -189,13 +189,13 @@ class ModelPlanItemSeeder extends Seeder
 
         foreach ($planItems as $clusterName => $items) {
             $plan = $plans->get($clusterName);
-            if (!$plan) {
+            if (! $plan) {
                 continue;
             }
 
             foreach ($items as $item) {
                 $spot = $spots->get($item['spot_slug']);
-                if (!$spot) {
+                if (! $spot) {
                     continue;
                 }
 

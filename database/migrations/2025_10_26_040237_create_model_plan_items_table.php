@@ -14,17 +14,17 @@ return new class extends Migration
     {
         Schema::create('model_plan_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("model_plan_id")
-                ->constrained("model_plans")
+            $table->foreignId('model_plan_id')
+                ->constrained('model_plans')
                 ->cascadeOnDelete();
-            $table->unsignedInteger("display_order")->default(0);
-            $table->foreignId("spot_id")
-                ->constrained("spots")
+            $table->unsignedInteger('display_order')->default(0);
+            $table->foreignId('spot_id')
+                ->constrained('spots')
                 ->restrictOnDelete();
-            $table->unsignedInteger("duration_minutes")->default(0);
-            $table->unsignedInteger("travel_time_to_next_minutes")->default(0);
-            $table->enum("travel_mode", TravelMode::options())->nullable();
-            $table->text("description")->nullable();
+            $table->unsignedInteger('duration_minutes')->default(0);
+            $table->unsignedInteger('travel_time_to_next_minutes')->default(0);
+            $table->enum('travel_mode', TravelMode::options())->nullable();
+            $table->text('description')->nullable();
         });
     }
 

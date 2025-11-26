@@ -27,7 +27,7 @@ class SuggestionSetResource extends JsonResource
             // statusがcompleteの場合のみitemsを含める
             'items' => $this->when(
                 $this->status === SuggestionStatus::Complete,
-                fn() => SuggestionSetItemResource::collection($this->items)->resolve()
+                fn () => SuggestionSetItemResource::collection($this->items)->resolve()
             ),
         ];
     }

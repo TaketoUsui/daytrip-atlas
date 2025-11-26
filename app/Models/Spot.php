@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\SpotRole;
 use App\Enums\CoordinateReliability;
+use App\Enums\SpotRole;
 use App\Enums\UserSpotInterestStatus;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Eloquent;
@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-
 
 /**
  * @property int $id
@@ -44,6 +43,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $tags_count
  * @property-read Collection<int, User> $userInterests
  * @property-read int|null $user_interests_count
+ *
  * @method static Builder<static>|Spot newModelQuery()
  * @method static Builder<static>|Spot newQuery()
  * @method static Builder<static>|Spot query()
@@ -60,68 +60,77 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Spot whereSlug($value)
  * @method static Builder<static>|Spot whereSpotRole($value)
  * @method static Builder<static>|Spot whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class Spot extends Model
 {
     protected $fillable = [
-        "name",
-        "slug",
-        "location",
-        "prefecture",
-        "municipality",
-        "address_detail",
-        "min_duration_minutes",
-        "max_duration_minutes",
-        "spot_role",
-        "coordinate_reliability",
+        'name',
+        'slug',
+        'location',
+        'prefecture',
+        'municipality',
+        'address_detail',
+        'min_duration_minutes',
+        'max_duration_minutes',
+        'spot_role',
+        'coordinate_reliability',
     ];
 
     protected function casts(): array
     {
         return [
-            "min_duration_minutes" => "integer",
-            "max_duration_minutes" => "integer",
-            "spot_role" => SpotRole::class,
-            "coordinate_reliability" => CoordinateReliability::class,
+            'min_duration_minutes' => 'integer',
+            'max_duration_minutes' => 'integer',
+            'spot_role' => SpotRole::class,
+            'coordinate_reliability' => CoordinateReliability::class,
             'location' => Point::class,
         ];
     }
 
-    public function getRouteKeyName(): string{
+    public function getRouteKeyName(): string
+    {
         return 'slug';
     }
 
-    public function modelPlanItems(): HasMany{
+    public function modelPlanItems(): HasMany
+    {
         return $this->hasMany(ModelPlanItem::class);
     }
 
-    public function userInterests(): BelongsToMany{
-        return $this->belongsToMany(User::class, "user_spot_interests")
+    public function userInterests(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_spot_interests')
             ->using(UserSpotInterest::class)
-            ->withPivot("status", "created_at");
+            ->withPivot('status', 'created_at');
     }
 
-    public function interestedUsers(): BelongsToMany{
+    public function interestedUsers(): BelongsToMany
+    {
         return $this->userInterests()
-            ->wherePivot("status", UserSpotInterestStatus::Interested);
+            ->wherePivot('status', UserSpotInterestStatus::Interested);
     }
 
-    public function clusters(): BelongsToMany{
+    public function clusters(): BelongsToMany
+    {
         return $this->belongsToMany(Cluster::class);
     }
 
-    public function categories(): BelongsToMany{
-        return $this->belongsToMany(Category::class, "spot_category");
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'spot_category');
     }
 
-    public function tags(): BelongsToMany{
+    public function tags(): BelongsToMany
+    {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function images(): BelongsToMany{
-        return $this->belongsToMany(Image::class, "spot_images")
-            ->withPivot("display_order")
-            ->orderByPivot("display_order");
+    public function images(): BelongsToMany
+    {
+        return $this->belongsToMany(Image::class, 'spot_images')
+            ->withPivot('display_order')
+            ->orderByPivot('display_order');
     }
 }

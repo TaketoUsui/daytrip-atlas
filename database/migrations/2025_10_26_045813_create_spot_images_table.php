@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('spot_images', function (Blueprint $table) {
-            $table->foreignId("spot_id")
-                ->constrained("spots")
+            $table->foreignId('spot_id')
+                ->constrained('spots')
                 ->cascadeOnDelete();
-            $table->foreignId("image_id")
-                ->constrained("images")
+            $table->foreignId('image_id')
+                ->constrained('images')
                 ->cascadeOnDelete();
-            $table->unsignedInteger("display_order");
-            $table->primary(["spot_id", "image_id"]);
+            $table->unsignedInteger('display_order');
+            $table->primary(['spot_id', 'image_id']);
         });
     }
 

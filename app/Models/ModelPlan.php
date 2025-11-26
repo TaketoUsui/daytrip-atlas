@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $items_count
  * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
  * @property-read int|null $suggestion_set_items_count
+ *
  * @method static Builder<static>|ModelPlan newModelQuery()
  * @method static Builder<static>|ModelPlan newQuery()
  * @method static Builder<static>|ModelPlan query()
@@ -33,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ModelPlan whereIsDefault($value)
  * @method static Builder<static>|ModelPlan whereName($value)
  * @method static Builder<static>|ModelPlan whereTotalDurationMinutes($value)
+ *
  * @mixin Eloquent
  */
 class ModelPlan extends Model
@@ -40,30 +42,33 @@ class ModelPlan extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        "cluster_id",
-        "name",
-        "description",
-        "total_duration_minutes",
-        "is_default",
+        'cluster_id',
+        'name',
+        'description',
+        'total_duration_minutes',
+        'is_default',
     ];
 
     protected function casts(): array
     {
         return [
-            "total_duration_minutes" => "integer",
-            "is_default" => "boolean",
+            'total_duration_minutes' => 'integer',
+            'is_default' => 'boolean',
         ];
     }
 
-    public function cluster(): BelongsTo{
+    public function cluster(): BelongsTo
+    {
         return $this->belongsTo(Cluster::class);
     }
 
-    public function suggestionSetItems(): HasMany{
+    public function suggestionSetItems(): HasMany
+    {
         return $this->hasMany(SuggestionSetItem::class);
     }
 
-    public function items(): HasMany{
-        return $this->hasMany(ModelPlanItem::class)->orderBy("display_order");
+    public function items(): HasMany
+    {
+        return $this->hasMany(ModelPlanItem::class)->orderBy('display_order');
     }
 }

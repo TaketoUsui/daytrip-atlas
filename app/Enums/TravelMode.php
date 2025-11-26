@@ -2,16 +2,18 @@
 
 namespace App\Enums;
 
-enum TravelMode: string{
-    case Walk = "walk";
-    case Car = "car";
-    case Train = "train";
-    case Bus = "bus";
-    case Other = "other";
+enum TravelMode: string
+{
+    case Walk = 'walk';
+    case Car = 'car';
+    case Train = 'train';
+    case Bus = 'bus';
+    case Other = 'other';
 
-    public static function options(): array{
+    public static function options(): array
+    {
         return collect(self::cases())
-            ->map(fn(self $case) => [$case->value])
+            ->map(fn (self $case) => [$case->value])
             ->all();
     }
 

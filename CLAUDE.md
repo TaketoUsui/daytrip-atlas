@@ -97,19 +97,15 @@ docker-compose exec php php artisan pail --timeout=0
 
 ## Architecture
 
-### Hybrid Routing Approach
+### Routing Architecture
 
-The application uses a **"modern monolith"** architecture with two routing strategies:
+The application uses an **Inertia.js monolith** architecture (as per ADR-001 in technical spec):
 
-1. **Inertia.js Routes** (`routes/web.php`): For page rendering and navigation
-   - Returns React components via Inertia responses
-   - Handles traditional page-to-page navigation
-   - Example: Cluster detail pages, Top page
-
-2. **API Routes** (`routes/api.php`): For asynchronous data operations without page transitions
-   - RESTful endpoints under `/api/*`
-   - Used for non-blocking data fetching and updates
-   - Example: Polling suggestion generation status
+- **Inertia.js Routes** (`routes/web.php`): All page rendering and navigation
+  - Returns React components via Inertia responses
+  - Handles page-to-page navigation and data operations
+  - Routes: Top page (`/`), Suggestion creation (`POST /suggestions`), Suggestion results (`/suggestions/{uuid}`), Detail page (`/suggestions/detail/{uuid}`)
+- **API Routes** (`routes/api.php`): Currently unused (reserved for future microservice integration)
 
 ### Asynchronous Processing
 
@@ -142,6 +138,40 @@ The system separates user preferences from AI-generated content:
 - **User Interactions**: Tracked in `user_action_logs` for future ML training
 - **Suggestion Sets**: Complete user request context stored in `suggestion_sets` table
 
+### JSONB Schema Management
+
+**Important**: All JSONB columns use `spatie/laravel-data` for type-safe schema management:
+
+**Data Classes** (`app/Data/`):
+- `UserPreferencesData`: Schema for `user_profiles.preferences`
+- `ProcessingDetailsData`: Schema for `suggestion_sets.processing_details`
+- `InputTagsData`: Schema for `suggestion_sets.input_tags_json`
+- `SourceAnalysisData`: Schema for `catchphrases.source_analysis`
+
+**Usage Pattern**:
+```php
+// Creating with Data objects
+$suggestionSet->update([
+    'processing_details' => new ProcessingDetailsData(
+        found_clusters: ['Cluster A', 'Cluster B']
+    )
+]);
+
+// Accessing typed properties
+$clusters = $suggestionSet->processing_details->found_clusters; // string[]
+```
+
+**Benefits**:
+- Type safety and IDE autocomplete
+- Validation at the Data class level
+- Consistent schema across the application
+- Easy migration when schema evolves
+
+Models using this pattern:
+- `UserProfile` (with `WithData` trait)
+- `SuggestionSet` (with `WithData` trait)
+- `Catchphrase` (with `WithData` trait)
+
 ### Key Models
 
 Located in `app/Models/`:
@@ -163,9 +193,9 @@ Located in `app/Models/`:
 
 - Entry point: `resources/js/app.jsx`
 - Pages: `resources/js/Pages/` (Inertia.js components)
-  - `TopPage.jsx`: Landing/search page
-  - `Cluster/`: Cluster detail views
-  - `Suggestion/`: Suggestion generation and results
+  - `Top/Index.jsx`: Landing page with departure location input
+  - `Suggestion/Show.jsx`: Suggestion waiting/results page
+  - `Suggestion/Detail.jsx`: Individual suggestion detail page
 - Components: `resources/js/Components/`
 - Vite handles module bundling and HMR
 
@@ -173,40 +203,44 @@ Located in `app/Models/`:
 
 Primary documentation is in the `documents/` directory:
 
-- `1_proposal.md`: Product vision, market analysis, business model (Japanese)
-- `2_DB_DesignDocument.md`: Database schema, ER diagrams, design philosophy (Japanese)
-- `mvp/`: MVP-specific planning documents
+- **`1_proposal.md`**: Business proposal (Japanese)
+  - Product vision and value proposition
+  - Market analysis and business model
+  - Product/UX design and roadmap
+  - High-level technical overview (detailed specs in 2_technical_spec.md)
+
+- **`2_technical_spec.md`**: Technical specifications (Japanese)
+  - Ubiquitous language (terminology)
+  - System architecture (C4 Model diagrams)
+  - Architecture Decision Records (ADRs)
+  - Database design (ER diagrams, table definitions, ENUM types)
+
+- **`documents/references/`**: Reference materials
+  - `temp.md`: Frequently used for feeding large context to Claude
+  - `spots_example.md`: Examples of spot types
 
 The proposal emphasizes **"Deep Personalization"** as the core differentiator, using AI to understand latent user preferences and present travel options in the most appealing way for each individual.
 
-### MVP Development Documentation
+### Documentation Operation Policy for Claude
 
-**Key documents for MVP development:**
+**`documents/1_proposal.md`**:
+- **Default**: Read-only
+- **Exception**: Auto-edit when business perspective changes are expected, such as:
+  - WHY (Why are we building this service?)
+  - WHAT (What are we providing?)
+  - HOW (How to realize it - business perspective)
 
-- **`mvp/10_DevelopmentPlan.md`**: Comprehensive MVP development strategy
-  - 6-phase development approach (Phase 1: Foundation → Phase 6: PostGIS Integration)
-  - Technical stack details
-  - Development principles and coding standards
-  - Git strategy and commit conventions
-  - Performance targets and security policies
+**`documents/2_technical_spec.md`**:
+- **Default**: Read-only
+- **Exception**: Auto-edit when technical implementation policy changes are expected, such as:
+  - HOW (How to realize it - technical perspective)
+  - System design details
+  - Implementation guidelines
 
-- **`mvp/11_ProgressTracking.md`**: Detailed progress tracking and task management
-  - Phase-by-phase progress summary with completion percentages
-  - Detailed task lists with status indicators (✅ Done, 🔄 In Progress, ❌ Not Started, ⚠️ Needs Review)
-  - Current priority tasks and effort estimates
-  - Issues and blockers tracking
-  - Regular updates on completion of each phase or major milestone
-
-**Progress Management Policy:**
-
-All MVP development work should be tracked using documents 10 and 11:
-- **Before starting tasks**: Check `11_ProgressTracking.md` for current priorities and task status
-- **During development**: Update task status in `11_ProgressTracking.md` as work progresses
-- **After completing tasks**: Mark tasks as completed (✅) and update progress percentages
-- **When plans change**: Update `10_DevelopmentPlan.md` to reflect new strategies or approaches
-- **When issues arise**: Add to the "Issues & Blockers" section in `11_ProgressTracking.md`
-
-These documents serve as the single source of truth for MVP development status and should be kept up-to-date throughout the development process.
+**`documents/references/`**:
+- **Default**: No editing, no reading required
+- **Exception**: Read when explicitly instructed
+- **Exception**: Edit only when special instructions are given
 
 ## Development Principles for This Project
 
@@ -219,10 +253,18 @@ Currently in MVP phase prioritizing **development speed** over premature optimiz
 
 ### AI Integration
 
-While AI features are core to the vision, current implementation may be foundational:
-- `GenerateSuggestionsJob` exists but may be a placeholder (`app/Jobs/GenerateSuggestionsJob.php`)
-- AI-generated catchphrases tracked separately for A/B testing
-- User interaction logs prepared for future ML model training
+AI-powered suggestion generation is **fully implemented** as a core feature:
+- **`GenerateSuggestionsJob`** (`app/Jobs/GenerateSuggestionsJob.php`): 7-stage pipeline for complete travel plan generation
+  - Stage 1: Cluster selection (probabilistic weighting)
+  - Stage 2: Spot listing (Gemini API)
+  - Stage 3: Spot detail analysis (Gemini API + coordinate validation)
+  - Stage 4: Catchphrase generation (Gemini API)
+  - Stage 5: Image selection (Gemini API)
+  - Stage 6: Model plan generation (Gemini API)
+  - Stage 7: Cluster re-evaluation
+- **Service Classes** (`app/Services/`): Each AI operation has a dedicated service class
+- **Performance Tracking**: Catchphrases tracked with `performance_score` for A/B testing
+- **User Behavior Logging**: `user_action_logs` table prepared for future ML model training
 
 ### Testing
 

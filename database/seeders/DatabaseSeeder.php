@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ClusterSeeder::class,
             TagSeeder::class,
             DemoImageSeeder::class,
+            DefaultImageSeeder::class,
 
             // 2. スポットデータ（クラスターとタグに依存）
             SpotSeeder::class,
@@ -33,11 +34,11 @@ class DatabaseSeeder extends Seeder
             CatchphraseSeeder::class,
         ]);
 
-//        User::factory(10)->create();
+        //        User::factory(10)->create();
 
-//        User::factory()->create([
-//            'name' => 'Test User',
-//            'email' => 'test@example.com',
-//        ]);
+        //        User::factory()->create([
+        //            'name' => 'Test User',
+        //            'email' => 'test@example.com',
+        //        ]);
     }
 }

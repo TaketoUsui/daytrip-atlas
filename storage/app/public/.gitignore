@@ -1,2 +1,6 @@
 *
 !.gitignore
+!default_images/
+!default_images/**
+!demo_images
+!demo_images/**

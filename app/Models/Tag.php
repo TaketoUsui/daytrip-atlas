@@ -13,11 +13,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $name
  * @property-read Collection<int, Spot> $spots
  * @property-read int|null $spots_count
+ *
  * @method static Builder<static>|Tag newModelQuery()
  * @method static Builder<static>|Tag newQuery()
  * @method static Builder<static>|Tag query()
  * @method static Builder<static>|Tag whereId($value)
  * @method static Builder<static>|Tag whereName($value)
+ *
  * @mixin Eloquent
  */
 class Tag extends Model
@@ -25,7 +27,7 @@ class Tag extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        "name",
+        'name',
     ];
 
     public function spots(): BelongsToMany

@@ -11,21 +11,109 @@
     --font-sans: 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-    /* カラーパレット */
-    --color-primary: oklch(0.55 0.24 252); /* blue-600相当 */
-    --color-primary-hover: oklch(0.45 0.24 252); /* blue-700相当 */
-    --color-secondary: oklch(0.55 0.18 162); /* emerald-600相当 */
-    --color-accent: oklch(0.80 0.15 85); /* yellow-400相当 */
+    /* Daytrip Atlasテーマカラーパレット - banner_with_bg.jpgベース */
 
-    /* グレースケール */
-    --color-gray-50: oklch(0.98 0 0);
-    --color-gray-100: oklch(0.96 0 0);
-    --color-gray-200: oklch(0.93 0 0);
-    --color-gray-300: oklch(0.87 0 0);
-    --color-gray-400: oklch(0.71 0 0);
-    --color-gray-500: oklch(0.55 0 0);
-    --color-gray-600: oklch(0.42 0 0);
-    --color-gray-700: oklch(0.35 0 0);
-    --color-gray-800: oklch(0.24 0 0);
-    --color-gray-900: oklch(0.15 0 0);
+    /* プライマリカラー - オレンジ/ブラウン系 */
+    --color-primary: oklch(0.70 0.14 40); /* #FF8C42 オレンジ */
+    --color-primary-hover: oklch(0.60 0.12 35); /* #C17A5A ブラウン */
+    --color-primary-dark: oklch(0.55 0.11 35); /* #B8734D ダークブラウン */
+
+    /* セカンダリカラー - ベージュ/クリーム系 */
+    --color-secondary: oklch(0.92 0.03 60); /* #F5E6D3 ベージュ */
+    --color-secondary-light: oklch(0.94 0.04 70); /* #FFE4B5 クリーム */
+    --color-secondary-lighter: oklch(0.97 0.02 75); /* #FFF8DC コーンシルク */
+
+    /* アクセントカラー - ネイビー/ダークブルー系 */
+    --color-accent: oklch(0.30 0.03 240); /* #2C3E50 ネイビー */
+    --color-accent-light: oklch(0.35 0.03 240); /* #34495E ダークブルー */
+
+    /* 青系アクセントカラー - 旅行・移動のイメージ */
+    --color-sky: oklch(0.65 0.12 230); /* #5B9BD5 スカイブルー */
+    --color-sky-light: oklch(0.75 0.10 230); /* #7BAFD4 ライトスカイブルー */
+    --color-ocean: oklch(0.55 0.14 240); /* #4682B4 オーシャンブルー */
+
+    /* 緑系アクセントカラー - 自然・新鮮さのイメージ */
+    --color-nature: oklch(0.65 0.14 150); /* #52B788 ナチュラルグリーン */
+    --color-nature-light: oklch(0.75 0.12 150); /* #74C69D ライトグリーン */
+    --color-forest: oklch(0.55 0.12 140); /* #2D6A4F フォレストグリーン */
+
+    /* サブカラー - パステルオレンジ/サンディブラウン */
+    --color-warm-100: oklch(0.80 0.10 50); /* #F4A460 サンディブラウン */
+    --color-warm-200: oklch(0.78 0.12 45); /* #FFB347 パステルオレンジ */
+    --color-warm-300: oklch(0.65 0.12 40); /* #D2691E チョコレート */
+
+    /* グレースケール - 温かみのあるニュートラルトーン */
+    --color-gray-50: oklch(0.98 0.01 60);
+    --color-gray-100: oklch(0.96 0.01 60);
+    --color-gray-200: oklch(0.93 0.01 55);
+    --color-gray-300: oklch(0.87 0.01 50);
+    --color-gray-400: oklch(0.71 0.01 45);
+    --color-gray-500: oklch(0.55 0.01 40);
+    --color-gray-600: oklch(0.42 0.02 35);
+    --color-gray-700: oklch(0.35 0.02 35);
+    --color-gray-800: oklch(0.24 0.02 30);
+    --color-gray-900: oklch(0.15 0.02 30);
+}
+
+/* カスタムアニメーション定義 */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* アニメーションクラス */
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slideIn {
+    animation: slideIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-gradientShift {
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
 }

@@ -33,9 +33,9 @@ class TravelTimeCalculatorService
      * 3. 平均時速60km/hで移動時間を計算
      * 4. 出発準備時間（15分）を加算
      *
-     * @param float $fromLatitude 出発地の緯度
-     * @param float $fromLongitude 出発地の経度
-     * @param Cluster $cluster 目的地クラスター
+     * @param  float  $fromLatitude  出発地の緯度
+     * @param  float  $fromLongitude  出発地の経度
+     * @param  Cluster  $cluster  目的地クラスター
      * @return int 移動時間（分）
      */
     public function calculateTravelTime(float $fromLatitude, float $fromLongitude, Cluster $cluster): int
@@ -43,7 +43,7 @@ class TravelTimeCalculatorService
         // クラスターの座標を取得
         $clusterLocation = $cluster->location;
 
-        if (!$clusterLocation) {
+        if (! $clusterLocation) {
             // 座標情報がない場合はデフォルト値を返す
             return 60;
         }
@@ -68,7 +68,7 @@ class TravelTimeCalculatorService
         $totalTimeMinutes = $drivingTimeMinutes + self::PREPARATION_TIME_MINUTES;
 
         // 整数に丸める
-        $travelTimeMinutes = (int)round($totalTimeMinutes);
+        $travelTimeMinutes = (int) round($totalTimeMinutes);
 
         // 最小20分、最大240分（4時間）で制限
         return min(max($travelTimeMinutes, 20), 240);
@@ -77,22 +77,22 @@ class TravelTimeCalculatorService
     /**
      * PostGISを使用して2地点間の距離を計算（メートル単位）
      *
-     * @param float $fromLatitude 出発地の緯度
-     * @param float $fromLongitude 出発地の経度
-     * @param mixed $toLocation 目的地のlocation（Point型）
+     * @param  float  $fromLatitude  出発地の緯度
+     * @param  float  $fromLongitude  出発地の経度
+     * @param  mixed  $toLocation  目的地のlocation（Point型）
      * @return float 距離（メートル）
      */
     private function calculateDistanceWithPostGIS(float $fromLatitude, float $fromLongitude, $toLocation): float
     {
-        $result = DB::selectOne("
+        $result = DB::selectOne('
             SELECT ST_Distance(
                 ST_MakePoint(?, ?)::geography,
                 ?::geography
             ) as distance
-        ", [
+        ', [
             $fromLongitude,
             $fromLatitude,
-            $toLocation
+            $toLocation,
         ]);
 
         return $result->distance ?? 0.0;
@@ -101,7 +101,7 @@ class TravelTimeCalculatorService
     /**
      * 出発地からクラスターまでの移動時間を人間が読みやすいテキストに変換
      *
-     * @param int $travelTimeMinutes 移動時間（分）
+     * @param  int  $travelTimeMinutes  移動時間（分）
      * @return string 移動時間テキスト（例: "車で約1時間30分"）
      */
     public function formatTravelTimeText(int $travelTimeMinutes): string
@@ -121,10 +121,10 @@ class TravelTimeCalculatorService
     /**
      * ハバーサイン公式を使用して2地点間の直線距離（km）を計算
      *
-     * @param float $lat1 地点1の緯度
-     * @param float $lon1 地点1の経度
-     * @param float $lat2 地点2の緯度
-     * @param float $lon2 地点2の経度
+     * @param  float  $lat1  地点1の緯度
+     * @param  float  $lon1  地点1の経度
+     * @param  float  $lat2  地点2の緯度
+     * @param  float  $lon2  地点2の経度
      * @return float 直線距離（km）
      */
     private function calculateHaversineDistance(float $lat1, float $lon1, float $lat2, float $lon2): float

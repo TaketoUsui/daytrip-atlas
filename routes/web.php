@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\TopController;
 use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\SuggestionSetItemController;
+use App\Http\Controllers\TopController;
 use Illuminate\Support\Facades\Route;
 
 /**

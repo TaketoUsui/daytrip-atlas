@@ -42,6 +42,7 @@ use Illuminate\Support\Str;
  * @property-read int|null $spot_interests_count
  * @property-read Collection<int, SuggestionSet> $suggestionSets
  * @property-read int|null $suggestion_sets_count
+ *
  * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
@@ -54,6 +55,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|User wherePassword($value)
  * @method static Builder<static>|User whereRememberToken($value)
  * @method static Builder<static>|User whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
@@ -95,45 +97,54 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    protected static function booted(): void{
+    protected static function booted(): void
+    {
         static::creating(function (User $user) {
             $user->uuid = $user->uuid ?? (string) Str::uuid();
         });
     }
 
-    public function getRouteKeyName(): string{
+    public function getRouteKeyName(): string
+    {
         return 'uuid';
     }
 
-    public function profile(): HasOne{
+    public function profile(): HasOne
+    {
         return $this->hasOne(UserProfile::class);
     }
 
-    public function savedLocations(): HasMany{
+    public function savedLocations(): HasMany
+    {
         return $this->hasMany(UserSavedLocation::class);
     }
 
-    public function actionLogs(): HasMany{
+    public function actionLogs(): HasMany
+    {
         return $this->hasMany(UserActionLog::class);
     }
 
-    public function suggestionSets(): HasMany{
+    public function suggestionSets(): HasMany
+    {
         return $this->hasMany(SuggestionSet::class);
     }
 
-    public function spotInterests(): BelongsToMany{
+    public function spotInterests(): BelongsToMany
+    {
         return $this->belongsToMany(Spot::class, 'user_spot_interests')
             ->using(UserSpotInterest::class)
-            ->withPivot("status", "created_at");
+            ->withPivot('status', 'created_at');
     }
 
-    public function interestedSpots(): BelongsToMany{
+    public function interestedSpots(): BelongsToMany
+    {
         return $this->spotInterests()
-            ->wherePivot("status", UserSpotInterestStatus::Interested);
+            ->wherePivot('status', UserSpotInterestStatus::Interested);
     }
 
-    public function dismissedSpots(): HasMany{
+    public function dismissedSpots(): HasMany
+    {
         return $this->spotInterests()
-            ->wherePivot("status", UserSpotInterestStatus::Dismissed);
+            ->wherePivot('status', UserSpotInterestStatus::Dismissed);
     }
 }

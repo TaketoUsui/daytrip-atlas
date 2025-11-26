@@ -27,6 +27,7 @@ use Illuminate\Support\Str;
  * @property-read int|null $spots_count
  * @property-read Collection<int, SuggestionSetItem> $suggestionSetItemsAsKeyVisual
  * @property-read int|null $suggestion_set_items_as_key_visual_count
+ *
  * @method static Builder<static>|Image newModelQuery()
  * @method static Builder<static>|Image newQuery()
  * @method static Builder<static>|Image query()
@@ -39,6 +40,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Image whereDescription($value)
  * @method static Builder<static>|Image whereStoragePath($value)
  * @method static Builder<static>|Image whereUuid($value)
+ *
  * @mixin Eloquent
  */
 class Image extends Model
@@ -48,46 +50,48 @@ class Image extends Model
     protected $appends = ['public_url'];
 
     protected $fillable = [
-        "file_name",
-        "storage_path",
-        "alt_text",
-        "copyright_holder",
-        "description",
-        "image_quality_level",
+        'file_name',
+        'storage_path',
+        'category',
+        'alt_text',
+        'copyright_holder',
+        'description',
+        'image_quality_level',
     ];
 
     protected function casts(): array
     {
         return [
-            "image_quality_level" => ImageQualityLevel::class,
+            'image_quality_level' => ImageQualityLevel::class,
         ];
     }
 
-    protected static function booted(): void{
+    protected static function booted(): void
+    {
         static::creating(function (self $image) {
             $image->uuid = $image->uuid ?? (string) Str::uuid();
         });
     }
 
-    public function getRouteKeyName(): string{
-        return "uuid";
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
-    public function suggestionSetItemsAsKeyVisual(): HasMany{
-        return $this->hasMany(SuggestionSetItem::class, "key_visual_image_id");
+    public function suggestionSetItemsAsKeyVisual(): HasMany
+    {
+        return $this->hasMany(SuggestionSetItem::class, 'key_visual_image_id');
     }
 
     public function spots(): BelongsToMany
     {
-        return $this->belongsToMany(Spot::class, "spot_images")
-            ->withPivot("display_order")
-            ->orderBy("display_order");
+        return $this->belongsToMany(Spot::class, 'spot_images')
+            ->withPivot('display_order')
+            ->orderBy('display_order');
     }
 
     /**
      * storage_path から完全な公開URLを生成するアクセサ
-     *
-     * @return string
      */
     public function getPublicUrlAttribute(): string // [!code ++]
     { // [!code ++]

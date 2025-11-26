@@ -5,33 +5,45 @@ export default function SuggestionLoading({ statusMessage, processingDetails }) 
 
     return (
         <div className="flex flex-col items-center justify-center py-12 sm:py-20 px-4">
+            {/* ローディングスピナー with 多重アニメーション */}
             <div className="relative mb-6 sm:mb-8">
-                <LoadingSpinner size="xl" className="text-blue-600" />
-                {/* パルス効果 */}
+                <LoadingSpinner size="xl" className="text-ocean" />
+                {/* パルス効果1 */}
                 <div className="absolute inset-0 animate-ping opacity-20">
-                    <LoadingSpinner size="xl" className="text-blue-400" />
+                    <LoadingSpinner size="xl" className="text-sky" />
+                </div>
+                {/* パルス効果2（遅延） */}
+                <div className="absolute inset-0 animate-pulse opacity-30" style={{ animationDelay: '0.5s' }}>
+                    <LoadingSpinner size="xl" className="text-nature-light" />
                 </div>
             </div>
-            <h2 className="text-lg sm:text-xl text-gray-700 font-medium text-center mb-2">
-                {statusMessage || '提案を生成しています...'}
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500 text-center mb-6">しばらくお待ちください</p>
+
+            {/* ステータスメッセージ - フローティング効果 */}
+            <div className="animate-float">
+                <h2 className="text-lg sm:text-xl text-accent font-bold text-center mb-2 drop-shadow-sm">
+                    {statusMessage || '提案を生成しています...'}
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-600 text-center mb-6 font-medium">
+                    あなたにぴったりの旅行先を探しています
+                </p>
+            </div>
 
             {/* 見つかった旅行先案の表示 */}
             {foundClusters.length > 0 && (
-                <div className="mt-4 sm:mt-6 max-w-md w-full">
-                    <div className="bg-blue-50 rounded-lg p-4 sm:p-5 border border-blue-100">
-                        <h3 className="text-sm font-semibold text-blue-900 mb-3 text-center">
+                <div className="mt-4 sm:mt-6 max-w-md w-full animate-fadeIn">
+                    <div className="bg-gradient-to-br from-sky-light/20 to-nature-light/20 rounded-2xl p-4 sm:p-5 border-2 border-sky/30 shadow-lg">
+                        <h3 className="text-sm font-bold text-accent mb-3 text-center">
                             候補の旅行先を見つけました
                         </h3>
                         <ul className="space-y-2">
                             {foundClusters.map((clusterName, index) => (
                                 <li
                                     key={index}
-                                    className="flex items-center text-sm text-blue-800"
+                                    className="flex items-center text-sm text-gray-800 animate-slideIn"
+                                    style={{ animationDelay: `${index * 0.1}s` }}
                                 >
                                     <svg
-                                        className="w-4 h-4 mr-2 flex-shrink-0 text-blue-600"
+                                        className="w-5 h-5 mr-2 flex-shrink-0 text-nature"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                     >
@@ -41,11 +53,11 @@ export default function SuggestionLoading({ statusMessage, processingDetails }) 
                                             clipRule="evenodd"
                                         />
                                     </svg>
-                                    <span>{clusterName}</span>
+                                    <span className="font-medium">{clusterName}</span>
                                 </li>
                             ))}
                         </ul>
-                        <p className="text-xs text-blue-700 mt-3 text-center">
+                        <p className="text-xs text-gray-700 mt-4 text-center font-medium bg-white/50 rounded-lg py-2 px-3">
                             最適なプランを選定しています...
                         </p>
                     </div>

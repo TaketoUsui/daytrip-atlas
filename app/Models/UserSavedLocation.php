@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $address
  * @property Carbon|null $created_at
  * @property-read User $user
+ *
  * @method static Builder<static>|UserSavedLocation newModelQuery()
  * @method static Builder<static>|UserSavedLocation newQuery()
  * @method static Builder<static>|UserSavedLocation query()
@@ -27,6 +28,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|UserSavedLocation whereLongitude($value)
  * @method static Builder<static>|UserSavedLocation whereName($value)
  * @method static Builder<static>|UserSavedLocation whereUserId($value)
+ *
  * @mixin Eloquent
  */
 class UserSavedLocation extends Model
