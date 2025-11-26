@@ -181,11 +181,31 @@ class AnalyzeImageSelectionJob implements ShouldQueue
         $lines = [];
 
         foreach ($images as $image) {
-            $lines[] = sprintf(
-                'ID: %d - カテゴリ: %s',
-                $image->id,
-                $image->category ?? '未分類'
-            );
+            $parts = [
+                sprintf('ID: %d', $image->id),
+            ];
+
+            // alt_text（画像の種類を示す主要な情報）
+            if ($image->alt_text) {
+                $parts[] = sprintf('種類: %s', $image->alt_text);
+            }
+
+            // description（画像の詳細説明）
+            if ($image->description) {
+                $parts[] = sprintf('説明: %s', $image->description);
+            }
+
+            // file_name（ファイル名も参考情報として）
+            if ($image->file_name) {
+                $parts[] = sprintf('ファイル名: %s', $image->file_name);
+            }
+
+            // category（設定されている場合のみ）
+            if ($image->category) {
+                $parts[] = sprintf('カテゴリ: %s', $image->category);
+            }
+
+            $lines[] = implode(' | ', $parts);
         }
 
         return implode("\n", $lines);
