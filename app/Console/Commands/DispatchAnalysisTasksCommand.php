@@ -19,7 +19,7 @@ class DispatchAnalysisTasksCommand extends Command
     /**
      * コマンド名と引数
      */
-    protected $signature = 'analysis:dispatch';
+    protected $signature = 'analysis:dispatch {--count=1 : Number of jobs to dispatch in parallel}';
 
     /**
      * コマンドの説明
@@ -37,12 +37,22 @@ class DispatchAnalysisTasksCommand extends Command
             return self::FAILURE;
         }
 
-        $this->info('Dispatching AI analysis tasks...');
+        $count = (int) $this->option('count');
 
-        // タスクディスパッチャージョブをキューに投入
-        DispatchAsyncAnalysisTasksJob::dispatch();
+        if ($count < 1) {
+            $this->error('Count must be at least 1');
 
-        $this->info('Analysis task dispatcher job has been queued');
+            return self::FAILURE;
+        }
+
+        $this->info("Dispatching {$count} AI analysis task(s)...");
+
+        // 指定された回数だけタスクディスパッチャージョブをキューに投入
+        for ($i = 0; $i < $count; $i++) {
+            DispatchAsyncAnalysisTasksJob::dispatch();
+        }
+
+        $this->info("{$count} analysis task dispatcher job(s) have been queued");
 
         return self::SUCCESS;
     }
