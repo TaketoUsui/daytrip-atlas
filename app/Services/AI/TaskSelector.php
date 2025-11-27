@@ -135,12 +135,12 @@ class TaskSelector
         $maxConcurrent = config('ai.task_selection.max_concurrent_tasks_per_type', 3);
         $lockTimeoutMinutes = config('ai.task_selection.task_lock_timeout_minutes', 30);
 
-        // Bタイプタスクの優先順位（temp.mdの仕様通り）
+        // Bタイプタスクの優先順位（依存関係に基づく順序）
         $taskPriorities = [
-            'image_selection',   // 1. 画像選定（最優先）
-            'main_spot',         // 2. メインスポット選定
-            'model_plan',        // 3. モデルプラン生成
-            'catchphrase',       // 4. キャッチフレーズ生成
+            'catchphrase',       // 1. キャッチフレーズ生成（最初）
+            'model_plan',        // 2. モデルプラン生成（catchphrase完了後）
+            'main_spot',         // 3. メインスポット選定（model_plan完了後）
+            'image_selection',   // 4. 画像選定（最後: catchphrase, model_plan, main_spot完了後）
         ];
 
         foreach ($taskPriorities as $taskType) {
@@ -202,8 +202,10 @@ class TaskSelector
     {
         switch ($taskType) {
             case 'image_selection':
-                // 画像選定: メインスポット選定が完了しており、画像が未選定のモデルプラン
-                $modelPlan = \App\Models\ModelPlan::whereNotNull('main_spot_id')
+                // 画像選定: キャッチフレーズ、モデルプラン、メインスポットが完了しており、画像が未選定のモデルプラン
+                $modelPlan = \App\Models\ModelPlan::whereNotNull('catchphrase_analyzed_by_model_id')
+                    ->whereNotNull('model_plan_analyzed_by_model_id')
+                    ->whereNotNull('main_spot_id')
                     ->whereNull('image_selection_analyzed_by_model_id')
                     ->whereNull('image_selection_analyzing_by_model_id')
                     ->inRandomOrder()
