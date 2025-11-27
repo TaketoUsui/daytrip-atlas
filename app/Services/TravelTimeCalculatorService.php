@@ -106,15 +106,46 @@ class TravelTimeCalculatorService
      */
     public function formatTravelTimeText(int $travelTimeMinutes): string
     {
-        $hours = intdiv($travelTimeMinutes, 60);
-        $minutes = $travelTimeMinutes % 60;
+        // 適切な刻みで丸める
+        $roundedMinutes = $this->roundTravelTime($travelTimeMinutes);
+
+        $hours = intdiv($roundedMinutes, 60);
+        $minutes = $roundedMinutes % 60;
 
         if ($hours > 0 && $minutes > 0) {
-            return "車で約{$hours}時間{$minutes}分";
+            return "車で片道 約{$hours}時間{$minutes}分";
         } elseif ($hours > 0) {
-            return "車で約{$hours}時間";
+            return "車で片道 約{$hours}時間";
         } else {
-            return "車で約{$minutes}分";
+            return "車で片道 約{$minutes}分";
+        }
+    }
+
+    /**
+     * 移動時間を適切な刻みで丸める
+     *
+     * - 20分以内：5分刻み
+     * - 1時間以内：10分刻み
+     * - 3時間以内：30分刻み
+     * - それ以上：1時間刻み
+     *
+     * @param  int  $travelTimeMinutes  移動時間（分）
+     * @return int 丸めた移動時間（分）
+     */
+    private function roundTravelTime(int $travelTimeMinutes): int
+    {
+        if ($travelTimeMinutes <= 20) {
+            // 20分以内：5分刻み
+            return (int) (ceil($travelTimeMinutes / 5) * 5);
+        } elseif ($travelTimeMinutes <= 60) {
+            // 1時間以内：10分刻み
+            return (int) (ceil($travelTimeMinutes / 10) * 10);
+        } elseif ($travelTimeMinutes <= 180) {
+            // 3時間以内：30分刻み
+            return (int) (ceil($travelTimeMinutes / 30) * 30);
+        } else {
+            // それ以上：1時間刻み（60分刻み）
+            return (int) (ceil($travelTimeMinutes / 60) * 60);
         }
     }
 
