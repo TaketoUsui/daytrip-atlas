@@ -53,6 +53,9 @@ class ModelPlan extends Model
         'model_plan_analyzed_by_model_id',
         'model_plan_analyzing_by_model_id',
         'model_plan_analyzing_started_at',
+        'image_selection_analyzed_by_model_id',
+        'image_selection_analyzing_by_model_id',
+        'image_selection_analyzing_started_at',
     ];
 
     protected function casts(): array
@@ -63,6 +66,7 @@ class ModelPlan extends Model
             // AI分析タイムスタンプのキャスト
             'catchphrase_analyzing_started_at' => 'datetime',
             'model_plan_analyzing_started_at' => 'datetime',
+            'image_selection_analyzing_started_at' => 'datetime',
         ];
     }
 
@@ -116,5 +120,15 @@ class ModelPlan extends Model
     public function modelPlanAnalyzingByModel(): BelongsTo
     {
         return $this->belongsTo(AiModel::class, 'model_plan_analyzing_by_model_id');
+    }
+
+    public function imageSelectionAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'image_selection_analyzed_by_model_id');
+    }
+
+    public function imageSelectionAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'image_selection_analyzing_by_model_id');
     }
 }

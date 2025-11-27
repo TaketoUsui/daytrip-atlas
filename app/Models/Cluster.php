@@ -59,9 +59,6 @@ class Cluster extends Model
         'main_spot_analyzed_by_model_id',
         'main_spot_analyzing_by_model_id',
         'main_spot_analyzing_started_at',
-        'image_analyzed_by_model_id',
-        'image_analyzing_by_model_id',
-        'image_analyzing_started_at',
     ];
 
     protected function casts(): array
@@ -73,7 +70,6 @@ class Cluster extends Model
             'spot_listing_analyzing_started_at' => 'datetime',
             'spot_priority_analyzing_started_at' => 'datetime',
             'main_spot_analyzing_started_at' => 'datetime',
-            'image_analyzing_started_at' => 'datetime',
         ];
     }
 
@@ -133,15 +129,5 @@ class Cluster extends Model
     public function mainSpotAnalyzingByModel(): BelongsTo
     {
         return $this->belongsTo(AiModel::class, 'main_spot_analyzing_by_model_id');
-    }
-
-    public function imageAnalyzedByModel(): BelongsTo
-    {
-        return $this->belongsTo(AiModel::class, 'image_analyzed_by_model_id');
-    }
-
-    public function imageAnalyzingByModel(): BelongsTo
-    {
-        return $this->belongsTo(AiModel::class, 'image_analyzing_by_model_id');
     }
 }

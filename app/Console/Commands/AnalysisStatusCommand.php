@@ -109,24 +109,45 @@ class AnalysisStatusCommand extends Command
      */
     private function showBTypeTasks(): void
     {
-        $this->line('<fg=cyan>B-type Tasks (Cluster Analysis):</>');
+        $this->line('<fg=cyan>B-type Tasks (Cluster & Model Plan Analysis):</>');
 
         $totalClusters = Cluster::count();
 
-        $taskTypes = [
+        // Clusterベースのタスク
+        $clusterTaskTypes = [
             'spot_listing' => 'Spot Listing',
             'spot_priority' => 'Spot Priority',
             'main_spot' => 'Main Spot Selection',
-            'image' => 'Image Selection',
         ];
 
-        foreach ($taskTypes as $taskType => $label) {
+        foreach ($clusterTaskTypes as $taskType => $label) {
             $analyzedColumn = "{$taskType}_analyzed_by_model_id";
             $analyzingColumn = "{$taskType}_analyzing_by_model_id";
 
             $analyzed = Cluster::whereNotNull($analyzedColumn)->count();
             $analyzing = Cluster::whereNotNull($analyzingColumn)->count();
             $pending = $totalClusters - $analyzed - $analyzing;
+
+            $this->line("  <fg=white>{$label}:</>");
+            $this->line("    Analyzed: <fg=green>{$analyzed}</> | Analyzing: <fg=blue>{$analyzing}</> | Pending: <fg=red>{$pending}</>");
+        }
+
+        // ModelPlanベースのタスク
+        $totalModelPlans = \App\Models\ModelPlan::count();
+
+        $modelPlanTaskTypes = [
+            'image_selection' => 'Image Selection',
+            'catchphrase' => 'Catchphrase Generation',
+            'model_plan' => 'Model Plan Generation',
+        ];
+
+        foreach ($modelPlanTaskTypes as $taskType => $label) {
+            $analyzedColumn = "{$taskType}_analyzed_by_model_id";
+            $analyzingColumn = "{$taskType}_analyzing_by_model_id";
+
+            $analyzed = \App\Models\ModelPlan::whereNotNull($analyzedColumn)->count();
+            $analyzing = \App\Models\ModelPlan::whereNotNull($analyzingColumn)->count();
+            $pending = $totalModelPlans - $analyzed - $analyzing;
 
             $this->line("  <fg=white>{$label}:</>");
             $this->line("    Analyzed: <fg=green>{$analyzed}</> | Analyzing: <fg=blue>{$analyzing}</> | Pending: <fg=red>{$pending}</>");
@@ -165,9 +186,6 @@ class AnalysisStatusCommand extends Command
         })->orWhere(function ($query) use ($lockTimeoutMinutes) {
             $query->whereNotNull('main_spot_analyzing_by_model_id')
                 ->where('main_spot_analyzing_started_at', '>', now()->subMinutes($lockTimeoutMinutes));
-        })->orWhere(function ($query) use ($lockTimeoutMinutes) {
-            $query->whereNotNull('image_analyzing_by_model_id')
-                ->where('image_analyzing_started_at', '>', now()->subMinutes($lockTimeoutMinutes));
         })->get();
 
         if ($runningClusters->isNotEmpty()) {
@@ -180,10 +198,34 @@ class AnalysisStatusCommand extends Command
                     $taskType = 'spot_priority';
                 } elseif ($cluster->main_spot_analyzing_by_model_id) {
                     $taskType = 'main_spot';
-                } elseif ($cluster->image_analyzing_by_model_id) {
-                    $taskType = 'image';
                 }
                 $this->line("    - {$cluster->name} (task: {$taskType})");
+            }
+        }
+
+        $runningModelPlans = \App\Models\ModelPlan::where(function ($query) use ($lockTimeoutMinutes) {
+            $query->whereNotNull('image_selection_analyzing_by_model_id')
+                ->where('image_selection_analyzing_started_at', '>', now()->subMinutes($lockTimeoutMinutes));
+        })->orWhere(function ($query) use ($lockTimeoutMinutes) {
+            $query->whereNotNull('catchphrase_analyzing_by_model_id')
+                ->where('catchphrase_analyzing_started_at', '>', now()->subMinutes($lockTimeoutMinutes));
+        })->orWhere(function ($query) use ($lockTimeoutMinutes) {
+            $query->whereNotNull('model_plan_analyzing_by_model_id')
+                ->where('model_plan_analyzing_started_at', '>', now()->subMinutes($lockTimeoutMinutes));
+        })->get();
+
+        if ($runningModelPlans->isNotEmpty()) {
+            $this->line('  <fg=yellow>Running Model Plan Analysis Tasks:</>');
+            foreach ($runningModelPlans as $modelPlan) {
+                $taskType = null;
+                if ($modelPlan->image_selection_analyzing_by_model_id) {
+                    $taskType = 'image_selection';
+                } elseif ($modelPlan->catchphrase_analyzing_by_model_id) {
+                    $taskType = 'catchphrase';
+                } elseif ($modelPlan->model_plan_analyzing_by_model_id) {
+                    $taskType = 'model_plan';
+                }
+                $this->line("    - {$modelPlan->name} (task: {$taskType})");
             }
         }
     }

@@ -168,7 +168,7 @@ class DispatchAsyncAnalysisTasksJob implements ShouldQueue
 
         // タスクタイプに応じた適切なジョブをディスパッチ
         match ($taskType) {
-            'image_selection' => AnalyzeImageSelectionJob::dispatch($task['cluster'], $model),
+            'image_selection' => AnalyzeImageSelectionJob::dispatch($task['model_plan'], $model),
             'main_spot' => AnalyzeMainSpotJob::dispatch($task['cluster'], $model),
             'model_plan' => AnalyzeModelPlanJob::dispatch($task['model_plan'], $model),
             'catchphrase' => AnalyzeCatchphraseJob::dispatch($task['cluster'], $model),
@@ -176,7 +176,7 @@ class DispatchAsyncAnalysisTasksJob implements ShouldQueue
         };
 
         $targetId = isset($task['cluster']) ? $task['cluster']->id : $task['model_plan']->id;
-        $targetName = isset($task['cluster']) ? $task['cluster']->name : "ModelPlan#{$task['model_plan']->id}";
+        $targetName = isset($task['cluster']) ? $task['cluster']->name : $task['model_plan']->name;
 
         Log::info('[DispatchAsyncAnalysisTasksJob] Dispatched B-type task', [
             'task_type' => $taskType,

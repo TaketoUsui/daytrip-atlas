@@ -4,8 +4,8 @@ namespace App\Jobs\Analysis;
 
 use App\Exceptions\ConcurrentAnalysisException;
 use App\Models\AiModel;
-use App\Models\Cluster;
 use App\Models\Image;
+use App\Models\ModelPlan;
 use App\Services\AI\LockManager;
 use App\Services\GeminiClientService;
 use App\Services\PromptLoaderService;
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * 画像選定ジョブ（Bタイプタスク）
  *
- * クラスターに最適な画像を選定し、全モデルプランに設定する
+ * モデルプランに最適な画像を選定する
  */
 class AnalyzeImageSelectionJob implements ShouldQueue
 {
@@ -36,7 +36,7 @@ class AnalyzeImageSelectionJob implements ShouldQueue
     public int $backoff;
 
     public function __construct(
-        public Cluster $cluster,
+        public ModelPlan $modelPlan,
         public AiModel $model
     ) {
         $this->tries = config('ai.retry.max_attempts', 3);
@@ -55,19 +55,19 @@ class AnalyzeImageSelectionJob implements ShouldQueue
 
         if ($debugLog) {
             Log::info('[AnalyzeImageSelectionJob] Starting', [
-                'cluster_id' => $this->cluster->id,
-                'cluster_name' => $this->cluster->name,
+                'model_plan_id' => $this->modelPlan->id,
+                'model_plan_name' => $this->modelPlan->name,
                 'model' => $this->model->model_name,
             ]);
         }
 
         try {
             // ロックを取得
-            $lockManager->acquireLock($this->cluster, 'image', $this->model);
+            $lockManager->acquireLock($this->modelPlan, 'image_selection', $this->model);
 
             if ($debugLog) {
                 Log::info('[AnalyzeImageSelectionJob] Lock acquired', [
-                    'cluster_id' => $this->cluster->id,
+                    'model_plan_id' => $this->modelPlan->id,
                 ]);
             }
 
@@ -78,27 +78,28 @@ class AnalyzeImageSelectionJob implements ShouldQueue
                 throw new Exception('No available images found');
             }
 
-            // メインスポット情報を取得
-            $mainSpotName = null;
-            $mainSpotRole = null;
+            // モデルプラン情報を取得
+            $cluster = $this->modelPlan->cluster;
+            $mainSpot = $this->modelPlan->mainSpot;
+            $catchphrase = $this->modelPlan->catchphrase;
 
-            $modelPlans = $this->cluster->modelPlans;
-            if ($modelPlans->isNotEmpty()) {
-                $firstPlan = $modelPlans->first();
-                if ($firstPlan->mainSpot) {
-                    $mainSpotName = $firstPlan->mainSpot->name;
-                    $mainSpotRole = $firstPlan->mainSpot->spot_role;
-                }
-            }
+            // プランに含まれるスポットのリストを取得
+            $planItems = $this->modelPlan->items()->with('spot')->orderBy('display_order')->get();
+            $spotsList = $planItems->map(function ($item) {
+                return $item->spot->name;
+            })->join('、');
 
             // 画像リストをフォーマット
             $imageListText = $this->formatImageList($availableImages);
 
             // プロンプトを読み込み
             $prompt = $promptLoader->load('image_selection.txt', [
-                'cluster_name' => $this->cluster->name,
-                'main_spot_name' => $mainSpotName ?? 'なし',
-                'main_spot_role' => $mainSpotRole ?? 'unknown',
+                'model_plan_name' => $this->modelPlan->name,
+                'cluster_name' => $cluster->name,
+                'plan_description' => $this->modelPlan->description ?? 'なし',
+                'catchphrase' => $catchphrase?->text ?? 'なし',
+                'main_spot_name' => $mainSpot?->name ?? 'なし',
+                'spots_list' => $spotsList ?: 'なし',
                 'available_images' => $imageListText,
             ]);
 
@@ -124,33 +125,26 @@ class AnalyzeImageSelectionJob implements ShouldQueue
                 throw new Exception("Selected image not found: {$selectedImageId}");
             }
 
-            // クラスターの全モデルプランに画像を設定
-            foreach ($modelPlans as $modelPlan) {
-                $modelPlan->update([
-                    'image_id' => $selectedImageId,
-                ]);
-
-                Log::info('[AnalyzeImageSelectionJob] Updated model plan with image', [
-                    'model_plan_id' => $modelPlan->id,
-                    'image_id' => $selectedImageId,
-                ]);
-            }
+            // モデルプランに画像を設定
+            $this->modelPlan->update([
+                'image_id' => $selectedImageId,
+            ]);
 
             // ロックを解放（分析完了）
-            $lockManager->releaseLock($this->cluster, 'image', $this->model);
+            $lockManager->releaseLock($this->modelPlan, 'image_selection', $this->model);
 
             Log::info('[AnalyzeImageSelectionJob] Successfully selected image', [
-                'cluster_id' => $this->cluster->id,
-                'cluster_name' => $this->cluster->name,
+                'model_plan_id' => $this->modelPlan->id,
+                'model_plan_name' => $this->modelPlan->name,
+                'cluster_name' => $cluster->name,
                 'image_id' => $selectedImageId,
-                'updated_model_plans' => $modelPlans->count(),
                 'model' => $this->model->model_name,
             ]);
 
         } catch (ConcurrentAnalysisException $e) {
             // 並行実行が検出された場合はジョブを終了（リトライしない）
             Log::info('[AnalyzeImageSelectionJob] Concurrent execution detected, skipping', [
-                'cluster_id' => $this->cluster->id,
+                'model_plan_id' => $this->modelPlan->id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -158,13 +152,13 @@ class AnalyzeImageSelectionJob implements ShouldQueue
 
         } catch (Exception $e) {
             Log::error('[AnalyzeImageSelectionJob] Failed to select image', [
-                'cluster_id' => $this->cluster->id,
-                'cluster_name' => $this->cluster->name,
+                'model_plan_id' => $this->modelPlan->id,
+                'model_plan_name' => $this->modelPlan->name,
                 'error' => $e->getMessage(),
             ]);
 
             // エラー時はロックを強制解放
-            $lockManager->forceReleaseLock($this->cluster, 'image');
+            $lockManager->forceReleaseLock($this->modelPlan, 'image_selection');
 
             throw $e;
         }

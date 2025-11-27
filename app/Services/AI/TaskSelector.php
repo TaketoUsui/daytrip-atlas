@@ -179,18 +179,16 @@ class TaskSelector
      */
     private function countRunningTasksForBType(string $taskType, int $lockTimeoutMinutes): int
     {
-        // ModelPlanテーブルで管理されるタスク
-        if ($taskType === 'model_plan' || $taskType === 'catchphrase') {
+        // ModelPlanテーブルで管理されるタスク（model_plan, catchphrase, image_selection）
+        if ($taskType === 'model_plan' || $taskType === 'catchphrase' || $taskType === 'image_selection') {
             return \App\Models\ModelPlan::whereNotNull("{$taskType}_analyzing_by_model_id")
                 ->where("{$taskType}_analyzing_started_at", '>', now()->subMinutes($lockTimeoutMinutes))
                 ->count();
         }
 
-        // Clusterテーブルで管理されるタスク（image_selection, main_spot）
-        // タスク名をDBカラム名にマッピング
-        $columnPrefix = $taskType === 'image_selection' ? 'image' : $taskType;
-        $analyzingByColumn = "{$columnPrefix}_analyzing_by_model_id";
-        $analyzingStartedAtColumn = "{$columnPrefix}_analyzing_started_at";
+        // Clusterテーブルで管理されるタスク（main_spot）
+        $analyzingByColumn = "{$taskType}_analyzing_by_model_id";
+        $analyzingStartedAtColumn = "{$taskType}_analyzing_started_at";
 
         return Cluster::whereNotNull($analyzingByColumn)
             ->where($analyzingStartedAtColumn, '>', now()->subMinutes($lockTimeoutMinutes))
@@ -204,14 +202,14 @@ class TaskSelector
     {
         switch ($taskType) {
             case 'image_selection':
-                // 画像選定: メインスポット選定が完了しているクラスター
-                $cluster = Cluster::whereNotNull('main_spot_analyzed_by_model_id')
-                    ->whereNull('image_analyzed_by_model_id')
-                    ->whereNull('image_analyzing_by_model_id')
+                // 画像選定: メインスポット選定が完了しており、画像が未選定のモデルプラン
+                $modelPlan = \App\Models\ModelPlan::whereNotNull('main_spot_id')
+                    ->whereNull('image_selection_analyzed_by_model_id')
+                    ->whereNull('image_selection_analyzing_by_model_id')
                     ->inRandomOrder()
                     ->first();
 
-                return $cluster ? ['type' => 'image_selection', 'cluster' => $cluster] : null;
+                return $modelPlan ? ['type' => 'image_selection', 'model_plan' => $modelPlan] : null;
 
             case 'main_spot':
                 // メインスポット選定: キャッチフレーズ生成とモデルプラン生成が完了しているクラスター
@@ -311,7 +309,6 @@ class TaskSelector
             'spot_listing_analyzing_started_at',
             'spot_priority_analyzing_started_at',
             'main_spot_analyzing_started_at',
-            'image_analyzing_started_at',
         ];
 
         $latestClusterTime = null;
@@ -353,6 +350,7 @@ class TaskSelector
         $modelPlanColumns = [
             'catchphrase_analyzing_started_at',
             'model_plan_analyzing_started_at',
+            'image_selection_analyzing_started_at',
         ];
 
         $latestModelPlanTime = null;
