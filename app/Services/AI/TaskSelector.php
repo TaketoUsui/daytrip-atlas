@@ -122,11 +122,13 @@ class TaskSelector
     /**
      * Bタイプタスク（プラン関連分析）を選定
      *
-     * 優先順位（temp.mdの仕様通り）:
-     * 1. 画像選定
+     * 優先順位:
+     * 1. 画像選定（最優先）
      * 2. メインスポット選定
      * 3. モデルプラン生成
      * 4. キャッチフレーズ生成
+     *
+     * 注: 各タスクは前提条件を満たす必要がある（例: image_selectionはmain_spot完了後のみ実行可能）
      *
      * @return array{type: string, cluster?: Cluster, model_plan?: ModelPlan}|null
      */
@@ -135,12 +137,12 @@ class TaskSelector
         $maxConcurrent = config('ai.task_selection.max_concurrent_tasks_per_type', 3);
         $lockTimeoutMinutes = config('ai.task_selection.task_lock_timeout_minutes', 30);
 
-        // Bタイプタスクの優先順位（依存関係に基づく順序）
+        // Bタイプタスクの優先順位（優先度の高い順、前提条件は各findメソッド内で検証）
         $taskPriorities = [
-            'catchphrase',       // 1. キャッチフレーズ生成（最初）
-            'model_plan',        // 2. モデルプラン生成（catchphrase完了後）
-            'main_spot',         // 3. メインスポット選定（model_plan完了後）
-            'image_selection',   // 4. 画像選定（最後: catchphrase, model_plan, main_spot完了後）
+            'image_selection',   // 1. 画像選定（最優先、前提: catchphrase, model_plan, main_spot完了）
+            'main_spot',         // 2. メインスポット選定（前提: catchphrase, model_plan完了）
+            'model_plan',        // 3. モデルプラン生成（前提: catchphrase完了）
+            'catchphrase',       // 4. キャッチフレーズ生成（前提: スポット分析完了）
         ];
 
         foreach ($taskPriorities as $taskType) {
