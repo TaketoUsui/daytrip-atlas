@@ -58,7 +58,7 @@ class ClusterSelectorService
     /**
      * 出発地から150km以内の候補クラスターを取得
      *
-     * モデルプランが存在するクラスターのみを対象とする
+     * キービジュアル選定が完了したモデルプランが存在するクラスターのみを対象とする
      *
      * @param  float  $latitude  出発地の緯度
      * @param  float  $longitude  出発地の経度
@@ -78,7 +78,10 @@ class ClusterSelectorService
         ])
             ->where('status', 'published')
             ->whereNotNull('location')
-            ->whereHas('modelPlans') // モデルプランが存在するクラスターのみ
+            ->whereHas('modelPlans', function ($query) {
+                // キービジュアル選定が完了しているモデルプランが存在するクラスターのみ
+                $query->whereNotNull('image_selection_analyzed_by_model_id');
+            })
             ->whereRaw('
             ST_DWithin(
                 ST_MakePoint(?, ?)::geography,

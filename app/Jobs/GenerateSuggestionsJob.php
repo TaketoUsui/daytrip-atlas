@@ -93,33 +93,32 @@ class GenerateSuggestionsJob implements ShouldQueue
 
             foreach ($clusters as $cluster) {
                 try {
-                    // このクラスターのデフォルトモデルプランを取得
+                    // このクラスターの画像選定が完了したモデルプランを取得
+                    // まずデフォルトプランを優先
                     $modelPlan = $cluster->modelPlans()
                         ->where('is_default', true)
+                        ->whereNotNull('image_selection_analyzed_by_model_id')
                         ->first();
 
                     if (! $modelPlan) {
-                        // デフォルトプランがない場合は最初のプランを使用
-                        $modelPlan = $cluster->modelPlans()->first();
+                        // デフォルトプランがない場合は画像選定が完了した最初のプランを使用
+                        $modelPlan = $cluster->modelPlans()
+                            ->whereNotNull('image_selection_analyzed_by_model_id')
+                            ->first();
                     }
 
                     if (! $modelPlan) {
-                        // クラスター選択時にモデルプランの存在を確認済みだが、
-                        // 万が一の場合に備えて防御的にスキップ
+                        // 画像選定が完了したモデルプランが存在しない場合はスキップ
+                        // （通常はClusterSelectorServiceで除外されているため到達しないはず）
+                        Log::warning('[GenerateSuggestionsJob] No model plan with completed image selection found', [
+                            'cluster_id' => $cluster->id,
+                        ]);
                         continue;
                     }
 
                     // キャッチフレーズがまだ生成されていない場合の警告
                     if (! $modelPlan->catchphrase) {
                         Log::warning('[GenerateSuggestionsJob] Model plan missing catchphrase (async analysis pending)', [
-                            'model_plan_id' => $modelPlan->id,
-                            'cluster_id' => $cluster->id,
-                        ]);
-                    }
-
-                    // 画像がまだ選定されていない場合の警告
-                    if (! $modelPlan->image_id) {
-                        Log::warning('[GenerateSuggestionsJob] Model plan missing image (async analysis pending)', [
                             'model_plan_id' => $modelPlan->id,
                             'cluster_id' => $cluster->id,
                         ]);
