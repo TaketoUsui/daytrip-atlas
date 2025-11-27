@@ -44,18 +44,52 @@ export default function Detail({ modelPlan, suggestionSetUuid }) {
                             {/* グラデーションオーバーレイ */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
 
-                            {/* モデルプラン名オーバーレイ */}
+                            {/* モデルプラン名と総所要時間 */}
                             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg mb-3">
                                     {modelPlan.name}
                                 </h1>
+                                {/* 総所要時間 */}
+                                <div className="inline-flex items-center text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/30 w-fit">
+                                    <svg
+                                        className="w-5 h-5 mr-2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                    <span className="font-semibold text-sm sm:text-base">総所要時間: 約{formatDuration(modelPlan.total_duration_minutes)}</span>
+                                </div>
                             </div>
                         </div>
                     ) : (
                         <div className="p-6 sm:p-8">
-                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
                                 {modelPlan.name}
                             </h1>
+                            {/* 総所要時間（画像なし） */}
+                            <div className="inline-flex items-center text-gray-600 bg-gradient-to-r from-warm-100/10 to-warm-200/10 px-4 py-2 rounded-lg border-l-4 border-primary">
+                                <svg
+                                    className="w-5 h-5 mr-2 text-primary"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                <span className="font-semibold text-sm sm:text-base">総所要時間: 約{formatDuration(modelPlan.total_duration_minutes)}</span>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -63,23 +97,6 @@ export default function Detail({ modelPlan, suggestionSetUuid }) {
                 {/* メタデータカード */}
                 {(modelPlan.cluster_name || modelPlan.catchphrase || modelPlan.description) && (
                     <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-primary/10 mb-6 sm:mb-8">
-                        {/*<h2 className="text-lg sm:text-xl font-bold text-accent mb-4 flex items-center">*/}
-                        {/*    <svg*/}
-                        {/*        className="w-5 h-5 mr-2 text-primary"*/}
-                        {/*        fill="none"*/}
-                        {/*        stroke="currentColor"*/}
-                        {/*        viewBox="0 0 24 24"*/}
-                        {/*    >*/}
-                        {/*        <path*/}
-                        {/*            strokeLinecap="round"*/}
-                        {/*            strokeLinejoin="round"*/}
-                        {/*            strokeWidth={2}*/}
-                        {/*            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"*/}
-                        {/*        />*/}
-                        {/*    </svg>*/}
-                        {/*    旅行先情報*/}
-                        {/*</h2>*/}
-
                         <div className="space-y-4">
                             {/* クラスター名 */}
                             {modelPlan.cluster_name && (
@@ -160,31 +177,9 @@ export default function Detail({ modelPlan, suggestionSetUuid }) {
                 )}
 
                 {/* モデルプラン */}
-                {modelPlan && (
+                {modelPlan && modelPlan.items && modelPlan.items.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-primary/10">
-                        <div className="mb-6 sm:mb-8">
-                            <div className="flex items-center text-gray-600 bg-gradient-to-r from-warm-100/10 to-warm-200/10 px-4 py-2 rounded-lg border-l-4 border-primary">
-                                <svg
-                                    className="w-5 h-5 mr-2 text-primary"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                                <span className="font-semibold">総所要時間: 約{formatDuration(modelPlan.total_duration_minutes)}</span>
-                            </div>
-                        </div>
-
-                        {/* タイムライン */}
-                        {modelPlan.items && modelPlan.items.length > 0 && (
-                            <ModelPlanTimeline items={modelPlan.items} />
-                        )}
+                        <ModelPlanTimeline items={modelPlan.items} />
                     </div>
                 )}
             </div>
