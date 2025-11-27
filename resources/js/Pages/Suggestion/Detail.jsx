@@ -30,65 +30,139 @@ export default function Detail({ modelPlan, suggestionSetUuid }) {
                     </Link>
                 )}
 
-                {/* 提案情報 */}
+                {/* キービジュアル */}
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6 sm:mb-8 border-2 border-primary/10">
-                    {/* キービジュアル with オーバーレイ */}
                     {modelPlan.key_visual_url ? (
                         <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden">
                             {/* 背景画像 */}
                             <img
                                 src={modelPlan.key_visual_url}
-                                alt={modelPlan.cluster_name}
+                                alt={modelPlan.name}
                                 className="w-full h-full object-cover"
                             />
 
                             {/* グラデーションオーバーレイ */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
 
-                            {/* テキストオーバーレイ */}
+                            {/* モデルプラン名オーバーレイ */}
                             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 drop-shadow-lg">
-                                    {modelPlan.cluster_name}
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">
+                                    {modelPlan.name}
                                 </h1>
-
-                                {/* キャッチコピー */}
-                                {modelPlan.catchphrase && (
-                                    <p className="text-white text-base sm:text-lg font-medium mb-4 leading-relaxed italic drop-shadow-md">
-                                        {modelPlan.catchphrase}
-                                    </p>
-                                )}
                             </div>
                         </div>
                     ) : (
                         <div className="p-6 sm:p-8">
-                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-                                {modelPlan.cluster_name}
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                                {modelPlan.name}
                             </h1>
-
-                            {/* キャッチコピー */}
-                            {modelPlan.catchphrase && (
-                                <p className="text-gray-700 text-base sm:text-lg font-medium mb-4 leading-relaxed italic">
-                                    {modelPlan.catchphrase}
-                                </p>
-                            )}
                         </div>
                     )}
                 </div>
+
+                {/* メタデータカード */}
+                {(modelPlan.cluster_name || modelPlan.catchphrase || modelPlan.description) && (
+                    <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-primary/10 mb-6 sm:mb-8">
+                        {/*<h2 className="text-lg sm:text-xl font-bold text-accent mb-4 flex items-center">*/}
+                        {/*    <svg*/}
+                        {/*        className="w-5 h-5 mr-2 text-primary"*/}
+                        {/*        fill="none"*/}
+                        {/*        stroke="currentColor"*/}
+                        {/*        viewBox="0 0 24 24"*/}
+                        {/*    >*/}
+                        {/*        <path*/}
+                        {/*            strokeLinecap="round"*/}
+                        {/*            strokeLinejoin="round"*/}
+                        {/*            strokeWidth={2}*/}
+                        {/*            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"*/}
+                        {/*        />*/}
+                        {/*    </svg>*/}
+                        {/*    旅行先情報*/}
+                        {/*</h2>*/}
+
+                        <div className="space-y-4">
+                            {/* クラスター名 */}
+                            {modelPlan.cluster_name && (
+                                <div className="flex items-start">
+                                    <svg
+                                        className="w-5 h-5 mr-3 mt-0.5 text-ocean flex-shrink-0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                    </svg>
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-1">エリア</p>
+                                        <p className="text-sm sm:text-base text-gray-800 font-medium">{modelPlan.cluster_name}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* キャッチコピー */}
+                            {modelPlan.catchphrase && (
+                                <div className="flex items-start">
+                                    <svg
+                                        className="w-5 h-5 mr-3 mt-0.5 text-ocean flex-shrink-0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                                        />
+                                    </svg>
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-1">キャッチコピー</p>
+                                        <p className="text-sm sm:text-base text-gray-800 italic leading-relaxed">{modelPlan.catchphrase}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* モデルプラン説明 */}
+                            {modelPlan.description && (
+                                <div className="flex items-start">
+                                    <svg
+                                        className="w-5 h-5 mr-3 mt-0.5 text-ocean flex-shrink-0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        />
+                                    </svg>
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-1">プランについて</p>
+                                        <p className="text-sm sm:text-base text-gray-800 leading-relaxed">{modelPlan.description}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* モデルプラン */}
                 {modelPlan && (
                     <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-primary/10">
                         <div className="mb-6 sm:mb-8">
-                            <h2 className="text-xl sm:text-2xl font-bold text-accent mb-2">
-                                {modelPlan.name}
-                            </h2>
-
-                            {modelPlan.description && (
-                                <p className="text-gray-700 mb-4 leading-relaxed">
-                                    {modelPlan.description}
-                                </p>
-                            )}
-
                             <div className="flex items-center text-gray-600 bg-gradient-to-r from-warm-100/10 to-warm-200/10 px-4 py-2 rounded-lg border-l-4 border-primary">
                                 <svg
                                     className="w-5 h-5 mr-2 text-primary"
