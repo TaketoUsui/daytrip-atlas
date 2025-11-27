@@ -5,6 +5,7 @@ namespace App\Services;
 use Exception;
 use Gemini;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Gemini API呼び出しを共通化するサービス
@@ -32,6 +33,11 @@ class GeminiClientService
             throw new Exception('Gemini API key is not configured');
         }
 
+        // プロンプトログを記録（デバッグ用）
+        if (config('services.gemini.log_prompts', false)) {
+            $this->logPrompt($prompt, $model);
+        }
+
         $attempt = 0;
         $lastException = null;
 
@@ -50,6 +56,11 @@ class GeminiClientService
 
                 if (empty($generatedText)) {
                     throw new Exception('Generated text is empty');
+                }
+
+                // レスポンスログを記録（デバッグ用）
+                if (config('services.gemini.log_prompts', false)) {
+                    $this->logResponse($generatedText, $model);
                 }
 
                 return $generatedText;
@@ -127,5 +138,48 @@ class GeminiClientService
         }
 
         return $decoded;
+    }
+
+    /**
+     * プロンプトをログファイルに記録（デバッグ用）
+     *
+     * @param  string  $prompt  送信するプロンプト
+     * @param  string  $model  使用するモデル名
+     */
+    private function logPrompt(string $prompt, string $model): void
+    {
+        $timestamp = now()->format('Y-m-d H:i:s');
+        $date = now()->format('Y-m-d');
+        $logFile = "gemini-prompts-{$date}.log";
+
+        $logContent = str_repeat('=', 80)."\n";
+        $logContent .= "[{$timestamp}] PROMPT SENT\n";
+        $logContent .= "Model: {$model}\n";
+        $logContent .= str_repeat('-', 80)."\n";
+        $logContent .= $prompt."\n";
+        $logContent .= str_repeat('=', 80)."\n\n";
+
+        Storage::disk('local')->append($logFile, $logContent);
+    }
+
+    /**
+     * レスポンスをログファイルに記録（デバッグ用）
+     *
+     * @param  string  $response  受信したレスポンス
+     * @param  string  $model  使用したモデル名
+     */
+    private function logResponse(string $response, string $model): void
+    {
+        $timestamp = now()->format('Y-m-d H:i:s');
+        $date = now()->format('Y-m-d');
+        $logFile = "gemini-prompts-{$date}.log";
+
+        $logContent = "[{$timestamp}] RESPONSE RECEIVED\n";
+        $logContent .= "Model: {$model}\n";
+        $logContent .= str_repeat('-', 80)."\n";
+        $logContent .= $response."\n";
+        $logContent .= str_repeat('=', 80)."\n\n";
+
+        Storage::disk('local')->append($logFile, $logContent);
     }
 }

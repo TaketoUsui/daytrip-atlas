@@ -43,6 +43,7 @@ return [
             'times' => 3,
             'sleep_milliseconds' => 1000,
         ],
+        'log_prompts' => env('GEMINI_LOG_PROMPTS', false),
     ],
 
 ];
