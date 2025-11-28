@@ -255,7 +255,7 @@ class AnalyzeSpotDetailJob implements ShouldQueue
     private function updateSpotWithDetails(Spot $spot, array $details): void
     {
         $spot->update([
-            'location' => Point::make($details['latitude'], $details['longitude']),
+            'location' => Point::make($details['longitude'], $details['latitude']),
             'address_detail' => $details['address_detail'] ?? null,
             'min_duration_minutes' => $details['min_duration_minutes'],
             'max_duration_minutes' => $details['max_duration_minutes'],
