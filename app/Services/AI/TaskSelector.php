@@ -12,8 +12,8 @@ use Illuminate\Support\Collection;
  *
  * Aタイプ（スポット関連分析）とBタイプ（プラン関連分析）のタスクを選定する
  *
- * Aタイプ（80%）: スポット詳細分析、スポット優先度付け、スポットリストアップ
- * Bタイプ（20%）: 画像選定、メインスポット選定、モデルプラン生成、キャッチフレーズ生成
+ * Aタイプ（50%）: スポット詳細分析、スポット優先度付け、スポットリストアップ
+ * Bタイプ（50%）: 画像選定、メインスポット選定、モデルプラン生成、キャッチフレーズ生成
  */
 class TaskSelector
 {
@@ -86,15 +86,18 @@ class TaskSelector
         switch ($taskType) {
             case 'spot_detail':
                 // スポット詳細分析: 分析優先度が高く、まだ分析されていないスポット
+                // 優先度上位から選択しつつ、ランダム性も確保（上位10件からランダム選択）
                 $maxFailureCount = config('ai.task_selection.spot_detail_max_failure_count', 5);
 
-                $spot = Spot::whereNull('detail_analyzed_by_model_id')
+                $spots = Spot::whereNull('detail_analyzed_by_model_id')
                     ->whereNull('detail_analyzing_by_model_id')
                     ->whereNotNull('analysis_priority')
                     ->where('detail_analysis_failure_count', '<', $maxFailureCount)
                     ->orderBy('analysis_priority', 'desc')
-                    ->inRandomOrder()
-                    ->first();
+                    ->limit(10)
+                    ->get();
+
+                $spot = $spots->isNotEmpty() ? $spots->random() : null;
 
                 return $spot ? ['type' => 'spot_detail', 'spot' => $spot] : null;
 
