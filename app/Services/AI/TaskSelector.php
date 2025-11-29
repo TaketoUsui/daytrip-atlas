@@ -292,18 +292,47 @@ class TaskSelector
     /**
      * モデルが実行可能かどうかを判定
      *
+     * Gemini APIの日次上限は太平洋時間（PT）の午前0時にリセットされるため、
+     * PT基準で「今日」の実行回数をカウントする
+     *
      * @param  AiModel  $model
      * @return bool
      */
     private function canExecuteModel(AiModel $model): bool
     {
-        // 過去24時間の実際の実行回数をカウント
+        // 太平洋時間（PT）基準で「今日」の開始時刻を取得
+        $todayStartInPT = $this->getTodayStartInPacificTime();
+
+        // PT基準で「今日」の実行回数をカウント
         $executionCount = \App\Models\AiModelExecutionLog::where('ai_model_id', $model->id)
-            ->where('executed_at', '>=', now()->subDay())
+            ->where('executed_at', '>=', $todayStartInPT)
             ->count();
 
         // 上限に達していないかチェック
         return $executionCount < $model->daily_limit;
+    }
+
+    /**
+     * 太平洋時間（PT）基準で「今日」の開始時刻を取得
+     *
+     * Gemini APIの日次上限は太平洋時間の午前0時にリセットされる
+     * - 標準時（PST）: UTC-8, JST 17:00
+     * - 夏時間（PDT）: UTC-7, JST 16:00
+     *
+     * @return \Illuminate\Support\Carbon
+     */
+    private function getTodayStartInPacificTime(): \Illuminate\Support\Carbon
+    {
+        $timezone = config('ai.model_selection.api_reset_timezone', 'America/Los_Angeles');
+
+        // 現在時刻を太平洋時間に変換
+        $nowInPT = now()->setTimezone($timezone);
+
+        // 太平洋時間で「今日」の午前0時を取得
+        $todayStartInPT = $nowInPT->copy()->startOfDay();
+
+        // アプリケーションのタイムゾーン（UTC）に戻す
+        return $todayStartInPT->setTimezone(config('app.timezone', 'UTC'));
     }
 
     /**

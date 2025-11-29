@@ -80,6 +80,12 @@ return [
 
         // モデル選択時に過去何時間分の実行履歴を確認するか
         'execution_history_hours' => env('AI_MODEL_EXECUTION_HISTORY_HOURS', 24),
+
+        // Gemini API日次上限のリセットタイムゾーン
+        // Gemini APIは太平洋時間（PT）の午前0時にリセット
+        // 標準時（PST）: UTC-8, JST 17:00にリセット
+        // 夏時間（PDT）: UTC-7, JST 16:00にリセット
+        'api_reset_timezone' => env('AI_API_RESET_TIMEZONE', 'America/Los_Angeles'),
     ],
 
     /*
