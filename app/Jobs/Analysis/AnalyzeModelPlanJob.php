@@ -77,12 +77,12 @@ class AnalyzeModelPlanJob implements ShouldQueue
                 throw new Exception('Catchphrase not found for model plan');
             }
 
-            // クラスターに属するスポットを取得
+            // クラスターに属するスポットを取得（analysis_failedを除外）
             $cluster = $this->modelPlan->cluster;
-            $spots = $cluster->spots;
+            $spots = $cluster->validSpots;
 
             if ($spots->isEmpty()) {
-                throw new Exception('No spots found for cluster');
+                throw new Exception('No valid spots found for cluster');
             }
 
             // スポット情報をフォーマット

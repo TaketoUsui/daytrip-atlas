@@ -29,6 +29,10 @@ return [
 
         // タスクロックのタイムアウト（分）
         'task_lock_timeout_minutes' => env('AI_TASK_LOCK_TIMEOUT_MINUTES', 30),
+
+        // スポット詳細分析の失敗カウント閾値
+        // この回数以上失敗したスポットはタスク選択対象から除外される
+        'spot_detail_max_failure_count' => env('AI_SPOT_DETAIL_MAX_FAILURE_COUNT', 5),
     ],
 
     /*

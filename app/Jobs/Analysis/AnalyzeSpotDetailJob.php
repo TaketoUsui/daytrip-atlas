@@ -135,6 +135,36 @@ class AnalyzeSpotDetailJob implements ShouldQueue
             // エラー時はロックを強制解放
             $lockManager->forceReleaseLock($this->spot, 'detail');
 
+            // 失敗カウンターをインクリメント
+            $this->spot->increment('detail_analysis_failure_count');
+
+            // 閾値に達したら「分析失敗」として完了扱いにする
+            $maxFailureCount = config('ai.task_selection.spot_detail_max_failure_count', 5);
+            $this->spot->refresh(); // 最新の failure_count を取得
+
+            if ($this->spot->detail_analysis_failure_count >= $maxFailureCount) {
+                $this->spot->update([
+                    'spot_role' => 'analysis_failed',
+                    'detail_analyzed_by_model_id' => $this->model->id, // 失敗として記録
+                ]);
+
+                // クラスターのカウントをインクリメント（失敗としてカウント）
+                $cluster = $this->spot->cluster;
+                if ($cluster) {
+                    $cluster->increment('analyzed_spots_count');
+                }
+
+                Log::warning('[AnalyzeSpotDetailJob] Spot marked as failed after max retries', [
+                    'spot_id' => $this->spot->id,
+                    'spot_name' => $this->spot->name,
+                    'failure_count' => $this->spot->detail_analysis_failure_count,
+                    'max_failure_count' => $maxFailureCount,
+                ]);
+
+                // 閾値に達したのでこれ以上リトライしない
+                return;
+            }
+
             throw $e;
         }
     }

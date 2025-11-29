@@ -73,11 +73,11 @@ class AnalyzeSpotPriorityJob implements ShouldQueue
                 ]);
             }
 
-            // クラスターに属するスポットを取得
-            $spots = $this->cluster->spots;
+            // クラスターに属するスポットを取得（analysis_failedを除外）
+            $spots = $this->cluster->validSpots;
 
             if ($spots->isEmpty()) {
-                throw new Exception('No spots found for cluster');
+                throw new Exception('No valid spots found for cluster');
             }
 
             // スポット名のリストを作成

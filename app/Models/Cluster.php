@@ -100,6 +100,17 @@ class Cluster extends Model
         return $this->belongsToMany(Spot::class);
     }
 
+    /**
+     * 分析に有効なスポット（analysis_failedを除外）
+     *
+     * @return BelongsToMany
+     */
+    public function validSpots(): BelongsToMany
+    {
+        return $this->belongsToMany(Spot::class)
+            ->where('spot_role', '!=', 'analysis_failed');
+    }
+
     // AI分析関連のリレーション
     public function spotListingAnalyzedByModel(): BelongsTo
     {

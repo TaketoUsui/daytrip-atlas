@@ -86,9 +86,12 @@ class TaskSelector
         switch ($taskType) {
             case 'spot_detail':
                 // スポット詳細分析: 分析優先度が高く、まだ分析されていないスポット
+                $maxFailureCount = config('ai.task_selection.spot_detail_max_failure_count', 5);
+
                 $spot = Spot::whereNull('detail_analyzed_by_model_id')
                     ->whereNull('detail_analyzing_by_model_id')
                     ->whereNotNull('analysis_priority')
+                    ->where('detail_analysis_failure_count', '<', $maxFailureCount)
                     ->orderBy('analysis_priority', 'desc')
                     ->inRandomOrder()
                     ->first();
@@ -240,6 +243,7 @@ class TaskSelector
 
             case 'catchphrase':
                 // キャッチフレーズ生成: 全スポット分析済みのクラスター
+                // analyzed_spots_countは成功・失敗を問わず処理完了したスポット数をカウント
                 $cluster = Cluster::where('analyzed_spots_count', '>', 0) // 少なくとも1つのスポットが分析済み
                     ->whereColumn('analyzed_spots_count', '=', \DB::raw('(SELECT COUNT(*) FROM cluster_spot WHERE cluster_spot.cluster_id = clusters.id)'))
                     ->where(function ($query) {
