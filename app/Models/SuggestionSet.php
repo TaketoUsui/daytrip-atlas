@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Spatie\LaravelData\WithData;
@@ -26,8 +26,6 @@ use Spatie\LaravelData\WithData;
  * @property float $input_longitude
  * @property InputTagsData|null $input_tags_json
  * @property Carbon|null $created_at
- * @property-read Collection<int, SuggestionSetItem> $items
- * @property-read int|null $items_count
  * @property-read User|null $user
  *
  * @method static Builder<static>|SuggestionSet newModelQuery()
@@ -90,9 +88,11 @@ class SuggestionSet extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function items(): HasMany
+    public function modelPlans(): BelongsToMany
     {
-        return $this->hasMany(SuggestionSetItem::class)->orderBy('display_order');
+        return $this->belongsToMany(ModelPlan::class, 'suggestion_set_model_plans')
+            ->withPivot('display_order', 'generated_travel_time_text', 'created_at')
+            ->orderByPivot('display_order');
     }
 
     /**

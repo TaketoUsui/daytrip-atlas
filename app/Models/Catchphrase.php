@@ -7,7 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelData\WithData;
 
@@ -17,8 +17,6 @@ use Spatie\LaravelData\WithData;
  * @property SourceAnalysisData|null $source_analysis
  * @property int|null $performance_score
  * @property Carbon|null $created_at
- * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
- * @property-read int|null $suggestion_set_items_count
  *
  * @method static Builder<static>|Catchphrase newModelQuery()
  * @method static Builder<static>|Catchphrase newQuery()
@@ -38,6 +36,7 @@ class Catchphrase extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
+        'model_plan_id',
         'content',
         'source_analysis',
         'performance_score',
@@ -48,8 +47,8 @@ class Catchphrase extends Model
         'performance_score' => 'integer',
     ];
 
-    public function suggestionSetItems(): HasMany
+    public function modelPlan(): BelongsTo
     {
-        return $this->hasMany(SuggestionSetItem::class);
+        return $this->belongsTo(ModelPlan::class);
     }
 }

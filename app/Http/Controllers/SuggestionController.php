@@ -16,11 +16,12 @@ class SuggestionController extends Controller
      */
     public function show(SuggestionSet $suggestionSet): Response
     {
-        // itemsリレーションをロード（status=completeの場合に必要）
+        // modelPlansリレーションをロード（status=completeの場合に必要）
         $suggestionSet->load([
-            'items.cluster',
-            'items.keyVisualImage',
-            'items.catchphrase',
+            'modelPlans.cluster',
+            'modelPlans.image',
+            'modelPlans.catchphrase',
+            'modelPlans.items.spot',
         ]);
 
         return Inertia::render('Suggestion/Show', [

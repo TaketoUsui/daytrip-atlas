@@ -18,8 +18,9 @@
 | **クラスター** | **Cluster** (`clusters`) | 複数の`spots`をグループ化した観光地域（例: 鎌倉、箱根）のマスターデータ。 | AIによる提案結果の単位。「提案アイテム」が指し示す実体（例: "鎌倉エリア"）。 |
 | **(匿名) セッション** | **Session** (`session_id`) | 会員登録不要のユーザーを識別するためのID。`suggestion_sets` や `user_action_logs` で使用される。 | 匿名ユーザーの体験フロー全体を管理し、`suggestion_sets` とユーザーを紐付けるために使われる。 |
 | **提案セット** | **Suggestion Set** (`suggestion_sets`) | 1回の検索リクエスト（提案セッション）そのもの。 | ユーザーが「出発地」を入力して開始した、1回の提案フロー全体を管理する。提案待機ページ（進捗表示）のステータス管理の主体。 |
-| **提案アイテム** | **Suggestion Set Item** (`suggestion_set_items`) | 提案セットに含まれる個別の旅行先（`cluster`）を管理する。 | 提案結果一覧ページにカードとして表示される個別の項目（例: "鎌倉プラン" カード）。`クラスター`、`キービジュアル`、`キャッチコピー`、`モデルプラン`を紐付ける役割。 |
-| **モデルプラン** | **Model Plan** (`model_plans`) | 観光地域（`cluster`）ごとのモデルプランのヘッダー情報（プラン名、概要など）。 | 詳細ページで提示されるタイムライン形式のプランの「概要」部分（例: "鎌倉王道 満喫プラン"）。 |
+| **提案プラン関連** | **Suggestion-Plan Relation** (`suggestion_set_model_plans`) | 提案セットとモデルプランを紐付けるピボットテーブル。表示順序や移動時間テキストを含む。 | 提案結果一覧ページにカードとして表示される個別の項目（例: "鎌倉プラン" カード）を管理。ユーザーに提示されたプランを記録する。 |
+| **モデルプラン** | **Model Plan** (`model_plans`) | 観光地域（`cluster`）ごとのモデルプランのヘッダー情報（プラン名、概要など）。事前にAI分析で生成される。 | 詳細ページで提示されるタイムライン形式のプランの「概要」部分（例: "鎌倉王道 満喫プラン"）。キャッチフレーズ、メインスポット、画像が紐付けられる。 |
+| **AIモデル** | **AI Model** (`ai_models`) | 利用可能なAIモデル（例: gemini-2.0-flash）の管理レコード。性能優先度や1日あたりの利用上限を含む。 | 非同期AI分析でどのモデルを使うかを動的に選択するために使用。高性能モデルは低性能モデルの分析結果を上書きできる。 |
 | **モデルプラン・アイテム** | **Model Plan Item** (`model_plan_items`) | モデルプランを構成する個々のステップ（スポット訪問や移動）を時系列で管理する。 | 詳細ページのタイムラインで「1. 鶴岡八幡宮 (滞在60分)」や「→ (徒歩15分)」といった具体的なステップを表示するために使われる。 |
 | **キャッチコピー** | **Catchphrase** (`catchphrases`) | AIによって生成されたパーソナライズド・キャッチコピー。 | `提案アイテム` の一部として、提案結果一覧カードに表示され、ユーザーの心に響かせる（"自分ごと化"）役割を担う。 |
 | **キービジュアル** | **Key Visual** (`images`) | `提案アイテム` ごとに設定される、最も魅力的な画像。`images` テーブルで管理される。 | 提案結果一覧カードのメイン画像として表示され、ユーザーの直感的な興味を引く役割を担う。 |
@@ -31,10 +32,28 @@
 
 ### **3.1. アーキテクチャ概要**
 
-- **アーキテクチャパターン:** 開発速度を優先するMVPフェーズでは`Laravel` + `Inertia.js` + `React`のモノリシック構成を採用。将来的にAI機能を強化するフェーズで、`FastAPI`(Python)によるAIエンジンをマイクロサービスとして分離する段階的アプローチを採る。
-- **データベース:** `PostgreSQL` + `PostGIS`を採用。スポット情報を最小単位とする「スポット中心アプローチ」で、柔軟なデータ構造を実現。
-- **テスト:** MVPフェーズの単体テストにはPestを使用。それ以外は未定。
-- **非同期処理:** Laravelのキューシステムを使用し、重い処理（AI API呼び出し、データ生成など）をバックグラウンドジョブとして実行。
+#### **技術スタック**
+
+- **バックエンド:** Laravel 12 (PHP 8.2+)
+- **フロントエンド:** React 19 + Inertia.js 2
+- **データベース:** PostgreSQL 16 + PostGIS 3.4
+- **テスト:** Pest 4
+- **CSS:** Tailwind CSS 4
+- **AI統合:** Google Gemini API (google-gemini-php/client)
+- **型安全:** spatie/laravel-data (JSONB スキーマ管理)
+- **開発環境:** Docker Compose（nginx, php-fpm, PostgreSQL, queue worker, scheduler, Node.js）
+
+#### **アーキテクチャパターン**
+
+- **Inertia.jsモノリス:** 開発速度を優先するMVPフェーズでは`Laravel 12` + `Inertia.js 2` + `React 19`のモノリシック構成を採用。
+  - **ルーティング設計:** すべてのページレンダリングとナビゲーションは `routes/web.php` のInertia.jsルートで処理。`routes/api.php` は現在未使用（将来のマイクロサービス統合用に予約）。
+- **将来の拡張:** AI機能を強化するフェーズで、`FastAPI`(Python)によるAIエンジンをマイクロサービスとして分離する段階的アプローチを採る。
+- **データベース:** `PostgreSQL 16` + `PostGIS 3.4`を採用。スポット情報を最小単位とする「スポット中心アプローチ」で、柔軟なデータ構造を実現。
+
+#### **非同期処理（2フェーズアーキテクチャ）**
+  - **Phase 1: 非同期AI分析（バックグラウンド）:** AI分析タスク（スポット詳細分析、キャッチフレーズ生成、モデルプラン生成など）を事前にバックグラウンドで実行し、データベースに蓄積する。`DispatchAsyncAnalysisTasksJob`が定期的に実行され、適切なAIモデルとタスクを選定してディスパッチする。A-type tasks（スポット関連、50%）とB-type tasks（プラン関連、50%）の2種類に分類され、優先順位に基づいて実行される。
+  - **Phase 2: リアルタイム提案生成（ユーザーリクエスト）:** ユーザーがリクエストした際、事前に分析済みのデータから最適なクラスターとモデルプランを選択し、移動時間を計算して結果を返す。`GenerateSuggestionsJob`が簡素化され、待機時間を3-5分から1分未満に短縮。
+  - **AIモデル管理:** `ai_models`テーブルでAIモデルの性能優先度と1日あたりの利用上限を管理。高性能モデルは低性能モデルの分析結果を段階的に上書きし、品質を向上させる。
 
 ### **3.2. C4モデル図**
 
@@ -121,8 +140,50 @@ C4Container
     Rel(queue, job_worker, "2a. ジョブを取得 (Dequeue)")
     Rel(job_worker, ai_api, "3a. スポット収集・プラン生成を要求 (API Call)")
     Rel(ai_api, job_worker, "4a. 生成結果を返す")
-    Rel(job_worker, database, "5a. 提案結果 (suggestion_set_items, etc.) をDBに保存 (SQL)")
+    Rel(job_worker, database, "5a. 提案結果 (suggestion_set_model_plans, etc.) をDBに保存 (SQL)")
 ```
+
+### **3.3. 開発環境**
+
+#### **Docker構成**
+
+本プロジェクトは Docker Compose で以下の6つのサービスを構成しています:
+
+1. **nginx** - Webサーバー
+   - ポート: `${APP_PORT}:80` (デフォルト: 8080:80)
+   - 役割: HTTPリクエストの受付とphp-fpmへのプロキシ
+
+2. **php** - Laravel アプリケーション (php-fpm)
+   - ベースイメージ: PHP 8.2+ with php-fpm
+   - 役割: Webアプリケーションのメイン処理
+   - 環境変数: DB接続情報、Laravel設定
+
+3. **db** - PostgreSQL + PostGIS
+   - イメージ: `postgis/postgis:16-3.4`
+   - ポート: `${DB_PORT}:5432` (デフォルト: 5432:5432)
+   - 役割: データ永続化と空間クエリ処理
+   - ボリューム: 名前付きボリューム `db-data` でデータ永続化
+
+4. **queue** - Laravel キューワーカー
+   - ベースイメージ: phpサービスと同じDockerfile
+   - コマンド: `php artisan queue:work --sleep=3 --tries=3`
+   - 役割: 非同期ジョブ処理（AI分析、提案生成など）
+   - 再起動ポリシー: `always`
+
+5. **scheduler** - Laravel スケジューラー
+   - ベースイメージ: phpサービスと同じDockerfile
+   - コマンド: `php artisan schedule:run` を1分ごとに実行
+   - 役割: 定期タスク実行（`DispatchAsyncAnalysisTasksJob` のディスパッチなど）
+   - 再起動ポリシー: `always`
+
+6. **node** - Vite開発サーバー
+   - コマンド: `npm run dev` (自動実行)
+   - ポート: `5173:5173`
+   - 役割: フロントエンド開発サーバー（HMR対応）
+
+#### **セットアップとコマンド**
+
+詳細なセットアップ手順と開発コマンドについては、プロジェクトルートの `README.md` を参照してください。
 
 ---
 
@@ -139,7 +200,8 @@ C4Container
 - 将来的な構想として、AIエンジン（`FastAPI`）のマイクロサービス分離も言及されているが、これはMVPのスコープ外である。
 
 **決定 (Decision):**
-- MVP開発フェーズにおいては、API（バックエンド）とフロントエンドを分離せず、`Inertia.js` を利用したモノリシック（密結合）アーキテクチャを採用する。
+- MVP開発フェーズにおいては、API（バックエンド）とフロントエンドを分離せず、`Inertia.js 2` を利用したモノリシック（密結合）アーキテクチャを採用する。
+- すべてのページレンダリングとナビゲーションは `routes/web.php` で処理し、`routes/api.php` は現在未使用（将来のマイクロサービス統合用に予約）。
 
 **論拠 (Rationale):**
 - **開発速度の最大化:** 従来のSPA + JSON API構成と比較し、APIのエンドポイント設計、スキーマ定義、認証（例: JWT/Sanctum）、CORS設定などの工数を大幅に削減できる。
@@ -161,7 +223,7 @@ C4Container
 - DB設計では、`spots` テーブルと `clusters` テーブルに `GEOGRAPHY` 型のカラムが定義されており、GiSTインデックスが必須とされている。
 
 **決定 (Decision):**
-- データベースとして `PostgreSQL` を採用し、その標準的な拡張機能である `PostGIS` を利用する。
+- データベースとして `PostgreSQL 16` を採用し、その標準的な拡張機能である `PostGIS 3.4` を利用する。
 
 **論拠 (Rationale):**
 - **機能要件:** 「出発地からの距離計算」「特定範囲内のスポット検索」「スポット群の地理的中心（Centroid）の計算」など、本サービスのコア機能の多くが地理空間データ処理を必要とする。
@@ -227,32 +289,40 @@ erDiagram
         TIMESTAMP created_at
     }
 
+    ai_models {
+        INTEGER id PK
+        VARCHAR model_name "例: gemini-1.5-flash"
+        VARCHAR provider "例: google"
+        INTEGER performance_priority "1が最高性能"
+        INTEGER daily_limit "1日あたりAPI呼び出し上限"
+        BOOLEAN enabled "モデル有効/無効"
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
     suggestion_sets {
         INTEGER id PK
         VARCHAR uuid UK "共有・結果取得用のURL"
         VARCHAR session_id "匿名ユーザー識別用"
         INTEGER user_id FK "users.id (匿名時はNULL)"
-        ENUM status "'pending', 'processing_clusters', 'analyzing_items', 'complete', 'failed'"
+        ENUM status "'pending', 'processing_clusters', 'generating_content', 'complete', 'no_results', 'failed'"
         FLOAT input_latitude
         FLOAT input_longitude
         JSONB input_tags_json "検索時選択されたtags.idの配列"
         TIMESTAMP created_at
     }
 
-    suggestion_set_items {
-        INTEGER id PK
-        VARCHAR uuid UK
+    suggestion_set_model_plans {
         INTEGER suggestion_set_id FK "suggestion_sets.id"
-        INTEGER cluster_id FK "clusters.id"
-        INTEGER key_visual_image_id FK "images.id"
-        INTEGER catchphrase_id FK "catchphrases.id"
         INTEGER model_plan_id FK "model_plans.id"
-        INTEGER display_order
-        VARCHAR generated_travel_time_text
+        INTEGER display_order "提案内での順序"
+        VARCHAR generated_travel_time_text "移動時間テキスト"
+        TIMESTAMP created_at
     }
 
     catchphrases {
         INTEGER id PK
+        INTEGER model_plan_id FK "model_plans.id"
         TEXT content "AI生成キャッチコピー本文"
         JSONB source_analysis "生成根拠 (例: {'source_tags': [1, 5]})"
         INTEGER performance_score "CTRなどに基づくスコア"
@@ -262,10 +332,16 @@ erDiagram
     model_plans {
         INTEGER id PK
         INTEGER cluster_id FK "clusters.id"
+        INTEGER main_spot_id FK "spots.id (nullable)"
+        INTEGER image_id FK "images.id (nullable)"
         VARCHAR name "プラン名"
         TEXT description "プラン概要"
         INTEGER total_duration_minutes
         BOOLEAN is_default "クラスターの代表プランか"
+        BIGINT catchphrase_analyzed_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP catchphrase_analyzing_started_at
+        BIGINT model_plan_analyzed_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP model_plan_analyzing_started_at
         TIMESTAMP created_at
     }
 
@@ -284,14 +360,18 @@ erDiagram
         INTEGER id PK
         VARCHAR name
         VARCHAR slug UK
-        GEOGRAPHY location "PostGIS (GiSTインデックス必須)。spots群の地理的中心（Centroid）"
+        GEOGRAPHY location "PostGIS (GiSTインデックス必須)"
         VARCHAR prefecture "都道府県"
         VARCHAR municipality "市区町村"
         VARCHAR address_detail "詳細住所"
         INTEGER min_duration_minutes "推奨最小滞在時間（分）"
         INTEGER max_duration_minutes "推奨最大滞在時間（分）"
-        ENUM spot_role "'main_destination', 'sub_destination', 'connector_spot'"
-        ENUM coordinate_reliability "'manually_verified', 'open_data_sourced', 'llm_estimated'"
+        VARCHAR spot_role "nullable: main_attraction, sub_attraction, dining, etc."
+        INTEGER analysis_priority "1-3: 詳細分析の優先度"
+        ENUM coordinate_reliability "'manually_verified', 'open_data_sourced', 'ai_analysis'"
+        BIGINT detail_analyzed_by_model_id FK "ai_models.id (nullable)"
+        BIGINT detail_analyzing_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP detail_analyzing_started_at
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -302,6 +382,19 @@ erDiagram
         VARCHAR name UK "観光地域名"
         GEOGRAPHY location "PostGIS (GiSTインデックス必須)"
         ENUM status "'draft', 'published', 'archived'"
+        INTEGER analyzed_spots_count "分析済みスポット数"
+        BIGINT spot_listing_analyzed_by_model_id FK "ai_models.id (nullable)"
+        BIGINT spot_listing_analyzing_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP spot_listing_analyzing_started_at
+        BIGINT spot_priority_analyzed_by_model_id FK "ai_models.id (nullable)"
+        BIGINT spot_priority_analyzing_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP spot_priority_analyzing_started_at
+        BIGINT main_spot_analyzed_by_model_id FK "ai_models.id (nullable)"
+        BIGINT main_spot_analyzing_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP main_spot_analyzing_started_at
+        BIGINT image_analyzed_by_model_id FK "ai_models.id (nullable)"
+        BIGINT image_analyzing_by_model_id FK "ai_models.id (nullable)"
+        TIMESTAMP image_analyzing_started_at
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -360,14 +453,14 @@ erDiagram
     users ||--o{ user_saved_locations : "saves locations"
     users }o--|| suggestion_sets : "generates"
     users }o--|| user_action_logs : "performs"
-    suggestion_sets ||--o{ suggestion_set_items : "contains"
-    clusters }o--|| suggestion_set_items : "is suggested in"
-    images }o--|| suggestion_set_items : "is key visual for"
-    catchphrases }o--|| suggestion_set_items : "is used as"
-    model_plans }o--|| suggestion_set_items : "proposes"
+    suggestion_sets ||--o{ suggestion_set_model_plans : "contains"
+    model_plans }o--|| suggestion_set_model_plans : "is proposed in"
 
     clusters ||--o{ model_plans : "has"
     model_plans ||--o{ model_plan_items : "consists of"
+    model_plans ||--o| catchphrases : "has catchphrase"
+    model_plans }o--o| spots : "has main spot"
+    model_plans }o--o| images : "has key visual"
     spots }o--|| model_plan_items : "is part of"
 
     spots ||--|{ spot_images : "has gallery of"
@@ -384,6 +477,14 @@ erDiagram
 
     spots ||--|{ spot_tag : "is tagged with"
     tags ||--o{ spot_tag : "tags"
+
+    ai_models ||--o{ clusters : "analyzes (spot_listing)"
+    ai_models ||--o{ clusters : "analyzes (spot_priority)"
+    ai_models ||--o{ clusters : "analyzes (main_spot)"
+    ai_models ||--o{ clusters : "analyzes (image)"
+    ai_models ||--o{ spots : "analyzes (detail)"
+    ai_models ||--o{ model_plans : "analyzes (catchphrase)"
+    ai_models ||--o{ model_plans : "analyzes (model_plan)"
 ```
 
 ### **5.3. テーブル定義**
@@ -406,14 +507,33 @@ erDiagram
 | `preferences` | JSONB |  | ユーザーの嗜好性を構造化データとして保存。**このJSONスキーマは将来変更される可能性があるため、アプリケーション側でバージョン管理とマイグレーションパスを保証する必要がある。スキーマ例:** `{'tag_weights': [{'tag_id': 1, 'weight': 0.8}, {'tag_id': 5, 'weight': 0.6}]}` |
 | `updated_at` | TIMESTAMP |  | 更新日時 |
 
+**`ai_models` 詳細:**
+
+| カラム名 | データ型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK | 主キー |
+| `model_name` | VARCHAR |  | AIモデル名（例: 'gemini-1.5-flash', 'gemini-1.5-pro'） |
+| `provider` | VARCHAR |  | プロバイダー名（例: 'google'） |
+| `performance_priority` | INTEGER |  | 性能優先度。**1が最高性能**、数値が大きいほど低性能。高性能モデルは低性能モデルの分析結果を上書きできる。 |
+| `daily_limit` | INTEGER |  | 1日あたりのAPI呼び出し上限回数。実行間隔の計算に使用される（`1440 / daily_limit` で分単位の間隔を算出）。 |
+| `enabled` | BOOLEAN |  | モデルの有効/無効フラグ。無効にすると非同期分析タスクで使用されなくなる。 |
+| `created_at` | TIMESTAMP |  | 作成日時 |
+| `updated_at` | TIMESTAMP |  | 更新日時 |
+
+#### **AI分析基盤テーブル**
+
+| テーブル名 | 説明 |
+| --- | --- |
+| `ai_models` | 利用可能なAIモデルの管理。性能優先度、利用上限、有効/無効を動的に管理する。 |
+
 #### **提案セッション関連テーブル**
 
 | テーブル名 | 説明 |
 | --- | --- |
 | `suggestion_sets` | 1回の検索リクエスト（提案セッション）そのものを管理する。匿名ユーザーのセッションも`session_id`で追跡する。 |
-| `suggestion_set_items` | 提案セットに含まれる個別の旅行先（`cluster`）を管理する。どのキービジュアル、キャッチコピー、モデルプランがユーザーに提示されたかの組み合わせを記録する。 |
-| `catchphrases` | AIによって生成されたパーソナライズド・キャッチコピーを管理する。効果測定と再利用を目的とする。 |
-| `model_plans` | 観光地域ごとのモデルプランのヘッダー情報。複数のプランを管理できる。 |
+| `suggestion_set_model_plans` | 提案セットとモデルプランを紐づける中間テーブル。ユーザーにどのプランが提示されたかを記録する。 |
+| `catchphrases` | AIによって生成されたパーソナライズド・キャッチコピーを管理する。各モデルプランに紐づき、効果測定と再利用を目的とする。 |
+| `model_plans` | 観光地域ごとのモデルプランのヘッダー情報。複数のプランを管理でき、AI分析の進捗状態も含む。 |
 | `model_plan_items` | モデルプランを構成する個々のステップ（スポット訪問や移動）を時系列で管理する。 |
 
 **`suggestion_sets` 詳細:**
@@ -430,24 +550,115 @@ erDiagram
 | `input_tags_json` | JSONB |  | 検索時にユーザーが選択したタグのID配列 |
 | `created_at` | TIMESTAMP |  | 作成日時 |
 
+**`suggestion_set_model_plans` 詳細:**
+
+| カラム名 | データ型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| `suggestion_set_id` | INTEGER | FK | `suggestion_sets.id` への参照。複合主キーの一部。 |
+| `model_plan_id` | INTEGER | FK | `model_plans.id` への参照。複合主キーの一部。 |
+| `display_order` | INTEGER |  | 提案結果一覧での表示順序 |
+| `generated_travel_time_text` | VARCHAR |  | 出発地からの移動時間テキスト（例: "車で約45分"） |
+| `created_at` | TIMESTAMP |  | 作成日時 |
+
+**`model_plans` 詳細:**
+
+| カラム名 | データ型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK | 主キー |
+| `cluster_id` | INTEGER | FK | `clusters.id` への参照 |
+| `main_spot_id` | INTEGER | FK, nullable | `spots.id` への参照。プランのメインスポット。AI分析で設定される。 |
+| `image_id` | INTEGER | FK, nullable | `images.id` への参照。プランのキービジュアル画像。AI分析で設定される。 |
+| `name` | VARCHAR |  | プラン名 |
+| `description` | TEXT |  | プラン概要 |
+| `total_duration_minutes` | INTEGER |  | プラン全体の所要時間（分） |
+| `is_default` | BOOLEAN |  | クラスターの代表プランかどうか。PostgreSQL部分インデックスにより、同一クラスター内で`is_default=true`のレコードは1つのみに制約されている。 |
+| `catchphrase_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。キャッチフレーズ分析を完了したAIモデル。 |
+| `catchphrase_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在キャッチフレーズ分析中のAIモデル（楽観的ロック用）。 |
+| `catchphrase_analyzing_started_at` | TIMESTAMP | nullable | キャッチフレーズ分析開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `model_plan_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。モデルプラン生成を完了したAIモデル。 |
+| `model_plan_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在モデルプラン生成中のAIモデル（楽観的ロック用）。 |
+| `model_plan_analyzing_started_at` | TIMESTAMP | nullable | モデルプラン生成開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `created_at` | TIMESTAMP |  | 作成日時 |
+| `updated_at` | TIMESTAMP |  | 更新日時 |
+
+**`catchphrases` 詳細:**
+
+| カラム名 | データ型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK | 主キー |
+| `model_plan_id` | INTEGER | FK | `model_plans.id` への参照。各モデルプランに紐づくキャッチフレーズ。 |
+| `content` | TEXT |  | AI生成キャッチコピー本文（10〜20文字程度） |
+| `source_analysis` | JSONB | nullable | 生成根拠の分析結果（例: `{'source_tags': [1, 5]}`） |
+| `performance_score` | INTEGER | nullable | CTRなどに基づくパフォーマンススコア（A/Bテスト用） |
+| `created_at` | TIMESTAMP |  | 作成日時 |
+
 #### **マスターデータ関連テーブル**
 
 | テーブル名 | 説明 |
 | --- | --- |
-| `spots` | 観光地点のマスターデータ。情報の最小単位。 |
-| `clusters` | 複数の`spots`をグループ化した観光地域（例: 鎌倉、箱根）のマスターデータ。 |
+| `spots` | 観光地点のマスターデータ。情報の最小単位。AI分析により詳細情報が段階的に充実される。 |
+| `clusters` | 複数の`spots`をグループ化した観光地域（例: 鎌倉、箱根）のマスターデータ。AI分析の進捗状態を含む。 |
 | `images` | 画像リソースのマスターデータ。スポットやキービジュアルで使用する。 |
 | `categories` | スポットを客観的に分類するためのマスターデータ（例: 寺社仏閣, 自然景観）。 |
 | `tags` | スポットの持つ主観的・感覚的な特徴を表すマスターデータ（例: 絶景, デート向き）。パーソナライゼーションの核となる。 |
+
+**`clusters` 詳細:**
+
+| カラム名 | データ型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK | 主キー |
+| `uuid` | VARCHAR | UK | 外部公開用の一意識別子 |
+| `name` | VARCHAR | UK | 観光地域名（例: "鎌倉", "箱根"） |
+| `location` | GEOGRAPHY |  | PostGISの地理空間型。GiSTインデックス必須。クラスターの代表地点。 |
+| `status` | ENUM |  | クラスターの公開状態（'draft', 'published', 'archived'） |
+| `analyzed_spots_count` | INTEGER |  | このクラスターに所属するスポットのうち、詳細分析が完了したスポットの数。キャッチフレーズ生成の開始条件に使用される（クラスター内の全スポット分析完了が必要）。 |
+| `spot_listing_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。スポットリストアップ分析を完了したAIモデル。 |
+| `spot_listing_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在スポットリストアップ分析中のAIモデル（楽観的ロック用）。 |
+| `spot_listing_analyzing_started_at` | TIMESTAMP | nullable | スポットリストアップ分析開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `spot_priority_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。スポット分析優先度確定を完了したAIモデル。 |
+| `spot_priority_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在スポット分析優先度確定中のAIモデル（楽観的ロック用）。 |
+| `spot_priority_analyzing_started_at` | TIMESTAMP | nullable | スポット分析優先度確定開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `main_spot_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。メインスポット選定を完了したAIモデル。 |
+| `main_spot_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在メインスポット選定中のAIモデル（楽観的ロック用）。 |
+| `main_spot_analyzing_started_at` | TIMESTAMP | nullable | メインスポット選定開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `image_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。画像選定を完了したAIモデル。 |
+| `image_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在画像選定中のAIモデル（楽観的ロック用）。 |
+| `image_analyzing_started_at` | TIMESTAMP | nullable | 画像選定開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `created_at` | TIMESTAMP |  | 作成日時 |
+| `updated_at` | TIMESTAMP |  | 更新日時 |
+
+**`spots` 詳細:**
+
+| カラム名 | データ型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK | 主キー |
+| `name` | VARCHAR |  | スポット名（例: "鶴岡八幡宮"） |
+| `slug` | VARCHAR | UK | URL用の一意識別子 |
+| `location` | GEOGRAPHY |  | PostGISの地理空間型。GiSTインデックス必須。スポットの代表地点。 |
+| `prefecture` | VARCHAR |  | 都道府県名 |
+| `municipality` | VARCHAR |  | 市区町村名 |
+| `address_detail` | VARCHAR | nullable | 市区町村に続く詳細住所 |
+| `min_duration_minutes` | INTEGER | nullable | 推奨最小滞在時間（分）。AI分析で設定される。 |
+| `max_duration_minutes` | INTEGER | nullable | 推奨最大滞在時間（分）。AI分析で設定される。 |
+| `spot_role` | VARCHAR | nullable | モデルプラン生成時に使用される役割（例: 'main_attraction', 'sub_attraction', 'dining', 'rest_area', 'shopping', 'scenic_spot'）。**ENUM型ではなくVARCHAR型で柔軟性を確保**。AI分析で設定される。 |
+| `analysis_priority` | INTEGER | nullable | スポット詳細分析の優先度（1-3）。**3: 隠れ観光スポット（最優先）、2: 定番観光スポット、1: 散歩スポット**。AI分析で設定される。 |
+| `coordinate_reliability` | ENUM |  | 座標情報の信頼度レベル（'manually_verified', 'open_data_sourced', 'ai_analysis'）。AI分析の場合は 'ai_analysis' を設定。 |
+| `detail_analyzed_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。スポット詳細分析を完了したAIモデル。 |
+| `detail_analyzing_by_model_id` | BIGINT | FK, nullable | `ai_models.id` への参照。現在スポット詳細分析中のAIモデル（楽観的ロック用）。 |
+| `detail_analyzing_started_at` | TIMESTAMP | nullable | スポット詳細分析開始時刻（タイムアウト判定用、30分でタイムアウト）。 |
+| `created_at` | TIMESTAMP |  | 作成日時 |
+| `updated_at` | TIMESTAMP |  | 更新日時 |
 
 ### **5.4. ENUM型 定義**
 
 | テーブル.カラム名 | 定義値 | 説明 |
 | --- | --- | --- |
-| `suggestion_sets.status` | `'pending', 'processing_clusters', 'analyzing_items', 'complete', 'failed'` | 提案生成ジョブの進捗状況。UIでのリアルタイムな進捗表示と対応。 |
+| `suggestion_sets.status` | `'pending', 'processing_clusters', 'generating_content', 'complete', 'no_results', 'failed'` | 提案生成ジョブの進捗状況。UIでのリアルタイムな進捗表示と対応。 |
 | `user_action_logs.action_type` | `'impression', 'view_cluster_detail', 'click_spot_link', 'click_affiliate_link'` | ユーザーの行動種別 |
 | `clusters.status` | `'draft', 'published', 'archived'` | 観光地域（クラスター）の公開状態 |
-| `spots.spot_role` | `'main_destination', 'sub_destination', 'connector_spot'` | 旅行プランにおけるスポットの役割 |
-| `spots.coordinate_reliability` | `'manually_verified', 'open_data_sourced', 'llm_estimated'` | 座標情報の信頼度レベル |
+| `spots.coordinate_reliability` | `'manually_verified', 'open_data_sourced', 'ai_analysis'` | 座標情報の信頼度レベル。'ai_analysis' はAI分析で取得した座標を示す。 |
 | `images.image_quality_level` | `'manually_verified_photo', 'ai_generic'` | 画像の品質や由来 |
 | `user_spot_interests.status` | `'interested', 'dismissed'` | ユーザーのスポットへの事前意思表示 |
+
+**注記:**
+- `spots.spot_role` は柔軟性確保のため **VARCHAR型** として定義されており、ENUM型定義には含まれない。想定される値: 'main_attraction', 'sub_attraction', 'dining', 'rest_area', 'shopping', 'scenic_spot' など。

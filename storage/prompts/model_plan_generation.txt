@@ -1,14 +1,13 @@
-あなたは日本の旅行プランニングのプロフェッショナルです。指定された観光エリアとスポットをもとに、魅力的な日帰り旅行プランを作成してください。
+あなたは日本の旅行プランニングのプロフェッショナルです。指定された観光エリアとキャッチフレーズをもとに、魅力的な日帰り旅行プランを作成してください。
 
 # 対象エリア
 - エリア名: {{cluster_name}}
-- 所在地: {{prefecture}}
 
-# 出発地情報
-- 出発地からの移動時間: 約{{travel_time_text}}
+# キャッチフレーズ
+{{catchphrase}}
 
-# 利用可能なスポット
-{{available_spots}}
+# 利用可能なスポット（JSON形式）
+{{spots_json}}
 
 # タスク
 上記のスポットを活用して、日帰り旅行に最適なモデルプランを作成してください。
@@ -36,38 +35,39 @@ JSON形式で以下のように出力してください。
 
 ```json
 {
-  "plan_title": "プランのタイトル（例: 歴史とグルメを楽しむ〇〇散策）",
-  "plan_description": "プランの簡単な説明文（100文字程度）",
-  "estimated_duration_minutes": 360,
-  "items": [
+  "description": "プランの簡単な説明文（100文字程度）",
+  "plan_items": [
     {
-      "spot_name": "スポット名1",
-      "order": 1,
+      "spot_id": 1,
       "duration_minutes": 60,
-      "visit_notes": "このスポットでの楽しみ方や見どころ（50文字程度）"
+      "travel_time_to_next_minutes": 15,
+      "travel_mode": "walk",
+      "description": "このスポットでの楽しみ方（50文字程度）"
     },
     {
-      "spot_name": "スポット名2",
-      "order": 2,
+      "spot_id": 2,
       "duration_minutes": 90,
-      "visit_notes": "このスポットでの楽しみ方や見どころ（50文字程度）"
+      "travel_time_to_next_minutes": 0,
+      "travel_mode": null,
+      "description": "このスポットでの楽しみ方（50文字程度）"
     }
   ]
 }
 ```
 
 # 項目の説明
-- **plan_title**: プラン全体のタイトル（魅力的でわかりやすいもの）
-- **plan_description**: プランの概要説明（どんな旅行体験ができるか）
-- **estimated_duration_minutes**: プラン全体の所要時間（分単位、スポット間移動時間含む）
-- **items**: 訪問するスポットのリスト
-  - **spot_name**: 利用可能なスポットリストに記載されている正確なスポット名
-  - **order**: 訪問順序（1から始まる連番）
+- **description**: プランの概要説明（どんな旅行体験ができるか）
+- **plan_items**: 訪問するスポットのリスト（訪問順に配置）
+  - **spot_id**: 利用可能なスポットのid（数値）
   - **duration_minutes**: そのスポットでの滞在時間（分単位）
-  - **visit_notes**: そのスポットでの楽しみ方や見どころ
+  - **travel_time_to_next_minutes**: 次のスポットまでの移動時間（分単位、最後のスポットは0）
+  - **travel_mode**: 移動手段（"walk", "train", "car", "bus" のいずれか、最後のスポットはnull）
+  - **description**: そのスポットでの楽しみ方や見どころ
 
 # 重要な注意事項
-- items の spot_name は、必ず「利用可能なスポット」に記載されている名前を正確に使用してください
-- JSON形式以外の出力は不要です
+- spot_id は、必ず「利用可能なスポット」のid（数値）を正確に使用してください
+- plan_items は訪問順に配置してください
+- 最後のスポットの travel_time_to_next_minutes は 0、travel_mode は null にしてください
 - コードブロック（```json）は含めず、JSON本体のみを出力してください
 - 現実的で実行可能なプランを作成してください
+- キャッチフレーズのテーマに合ったスポット選定と順序を心がけてください

@@ -8,6 +8,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -27,8 +28,6 @@ use Illuminate\Support\Str;
  * @property-read int|null $model_plans_count
  * @property-read Collection<int, Spot> $spots
  * @property-read int|null $spots_count
- * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
- * @property-read int|null $suggestion_set_items_count
  *
  * @method static Builder<static>|Cluster newModelQuery()
  * @method static Builder<static>|Cluster newQuery()
@@ -50,6 +49,16 @@ class Cluster extends Model
         'location',
         'status',
         'tourism_value',
+        'analyzed_spots_count',
+        'spot_listing_analyzed_by_model_id',
+        'spot_listing_analyzing_by_model_id',
+        'spot_listing_analyzing_started_at',
+        'spot_priority_analyzed_by_model_id',
+        'spot_priority_analyzing_by_model_id',
+        'spot_priority_analyzing_started_at',
+        'main_spot_analyzed_by_model_id',
+        'main_spot_analyzing_by_model_id',
+        'main_spot_analyzing_started_at',
     ];
 
     protected function casts(): array
@@ -57,6 +66,10 @@ class Cluster extends Model
         return [
             'location' => Point::class,
             'status' => ClusterStatus::class,
+            // AI分析タイムスタンプのキャスト
+            'spot_listing_analyzing_started_at' => 'datetime',
+            'spot_priority_analyzing_started_at' => 'datetime',
+            'main_spot_analyzing_started_at' => 'datetime',
         ];
     }
 
@@ -82,13 +95,50 @@ class Cluster extends Model
         return $this->hasOne(ModelPlan::class)->where('is_default', true);
     }
 
-    public function suggestionSetItems(): HasMany
-    {
-        return $this->hasMany(SuggestionSetItem::class);
-    }
-
     public function spots(): BelongsToMany
     {
         return $this->belongsToMany(Spot::class);
+    }
+
+    /**
+     * 分析に有効なスポット（analysis_failedを除外）
+     *
+     * @return BelongsToMany
+     */
+    public function validSpots(): BelongsToMany
+    {
+        return $this->belongsToMany(Spot::class)
+            ->where('spot_role', '!=', 'analysis_failed');
+    }
+
+    // AI分析関連のリレーション
+    public function spotListingAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'spot_listing_analyzed_by_model_id');
+    }
+
+    public function spotListingAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'spot_listing_analyzing_by_model_id');
+    }
+
+    public function spotPriorityAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'spot_priority_analyzed_by_model_id');
+    }
+
+    public function spotPriorityAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'spot_priority_analyzing_by_model_id');
+    }
+
+    public function mainSpotAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'main_spot_analyzed_by_model_id');
+    }
+
+    public function mainSpotAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'main_spot_analyzing_by_model_id');
     }
 }

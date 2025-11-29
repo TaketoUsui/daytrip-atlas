@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -21,8 +23,6 @@ use Illuminate\Support\Carbon;
  * @property-read Cluster $cluster
  * @property-read Collection<int, ModelPlanItem> $items
  * @property-read int|null $items_count
- * @property-read Collection<int, SuggestionSetItem> $suggestionSetItems
- * @property-read int|null $suggestion_set_items_count
  *
  * @method static Builder<static>|ModelPlan newModelQuery()
  * @method static Builder<static>|ModelPlan newQuery()
@@ -39,14 +39,23 @@ use Illuminate\Support\Carbon;
  */
 class ModelPlan extends Model
 {
-    const UPDATED_AT = null;
-
     protected $fillable = [
         'cluster_id',
+        'main_spot_id',
+        'image_id',
         'name',
         'description',
         'total_duration_minutes',
         'is_default',
+        'catchphrase_analyzed_by_model_id',
+        'catchphrase_analyzing_by_model_id',
+        'catchphrase_analyzing_started_at',
+        'model_plan_analyzed_by_model_id',
+        'model_plan_analyzing_by_model_id',
+        'model_plan_analyzing_started_at',
+        'image_selection_analyzed_by_model_id',
+        'image_selection_analyzing_by_model_id',
+        'image_selection_analyzing_started_at',
     ];
 
     protected function casts(): array
@@ -54,6 +63,10 @@ class ModelPlan extends Model
         return [
             'total_duration_minutes' => 'integer',
             'is_default' => 'boolean',
+            // AI分析タイムスタンプのキャスト
+            'catchphrase_analyzing_started_at' => 'datetime',
+            'model_plan_analyzing_started_at' => 'datetime',
+            'image_selection_analyzing_started_at' => 'datetime',
         ];
     }
 
@@ -62,13 +75,60 @@ class ModelPlan extends Model
         return $this->belongsTo(Cluster::class);
     }
 
-    public function suggestionSetItems(): HasMany
+    public function mainSpot(): BelongsTo
     {
-        return $this->hasMany(SuggestionSetItem::class);
+        return $this->belongsTo(Spot::class, 'main_spot_id');
+    }
+
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(Image::class);
+    }
+
+    public function catchphrase(): HasOne
+    {
+        return $this->hasOne(Catchphrase::class);
     }
 
     public function items(): HasMany
     {
         return $this->hasMany(ModelPlanItem::class)->orderBy('display_order');
+    }
+
+    public function suggestionSets(): BelongsToMany
+    {
+        return $this->belongsToMany(SuggestionSet::class, 'suggestion_set_model_plans')
+            ->withPivot('display_order', 'generated_travel_time_text', 'created_at');
+    }
+
+    // AI分析関連のリレーション
+    public function catchphraseAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'catchphrase_analyzed_by_model_id');
+    }
+
+    public function catchphraseAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'catchphrase_analyzing_by_model_id');
+    }
+
+    public function modelPlanAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'model_plan_analyzed_by_model_id');
+    }
+
+    public function modelPlanAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'model_plan_analyzing_by_model_id');
+    }
+
+    public function imageSelectionAnalyzedByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'image_selection_analyzed_by_model_id');
+    }
+
+    public function imageSelectionAnalyzingByModel(): BelongsTo
+    {
+        return $this->belongsTo(AiModel::class, 'image_selection_analyzing_by_model_id');
     }
 }

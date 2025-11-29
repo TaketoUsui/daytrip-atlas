@@ -24,10 +24,20 @@ class SuggestionSetResource extends JsonResource
             'status_message' => $this->status->getMessage(),
             'processing_details' => $this->processing_details,
 
-            // statusがcompleteの場合のみitemsを含める
+            // statusがcompleteの場合のみitemsを含める（modelPlansをitemsとして返す）
             'items' => $this->when(
                 $this->status === SuggestionStatus::Complete,
-                fn () => SuggestionSetItemResource::collection($this->items)->resolve()
+                fn () => $this->modelPlans->map(function ($modelPlan) {
+                    return [
+                        'uuid' => $modelPlan->id, // ModelPlanのIDをUUIDとして使用
+                        'cluster_uuid' => $modelPlan->cluster->uuid,
+                        'cluster_name' => $modelPlan->cluster->name,
+                        'key_visual_url' => $modelPlan->image?->public_url,
+                        'catchphrase_content' => $modelPlan->catchphrase?->content,
+                        'generated_travel_time_text' => $modelPlan->pivot->generated_travel_time_text,
+                        'display_order' => $modelPlan->pivot->display_order,
+                    ];
+                })
             ),
         ];
     }

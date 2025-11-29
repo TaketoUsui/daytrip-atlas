@@ -4,16 +4,8 @@ namespace App\Jobs;
 
 use App\Data\ProcessingDetailsData;
 use App\Enums\SuggestionStatus;
-use App\Models\Image;
 use App\Models\SuggestionSet;
-use App\Models\SuggestionSetItem;
-use App\Services\CatchphraseGeneratorService;
-use App\Services\ClusterEvaluatorService;
 use App\Services\ClusterSelectorService;
-use App\Services\ImageSelectorService;
-use App\Services\ModelPlanGeneratorService;
-use App\Services\SpotDetailAnalyzerService;
-use App\Services\SpotListingService;
 use App\Services\TravelTimeCalculatorService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,26 +15,25 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 /**
- * 旅行提案自動生成ジョブ
+ * 旅行提案生成ジョブ（簡素化版）
  *
- * AI（Gemini API）を使用して、クラスターからスポット、プラン、キャッチコピーまで
- * 全てを自動生成する7段階のパイプライン処理
+ * 非同期AI分析で事前計算されたデータから旅行提案を生成する
  *
  * 処理フロー:
  * 1. クラスター選定（確率的重みづけ）
- * 2. Spotsリストアップ（gemini-2.5-flash）
- * 3. Spots詳細分析（gemini-2.5-flash-lite + 座標検証）
- * 4. キャッチコピー生成（gemini-2.5-flash）
- * 5. 画像選択（gemini-2.5-flash-lite）
- * 6. モデルプラン生成（gemini-2.5-flash）
- * 7. Cluster再評価
+ * 2. 各クラスターの既存モデルプランを選択
+ * 3. 移動時間を計算
+ * 4. suggestion_set_model_plans ピボットテーブルに保存
+ *
+ * 注意: AI分析（スポット詳細、キャッチフレーズ、画像選定など）は
+ * 事前にバックグラウンドで非同期実行されている前提
  */
 class GenerateSuggestionsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /** ジョブのタイムアウト時間（秒） */
-    public int $timeout = 300;
+    /** ジョブのタイムアウト時間（秒） - 簡素化により大幅に短縮 */
+    public int $timeout = 60;
 
     public function __construct(
         public SuggestionSet $suggestionSet
@@ -53,12 +44,6 @@ class GenerateSuggestionsJob implements ShouldQueue
      */
     public function handle(
         ClusterSelectorService $clusterSelector,
-        SpotListingService $spotListing,
-        SpotDetailAnalyzerService $spotAnalyzer,
-        CatchphraseGeneratorService $catchphraseGenerator,
-        ImageSelectorService $imageSelector,
-        ModelPlanGeneratorService $modelPlanGenerator,
-        ClusterEvaluatorService $clusterEvaluator,
         TravelTimeCalculatorService $travelTimeCalculator
     ): void {
         try {
@@ -74,7 +59,16 @@ class GenerateSuggestionsJob implements ShouldQueue
             );
 
             if ($clusters->isEmpty()) {
-                throw new \Exception('No suitable clusters found');
+                // クラスターが見つからない場合（正常な結果）
+                $this->suggestionSet->update([
+                    'status' => SuggestionStatus::NoResults,
+                ]);
+
+                Log::info('[GenerateSuggestionsJob] No clusters with model plans found', [
+                    'suggestion_set_id' => $this->suggestionSet->id,
+                ]);
+
+                return;
             }
 
             $clusterNames = $clusters->pluck('name')->toArray();
@@ -84,91 +78,53 @@ class GenerateSuggestionsJob implements ShouldQueue
                 ),
             ]);
 
-            Log::info('Clusters selected', [
+            Log::info('[GenerateSuggestionsJob] Clusters selected', [
                 'suggestion_set_id' => $this->suggestionSet->id,
                 'clusters' => $clusterNames,
             ]);
 
-            // Step 2: Spotsリストアップ
-            $this->suggestionSet->update([
-                'status' => SuggestionStatus::ListingSpots,
-            ]);
-
-            foreach ($clusters as $cluster) {
-                try {
-                    $spots = $spotListing->listSpots($cluster);
-                    Log::info('Spots listed for cluster', [
-                        'cluster_id' => $cluster->id,
-                        'spots_count' => $spots->count(),
-                    ]);
-                } catch (\Exception $e) {
-                    Log::error('Failed to list spots for cluster', [
-                        'cluster_id' => $cluster->id,
-                        'error' => $e->getMessage(),
-                    ]);
-                    // エラーが発生してもジョブは継続（他のクラスターは処理する）
-                }
-            }
-
-            // Step 3: Spots詳細分析（並列実行）
-            $this->suggestionSet->update([
-                'status' => SuggestionStatus::AnalyzingSpots,
-            ]);
-
-            foreach ($clusters as $cluster) {
-                // クラスターに紐づくGeneratingステータスのスポットを取得
-                $spotsToAnalyze = $cluster->spots()
-                    ->where('spot_role', 'generating')
-                    ->get();
-
-                foreach ($spotsToAnalyze as $spot) {
-                    try {
-                        $spotAnalyzer->analyzeSpot($spot, $cluster);
-                    } catch (\Exception $e) {
-                        Log::error('Failed to analyze spot', [
-                            'spot_id' => $spot->id,
-                            'cluster_id' => $cluster->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                        // エラーが発生してもジョブは継続
-                    }
-                }
-            }
-
-            // Step 4: コンテンツ生成（並列実行可能）
+            // Step 2: 既存のモデルプランを選択して提案を作成
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::GeneratingContent,
             ]);
 
-            foreach ($clusters as $index => $cluster) {
+            $attachments = [];
+            $displayOrder = 1;
+
+            foreach ($clusters as $cluster) {
                 try {
-                    // キャッチコピー生成
-                    $catchphrase = $catchphraseGenerator->generateCatchphrase(
-                        $cluster,
-                        $this->suggestionSet->input_latitude,
-                        $this->suggestionSet->input_longitude
-                    );
+                    // このクラスターの画像選定が完了したモデルプランを取得
+                    // まずデフォルトプランを優先
+                    $modelPlan = $cluster->modelPlans()
+                        ->where('is_default', true)
+                        ->whereNotNull('image_selection_analyzed_by_model_id')
+                        ->first();
 
-                    // 画像選択（クラスターの全スポットから選択）
-                    $clusterSpots = $cluster->spots()
-                        ->whereNotNull('spot_role')
-                        ->get();
-
-                    $keyVisualImage = null;
-                    if ($clusterSpots->isNotEmpty()) {
-                        // 最初のメインスポットの画像を選択
-                        $mainSpot = $clusterSpots->where('spot_role', 'main_destination')->first()
-                            ?? $clusterSpots->first();
-
-                        $keyVisualImage = $imageSelector->selectImageForSpot($mainSpot);
+                    if (! $modelPlan) {
+                        // デフォルトプランがない場合は画像選定が完了した最初のプランを使用
+                        $modelPlan = $cluster->modelPlans()
+                            ->whereNotNull('image_selection_analyzed_by_model_id')
+                            ->first();
                     }
 
-                    // フォールバック: 画像が選択できなかった場合はランダム
-                    if (! $keyVisualImage) {
-                        $keyVisualImage = Image::inRandomOrder()->first();
+                    if (! $modelPlan) {
+                        // 画像選定が完了したモデルプランが存在しない場合はスキップ
+                        // （通常はClusterSelectorServiceで除外されているため到達しないはず）
+                        Log::warning('[GenerateSuggestionsJob] No model plan with completed image selection found', [
+                            'cluster_id' => $cluster->id,
+                        ]);
+                        continue;
                     }
 
-                    // モデルプラン生成
+                    // キャッチフレーズがまだ生成されていない場合の警告
+                    if (! $modelPlan->catchphrase) {
+                        Log::warning('[GenerateSuggestionsJob] Model plan missing catchphrase (async analysis pending)', [
+                            'model_plan_id' => $modelPlan->id,
+                            'cluster_id' => $cluster->id,
+                        ]);
+                    }
+
+                    // 移動時間を計算
                     $travelTimeMinutes = $travelTimeCalculator->calculateTravelTime(
                         $this->suggestionSet->input_latitude,
                         $this->suggestionSet->input_longitude,
@@ -176,35 +132,23 @@ class GenerateSuggestionsJob implements ShouldQueue
                     );
                     $travelTimeText = $travelTimeCalculator->formatTravelTimeText($travelTimeMinutes);
 
-                    $modelPlan = $modelPlanGenerator->generateModelPlan($cluster, $travelTimeText);
-
-                    // モデルプランが生成できなかった場合はこのクラスターをスキップ
-                    if (! $modelPlan) {
-                        Log::warning('Skipping cluster due to model plan generation failure', [
-                            'cluster_id' => $cluster->id,
-                        ]);
-
-                        continue;
-                    }
-
-                    // SuggestionSetItem作成
-                    SuggestionSetItem::create([
-                        'suggestion_set_id' => $this->suggestionSet->id,
-                        'cluster_id' => $cluster->id,
-                        'key_visual_image_id' => $keyVisualImage->id,
-                        'catchphrase_id' => $catchphrase->id,
-                        'model_plan_id' => $modelPlan->id,
-                        'display_order' => $index + 1,
+                    // ピボットテーブルに追加するデータを準備
+                    $attachments[$modelPlan->id] = [
+                        'display_order' => $displayOrder,
                         'generated_travel_time_text' => $travelTimeText,
-                    ]);
+                        'created_at' => now(),
+                    ];
 
-                    Log::info('Suggestion item created', [
+                    $displayOrder++;
+
+                    Log::info('[GenerateSuggestionsJob] Model plan selected', [
                         'cluster_id' => $cluster->id,
                         'model_plan_id' => $modelPlan->id,
+                        'travel_time' => $travelTimeText,
                     ]);
 
                 } catch (\Exception $e) {
-                    Log::error('Failed to generate content for cluster', [
+                    Log::error('[GenerateSuggestionsJob] Failed to process cluster', [
                         'cluster_id' => $cluster->id,
                         'error' => $e->getMessage(),
                     ]);
@@ -212,20 +156,36 @@ class GenerateSuggestionsJob implements ShouldQueue
                 }
             }
 
-            // Step 5: Cluster再評価
-            $this->suggestionSet->update([
-                'status' => SuggestionStatus::EvaluatingClusters,
-            ]);
+            // Step 3: suggestion_set_model_plans ピボットテーブルに一括保存
+            if (! empty($attachments)) {
+                $this->suggestionSet->modelPlans()->attach($attachments);
 
-            $clusterEvaluator->evaluateClusters($clusters);
+                Log::info('[GenerateSuggestionsJob] Attached model plans to suggestion set', [
+                    'suggestion_set_id' => $this->suggestionSet->id,
+                    'count' => count($attachments),
+                ]);
+            } else {
+                // モデルプランが添付できなかった場合（正常な結果）
+                $this->suggestionSet->update([
+                    'status' => SuggestionStatus::NoResults,
+                ]);
 
-            // Step 6: 完了
+                Log::info('[GenerateSuggestionsJob] No model plans available for selected clusters', [
+                    'suggestion_set_id' => $this->suggestionSet->id,
+                    'clusters' => $clusterNames,
+                ]);
+
+                return;
+            }
+
+            // Step 4: 完了
             $this->suggestionSet->update([
                 'status' => SuggestionStatus::Complete,
             ]);
 
-            Log::info('Suggestion generation completed', [
+            Log::info('[GenerateSuggestionsJob] Suggestion generation completed', [
                 'suggestion_set_id' => $this->suggestionSet->id,
+                'model_plans_count' => count($attachments),
             ]);
 
         } catch (\Exception $e) {
@@ -238,7 +198,7 @@ class GenerateSuggestionsJob implements ShouldQueue
                 ),
             ]);
 
-            Log::error('GenerateSuggestionsJob failed', [
+            Log::error('[GenerateSuggestionsJob] Failed', [
                 'suggestion_set_id' => $this->suggestionSet->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

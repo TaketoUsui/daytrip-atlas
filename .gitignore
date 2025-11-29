@@ -24,3 +24,7 @@ Homestead.yaml
 Thumbs.db
 /_ide_helper.php
 /_ide_helper_models.php
+
+# Seed用のデフォルト画像はバージョン管理対象とする
+!storage/app/public/default_images/
+!storage/app/public/default_images/*

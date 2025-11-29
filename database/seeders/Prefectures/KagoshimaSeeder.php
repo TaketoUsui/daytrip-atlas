@@ -160,16 +160,16 @@ class KagoshimaSeeder extends Seeder
             17 => [
                 'admin_code' => '46303',
                 'name' => '鹿児島県三島村',
-                'lat' => 31.594533,
-                'lon' => 130.560735,
+                'lat' => 30.79, // 竹島（三島村の主要な島）の座標
+                'lon' => 130.31,
                 'office_count' => 1,
                 'main_office_count' => 1,
             ],
             18 => [
                 'admin_code' => '46304',
                 'name' => '鹿児島県十島村',
-                'lat' => 31.593157,
-                'lon' => 130.560588,
+                'lat' => 29.85, // 中之島（十島村役場出張所がある主要な島）の座標
+                'lon' => 129.85,
                 'office_count' => 1,
                 'main_office_count' => 1,
             ],
