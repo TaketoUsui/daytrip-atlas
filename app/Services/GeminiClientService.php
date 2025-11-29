@@ -149,8 +149,8 @@ class GeminiClientService
     private function logPrompt(string $prompt, string $model): void
     {
         $timestamp = now()->format('Y-m-d H:i:s');
-        $date = now()->format('Y-m-d');
-        $logFile = "gemini-prompts-{$date}.log";
+        $dateHour = now()->format('Y-m-d_H');
+        $logFile = "logs/gemini-prompts-{$dateHour}.log";
 
         $logContent = str_repeat('=', 80)."\n";
         $logContent .= "[{$timestamp}] PROMPT SENT\n";
@@ -171,8 +171,8 @@ class GeminiClientService
     private function logResponse(string $response, string $model): void
     {
         $timestamp = now()->format('Y-m-d H:i:s');
-        $date = now()->format('Y-m-d');
-        $logFile = "gemini-prompts-{$date}.log";
+        $dateHour = now()->format('Y-m-d_H');
+        $logFile = "logs/gemini-prompts-{$dateHour}.log";
 
         $logContent = "[{$timestamp}] RESPONSE RECEIVED\n";
         $logContent .= "Model: {$model}\n";
