@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Cluster;
+use App\Models\ModelPlan;
 use App\Models\Spot;
 use App\Services\AI\LockManager;
 use Illuminate\Console\Command;
@@ -46,14 +47,26 @@ class CleanupTimedOutLocksCommand extends Command
         }
 
         // Clusterのタスクロックをクリーンアップ
-        $taskTypes = ['spot_listing', 'spot_priority', 'main_spot', 'image'];
+        $clusterTaskTypes = ['spot_listing', 'spot_priority', 'main_spot'];
 
-        foreach ($taskTypes as $taskType) {
+        foreach ($clusterTaskTypes as $taskType) {
             $released = $lockManager->releaseTimedOutLocks(Cluster::class, $taskType);
             $totalReleased += $released;
 
             if ($released > 0) {
                 $this->line("Released {$released} timed-out cluster {$taskType} locks");
+            }
+        }
+
+        // ModelPlanのタスクロックをクリーンアップ
+        $modelPlanTaskTypes = ['image_selection', 'model_plan', 'catchphrase'];
+
+        foreach ($modelPlanTaskTypes as $taskType) {
+            $released = $lockManager->releaseTimedOutLocks(ModelPlan::class, $taskType);
+            $totalReleased += $released;
+
+            if ($released > 0) {
+                $this->line("Released {$released} timed-out model_plan {$taskType} locks");
             }
         }
 
