@@ -4,6 +4,7 @@ namespace App\Jobs\Analysis;
 
 use App\Exceptions\ConcurrentAnalysisException;
 use App\Models\AiModel;
+use App\Models\AiModelExecutionLog;
 use App\Models\Cluster;
 use App\Services\AI\LockManager;
 use App\Services\GeminiClientService;
@@ -54,6 +55,8 @@ class AnalyzeSpotPriorityJob implements ShouldQueue
         GeminiClientService $geminiClient
     ): void {
         $debugLog = config('ai.debug.log_job_execution', false);
+        $apiCallSuccess = false;
+        $apiCallTime = null;
 
         if ($debugLog) {
             Log::info('[AnalyzeSpotPriorityJob] Starting', [
@@ -89,6 +92,9 @@ class AnalyzeSpotPriorityJob implements ShouldQueue
                 'spot_names' => implode("\n", $spotNames),
             ]);
 
+            // API呼び出し時刻を記録（実際の呼び出し直前）
+            $apiCallTime = now();
+
             // Gemini APIでスポット優先度を取得
             $response = $geminiClient->generateContent(
                 $prompt,
@@ -107,6 +113,9 @@ class AnalyzeSpotPriorityJob implements ShouldQueue
 
             // ロックを解放（分析完了）
             $lockManager->releaseLock($this->cluster, 'spot_priority', $this->model);
+
+            // API呼び出し成功フラグを立てる
+            $apiCallSuccess = true;
 
             Log::info('[AnalyzeSpotPriorityJob] Successfully assigned priorities', [
                 'cluster_id' => $this->cluster->id,
@@ -135,6 +144,23 @@ class AnalyzeSpotPriorityJob implements ShouldQueue
             $lockManager->forceReleaseLock($this->cluster, 'spot_priority');
 
             throw $e;
+
+        } finally {
+            // API呼び出しの実行ログを記録（成功・失敗を問わず）
+            if ($apiCallTime) {
+                AiModelExecutionLog::create([
+                    'ai_model_id' => $this->model->id,
+                    'executed_at' => $apiCallTime,
+                    'task_type' => 'spot_priority',
+                    'status' => $apiCallSuccess ? 'success' : 'failed',
+                    'target_type' => Cluster::class,
+                    'target_id' => $this->cluster->id,
+                    'metadata' => [
+                        'cluster_name' => $this->cluster->name,
+                        'model_name' => $this->model->model_name,
+                    ],
+                ]);
+            }
         }
     }
 

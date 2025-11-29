@@ -4,6 +4,7 @@ namespace App\Jobs\Analysis;
 
 use App\Exceptions\ConcurrentAnalysisException;
 use App\Models\AiModel;
+use App\Models\AiModelExecutionLog;
 use App\Models\Image;
 use App\Models\ModelPlan;
 use App\Services\AI\LockManager;
@@ -52,6 +53,8 @@ class AnalyzeImageSelectionJob implements ShouldQueue
         GeminiClientService $geminiClient
     ): void {
         $debugLog = config('ai.debug.log_job_execution', false);
+        $apiCallSuccess = false;
+        $apiCallTime = null;
 
         if ($debugLog) {
             Log::info('[AnalyzeImageSelectionJob] Starting', [
@@ -103,6 +106,9 @@ class AnalyzeImageSelectionJob implements ShouldQueue
                 'available_images' => $imageListText,
             ]);
 
+            // API呼び出し時刻を記録（実際の呼び出し直前）
+            $apiCallTime = now();
+
             // Gemini APIで画像を選択
             $response = $geminiClient->generateContent(
                 $prompt,
@@ -133,6 +139,9 @@ class AnalyzeImageSelectionJob implements ShouldQueue
             // ロックを解放（分析完了）
             $lockManager->releaseLock($this->modelPlan, 'image_selection', $this->model);
 
+            // API呼び出し成功フラグを立てる
+            $apiCallSuccess = true;
+
             Log::info('[AnalyzeImageSelectionJob] Successfully selected image', [
                 'model_plan_id' => $this->modelPlan->id,
                 'model_plan_name' => $this->modelPlan->name,
@@ -161,6 +170,23 @@ class AnalyzeImageSelectionJob implements ShouldQueue
             $lockManager->forceReleaseLock($this->modelPlan, 'image_selection');
 
             throw $e;
+
+        } finally {
+            // API呼び出しの実行ログを記録（成功・失敗を問わず）
+            if ($apiCallTime) {
+                AiModelExecutionLog::create([
+                    'ai_model_id' => $this->model->id,
+                    'executed_at' => $apiCallTime,
+                    'task_type' => 'image_selection',
+                    'status' => $apiCallSuccess ? 'success' : 'failed',
+                    'target_type' => ModelPlan::class,
+                    'target_id' => $this->modelPlan->id,
+                    'metadata' => [
+                        'model_plan_name' => $this->modelPlan->name,
+                        'model_name' => $this->model->model_name,
+                    ],
+                ]);
+            }
         }
     }
 

@@ -4,6 +4,7 @@ namespace App\Jobs\Analysis;
 
 use App\Exceptions\ConcurrentAnalysisException;
 use App\Models\AiModel;
+use App\Models\AiModelExecutionLog;
 use App\Models\Cluster;
 use App\Models\Spot;
 use App\Services\AI\LockManager;
@@ -61,6 +62,8 @@ class AnalyzeSpotDetailJob implements ShouldQueue
         GeminiClientService $geminiClient
     ): void {
         $debugLog = config('ai.debug.log_job_execution', false);
+        $apiCallSuccess = false;
+        $apiCallTime = null;
 
         if ($debugLog) {
             Log::info('[AnalyzeSpotDetailJob] Starting', [
@@ -87,6 +90,9 @@ class AnalyzeSpotDetailJob implements ShouldQueue
                 throw new Exception('Spot does not belong to any cluster');
             }
 
+            // API呼び出し時刻を記録（実際の呼び出し直前）
+            $apiCallTime = now();
+
             // 詳細情報を取得
             $details = $this->fetchSpotDetails($this->spot, $promptLoader, $geminiClient);
 
@@ -109,6 +115,9 @@ class AnalyzeSpotDetailJob implements ShouldQueue
 
             // クラスターの分析済みスポット数をインクリメント
             $cluster->increment('analyzed_spots_count');
+
+            // API呼び出し成功フラグを立てる
+            $apiCallSuccess = true;
 
             Log::info('[AnalyzeSpotDetailJob] Successfully analyzed spot', [
                 'spot_id' => $this->spot->id,
@@ -166,6 +175,23 @@ class AnalyzeSpotDetailJob implements ShouldQueue
             }
 
             throw $e;
+
+        } finally {
+            // API呼び出しの実行ログを記録（成功・失敗を問わず）
+            if ($apiCallTime) {
+                AiModelExecutionLog::create([
+                    'ai_model_id' => $this->model->id,
+                    'executed_at' => $apiCallTime,
+                    'task_type' => 'spot_detail',
+                    'status' => $apiCallSuccess ? 'success' : 'failed',
+                    'target_type' => Spot::class,
+                    'target_id' => $this->spot->id,
+                    'metadata' => [
+                        'spot_name' => $this->spot->name,
+                        'model_name' => $this->model->model_name,
+                    ],
+                ]);
+            }
         }
     }
 

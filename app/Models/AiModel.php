@@ -82,4 +82,12 @@ class AiModel extends Model
     {
         return $this->hasMany(ModelPlan::class, 'catchphrase_analyzed_by_model_id');
     }
+
+    /**
+     * このモデルの実行ログ
+     */
+    public function executionLogs(): HasMany
+    {
+        return $this->hasMany(AiModelExecutionLog::class);
+    }
 }

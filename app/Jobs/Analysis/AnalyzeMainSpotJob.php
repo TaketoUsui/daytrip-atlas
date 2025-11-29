@@ -4,6 +4,7 @@ namespace App\Jobs\Analysis;
 
 use App\Exceptions\ConcurrentAnalysisException;
 use App\Models\AiModel;
+use App\Models\AiModelExecutionLog;
 use App\Models\Cluster;
 use App\Models\Spot;
 use App\Services\AI\LockManager;
@@ -52,6 +53,8 @@ class AnalyzeMainSpotJob implements ShouldQueue
         GeminiClientService $geminiClient
     ): void {
         $debugLog = config('ai.debug.log_job_execution', false);
+        $apiCallSuccess = false;
+        $apiCallTime = null;
 
         if ($debugLog) {
             Log::info('[AnalyzeMainSpotJob] Starting', [
@@ -97,6 +100,9 @@ class AnalyzeMainSpotJob implements ShouldQueue
                 'spots_json' => json_encode($spotsInfo, JSON_UNESCAPED_UNICODE),
             ]);
 
+            // API呼び出し時刻を記録（実際の呼び出し直前）
+            $apiCallTime = now();
+
             // Gemini APIでメインスポットを選定
             $response = $geminiClient->generateContent(
                 $prompt,
@@ -134,6 +140,9 @@ class AnalyzeMainSpotJob implements ShouldQueue
             // ロックを解放（分析完了）
             $lockManager->releaseLock($this->cluster, 'main_spot', $this->model);
 
+            // API呼び出し成功フラグを立てる
+            $apiCallSuccess = true;
+
             Log::info('[AnalyzeMainSpotJob] Successfully selected main spot', [
                 'cluster_id' => $this->cluster->id,
                 'cluster_name' => $this->cluster->name,
@@ -163,6 +172,23 @@ class AnalyzeMainSpotJob implements ShouldQueue
             $lockManager->forceReleaseLock($this->cluster, 'main_spot');
 
             throw $e;
+
+        } finally {
+            // API呼び出しの実行ログを記録（成功・失敗を問わず）
+            if ($apiCallTime) {
+                AiModelExecutionLog::create([
+                    'ai_model_id' => $this->model->id,
+                    'executed_at' => $apiCallTime,
+                    'task_type' => 'main_spot',
+                    'status' => $apiCallSuccess ? 'success' : 'failed',
+                    'target_type' => Cluster::class,
+                    'target_id' => $this->cluster->id,
+                    'metadata' => [
+                        'cluster_name' => $this->cluster->name,
+                        'model_name' => $this->model->model_name,
+                    ],
+                ]);
+            }
         }
     }
 }

@@ -267,40 +267,43 @@ class TaskSelector
     /**
      * 使用可能なAIモデルを選定
      *
-     * performance_priorityが最も高く、かつ実行間隔制限を満たすモデルを返す
+     * performance_priorityが最も高く、かつ日次上限に達していないモデルを返す
+     *
+     * 改善点:
+     * - 実行間隔ではなく、実際の実行回数をカウント
+     * - ai_model_execution_logsテーブルを使用した正確な上限管理
      */
     public function selectAvailableModel(): ?AiModel
     {
-        $safetyMargin = config('ai.model_selection.interval_safety_margin', 1.2);
-        $historyHours = config('ai.model_selection.execution_history_hours', 24);
-
         // 有効なモデルを性能順に取得
         $models = AiModel::enabled()
             ->orderByPerformance()
             ->get();
 
         foreach ($models as $model) {
-            // このモデルの最低実行間隔（分）を計算
-            $requiredIntervalMinutes = $model->interval_minutes * $safetyMargin;
-
-            // このモデルの最終実行時刻を確認（全タスク種別を横断的に確認）
-            $lastExecutedAt = $this->getLastExecutionTime($model, $historyHours);
-
-            if ($lastExecutedAt === null) {
-                // このモデルはまだ一度も実行されていない
-                return $model;
-            }
-
-            // 最終実行からの経過時間を計算（絶対値）
-            $minutesSinceLastExecution = $lastExecutedAt->diffInMinutes(now());
-
-            if ($minutesSinceLastExecution >= $requiredIntervalMinutes) {
-                // 実行間隔が十分空いている
+            if ($this->canExecuteModel($model)) {
                 return $model;
             }
         }
 
         return null; // 現在使用可能なモデルがない
+    }
+
+    /**
+     * モデルが実行可能かどうかを判定
+     *
+     * @param  AiModel  $model
+     * @return bool
+     */
+    private function canExecuteModel(AiModel $model): bool
+    {
+        // 過去24時間の実際の実行回数をカウント
+        $executionCount = \App\Models\AiModelExecutionLog::where('ai_model_id', $model->id)
+            ->where('executed_at', '>=', now()->subDay())
+            ->count();
+
+        // 上限に達していないかチェック
+        return $executionCount < $model->daily_limit;
     }
 
     /**

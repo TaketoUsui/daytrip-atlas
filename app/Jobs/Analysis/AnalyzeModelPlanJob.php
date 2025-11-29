@@ -4,6 +4,7 @@ namespace App\Jobs\Analysis;
 
 use App\Exceptions\ConcurrentAnalysisException;
 use App\Models\AiModel;
+use App\Models\AiModelExecutionLog;
 use App\Models\ModelPlan;
 use App\Models\ModelPlanItem;
 use App\Services\AI\LockManager;
@@ -52,6 +53,8 @@ class AnalyzeModelPlanJob implements ShouldQueue
         GeminiClientService $geminiClient
     ): void {
         $debugLog = config('ai.debug.log_job_execution', false);
+        $apiCallSuccess = false;
+        $apiCallTime = null;
 
         if ($debugLog) {
             Log::info('[AnalyzeModelPlanJob] Starting', [
@@ -103,6 +106,9 @@ class AnalyzeModelPlanJob implements ShouldQueue
                 'spots_json' => json_encode($spotsInfo, JSON_UNESCAPED_UNICODE),
             ]);
 
+            // API呼び出し時刻を記録（実際の呼び出し直前）
+            $apiCallTime = now();
+
             // Gemini APIでモデルプランを生成
             $response = $geminiClient->generateContent(
                 $prompt,
@@ -153,6 +159,9 @@ class AnalyzeModelPlanJob implements ShouldQueue
             // ロックを解放（分析完了）
             $lockManager->releaseLock($this->modelPlan, 'model_plan', $this->model);
 
+            // API呼び出し成功フラグを立てる
+            $apiCallSuccess = true;
+
             Log::info('[AnalyzeModelPlanJob] Successfully generated model plan', [
                 'model_plan_id' => $this->modelPlan->id,
                 'cluster_id' => $cluster->id,
@@ -181,6 +190,23 @@ class AnalyzeModelPlanJob implements ShouldQueue
             $lockManager->forceReleaseLock($this->modelPlan, 'model_plan');
 
             throw $e;
+
+        } finally {
+            // API呼び出しの実行ログを記録（成功・失敗を問わず）
+            if ($apiCallTime) {
+                AiModelExecutionLog::create([
+                    'ai_model_id' => $this->model->id,
+                    'executed_at' => $apiCallTime,
+                    'task_type' => 'model_plan',
+                    'status' => $apiCallSuccess ? 'success' : 'failed',
+                    'target_type' => ModelPlan::class,
+                    'target_id' => $this->modelPlan->id,
+                    'metadata' => [
+                        'cluster_id' => $this->modelPlan->cluster_id,
+                        'model_name' => $this->model->model_name,
+                    ],
+                ]);
+            }
         }
     }
 }
