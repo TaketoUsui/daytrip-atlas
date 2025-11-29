@@ -261,11 +261,11 @@ AI-powered suggestion generation uses a **two-phase architecture** for optimal u
 AI analysis runs continuously in the background, preparing data in advance:
 
 - **`DispatchAsyncAnalysisTasksJob`**: Task dispatcher that selects and dispatches analysis jobs
-  - **A-type tasks (80%)**: Spot-related analysis
+  - **A-type tasks (50%)**: Spot-related analysis
     1. Spot detail analysis (`AnalyzeSpotDetailJob`)
     2. Spot priority determination (`AnalyzeSpotPriorityJob`)
     3. Spot listing (`AnalyzeSpotListingJob`)
-  - **B-type tasks (20%)**: Plan-related analysis
+  - **B-type tasks (50%)**: Plan-related analysis
     1. Image selection (`AnalyzeImageSelectionJob`)
     2. Main spot selection (`AnalyzeMainSpotJob`)
     3. Model plan generation (`AnalyzeModelPlanJob`)
@@ -277,7 +277,7 @@ AI analysis runs continuously in the background, preparing data in advance:
   - Progressive quality improvement (higher-performance models overwrite lower-performance results)
 
 - **Task Selection** (`app/Services/AI/TaskSelector.php`):
-  - Probabilistic task type selection (80% A-type, 20% B-type)
+  - Probabilistic task type selection (50% A-type, 50% B-type)
   - Priority-based task ordering within each type
   - Concurrent task limit enforcement
 
