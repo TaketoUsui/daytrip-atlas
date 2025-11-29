@@ -114,6 +114,25 @@ class GeminiClientService
         $response = preg_replace('/```\s*$/', '', $response);
         $response = trim($response);
 
+        // JSON部分のみを抽出（最初の { または [ から最後の } または ] まで）
+        // 最初に出現する括弧の種類を判定して、対応する閉じ括弧までを抽出
+        $firstBracePos = mb_strpos($response, '{');
+        $firstBracketPos = mb_strpos($response, '[');
+
+        // { が先に出現する場合（またはオブジェクトのみの場合）
+        if ($firstBracePos !== false && ($firstBracketPos === false || $firstBracePos < $firstBracketPos)) {
+            if (preg_match('/\{.*\}/s', $response, $matches)) {
+                $response = $matches[0];
+            }
+        }
+        // [ が先に出現する場合（配列形式）
+        elseif ($firstBracketPos !== false) {
+            if (preg_match('/\[.*\]/s', $response, $matches)) {
+                $response = $matches[0];
+            }
+        }
+        // どちらもマッチしない場合は元のレスポンスをそのまま使用（既存の挙動を維持）
+
         $decoded = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
