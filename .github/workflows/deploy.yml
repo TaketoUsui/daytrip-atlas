@@ -90,6 +90,9 @@ jobs:
             # デプロイディレクトリに移動
             cd $DEPLOY_DIR
 
+            # Laravelが書き込みを行うディレクトリの権限を緩める
+            chmod -R 777 storage bootstrap/cache
+
             # .envファイルが存在しない場合は警告 (初回デプロイ時)
             if [ ! -f .env ]; then
               echo "WARNING: .env file not found. Please create it before starting services."
