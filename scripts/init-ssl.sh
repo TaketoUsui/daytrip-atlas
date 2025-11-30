@@ -54,7 +54,7 @@ sleep 5
 
 # SSL証明書を取得
 echo "SSL証明書を取得中..."
-docker-compose -f compose.production.yml run --rm certbot certonly \
+docker-compose -f compose.production.yml run --rm --entrypoint certbot certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email $EMAIL \
