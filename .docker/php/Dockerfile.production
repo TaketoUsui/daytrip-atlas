@@ -1,8 +1,20 @@
 # Multi-stage build for production
 # Stage 1: Composer dependencies
-FROM composer/composer:2-php8.3 AS composer-builder
+FROM php:8.3-cli AS composer-builder
 
 WORKDIR /app
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Install system dependencies required for composer install
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    && docker-php-ext-install zip pdo pdo_pgsql \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY composer.json composer.lock ./
 RUN composer install \
