@@ -28,3 +28,8 @@ Thumbs.db
 # Seed用のデフォルト画像はバージョン管理対象とする
 !storage/app/public/default_images/
 !storage/app/public/default_images/*
+
+# Production deployment files
+docker-volumes/
+.docker/nginx/temp-ssl-init.conf
+deployment.tar.gz

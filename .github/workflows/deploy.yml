@@ -1,0 +1,132 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main  # mainブランチへのpush時に自動デプロイ
+  workflow_dispatch:  # 手動実行も可能
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+        env:
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+
+      - name: Create deployment archive
+        run: |
+          # 不要なファイルを除外してアーカイブ作成
+          tar -czf deployment.tar.gz \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='tests' \
+            --exclude='storage/logs/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            --exclude='docker-volumes' \
+            .
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "deployment.tar.gz"
+          target: "/tmp"
+
+      - name: Execute deployment script on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+
+            # デプロイディレクトリ
+            DEPLOY_DIR="/var/www/daytrip-atlas"
+
+            # バックアップディレクトリ作成
+            BACKUP_DIR="/var/backups/daytrip-atlas/$(date +%Y%m%d_%H%M%S)"
+            mkdir -p $BACKUP_DIR
+
+            # 既存のアプリケーションをバックアップ (初回デプロイ時は存在しない場合あり)
+            if [ -d "$DEPLOY_DIR" ]; then
+              echo "Creating backup..."
+              cp -r $DEPLOY_DIR/* $BACKUP_DIR/ || true
+            fi
+
+            # デプロイディレクトリ作成
+            mkdir -p $DEPLOY_DIR
+
+            # アーカイブを展開
+            echo "Extracting deployment archive..."
+            tar -xzf /tmp/deployment.tar.gz -C $DEPLOY_DIR
+
+            # デプロイディレクトリに移動
+            cd $DEPLOY_DIR
+
+            # .envファイルが存在しない場合は警告 (初回デプロイ時)
+            if [ ! -f .env ]; then
+              echo "WARNING: .env file not found. Please create it before starting services."
+              echo "Copy .env.production.example to .env and configure it."
+              exit 1
+            fi
+
+            # Dockerイメージをビルド
+            echo "Building Docker images..."
+            docker-compose -f compose.production.yml build
+
+            # コンテナを再起動 (ダウンタイムを最小化)
+            echo "Restarting containers..."
+            docker-compose -f compose.production.yml up -d
+
+            # マイグレーション実行
+            echo "Running migrations..."
+            docker-compose -f compose.production.yml exec -T php php artisan migrate --force
+
+            # キャッシュクリア&最適化
+            echo "Optimizing application..."
+            docker-compose -f compose.production.yml exec -T php php artisan config:cache
+            docker-compose -f compose.production.yml exec -T php php artisan route:cache
+            docker-compose -f compose.production.yml exec -T php php artisan view:cache
+
+            # 不要なコンテナ・イメージを削除
+            echo "Cleaning up..."
+            docker system prune -f
+
+            # アーカイブを削除
+            rm -f /tmp/deployment.tar.gz
+
+            echo "Deployment completed successfully!"
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Deployment succeeded"
+          else
+            echo "❌ Deployment failed"
+          fi
