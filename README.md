@@ -123,29 +123,29 @@ cp .env.example .env
 
 ```bash
 # コンテナに入る
-docker-compose exec php bash
+docker compose exec php bash
 
 # マイグレーション実行
-docker-compose exec php php artisan migrate
+docker compose exec php php artisan migrate
 
 # IDE補完生成
-docker-compose exec php php artisan ide-helper:generate
+docker compose exec php php artisan ide-helper:generate
 
 # キャッシュクリア
-docker-compose exec php php artisan config:clear
-docker-compose exec php php artisan cache:clear
+docker compose exec php php artisan config:clear
+docker compose exec php php artisan cache:clear
 
 # Tinker（REPL）
-docker-compose exec php php artisan tinker
+docker compose exec php php artisan tinker
 
 # テスト実行
-docker-compose exec php php artisan test
+docker compose exec php php artisan test
 
 # コードフォーマット（Laravel Pint）
-docker-compose exec php ./vendor/bin/pint
+docker compose exec php ./vendor/bin/pint
 
 # ログ監視
-docker-compose exec php php artisan pail --timeout=0
+docker compose exec php php artisan pail --timeout=0
 
 # 統合開発コマンド（サーバー、キュー、ログ、Viteを同時起動）
 composer dev
@@ -155,15 +155,15 @@ composer dev
 
 ```bash
 # ログ確認
-docker-compose logs -f node    # Vite開発サーバー
-docker-compose logs -f queue   # キューワーカー
-docker-compose logs -f scheduler # スケジューラー
+docker compose logs -f node    # Vite開発サーバー
+docker compose logs -f queue   # キューワーカー
+docker compose logs -f scheduler # スケジューラー
 
 # コンテナ再起動
-docker-compose restart
+docker compose restart
 
 # コンテナ再ビルド
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ## データベース設計

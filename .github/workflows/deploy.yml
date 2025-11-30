@@ -99,21 +99,21 @@ jobs:
 
             # Dockerイメージをビルド
             echo "Building Docker images..."
-            docker-compose -f compose.production.yml build
+            docker compose -f compose.production.yml build
 
             # コンテナを再起動 (ダウンタイムを最小化)
             echo "Restarting containers..."
-            docker-compose -f compose.production.yml up -d
+            docker compose -f compose.production.yml up -d
 
             # マイグレーション実行
             echo "Running migrations..."
-            docker-compose -f compose.production.yml exec -T php php artisan migrate --force
+            docker compose -f compose.production.yml exec -T php php artisan migrate --force
 
             # キャッシュクリア&最適化
             echo "Optimizing application..."
-            docker-compose -f compose.production.yml exec -T php php artisan config:cache
-            docker-compose -f compose.production.yml exec -T php php artisan route:cache
-            docker-compose -f compose.production.yml exec -T php php artisan view:cache
+            docker compose -f compose.production.yml exec -T php php artisan config:cache
+            docker compose -f compose.production.yml exec -T php php artisan route:cache
+            docker compose -f compose.production.yml exec -T php php artisan view:cache
 
             # 不要なコンテナ・イメージを削除
             echo "Cleaning up..."

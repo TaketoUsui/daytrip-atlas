@@ -44,7 +44,7 @@ server {
 }
 EOF
 
-# docker-compose.ymlを一時的に上書き
+# docker compose.ymlを一時的に上書き
 echo "Nginxコンテナを起動中..."
 docker compose -f compose.production.yml up -d nginx
 
@@ -69,8 +69,8 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "次のステップ:"
     echo "1. .docker/nginx/production.conf の 'YOUR_DOMAIN' を '$DOMAIN' に置き換えてください"
-    echo "2. docker-compose -f compose.production.yml down でコンテナを停止"
-    echo "3. docker-compose -f compose.production.yml up -d でSSL対応のnginxを起動"
+    echo "2. docker compose -f compose.production.yml down でコンテナを停止"
+    echo "3. docker compose -f compose.production.yml up -d でSSL対応のnginxを起動"
     echo ""
 
     # 自動的にドメイン名を置換

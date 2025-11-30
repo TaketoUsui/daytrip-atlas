@@ -75,18 +75,18 @@ cd $DEPLOY_DIR
 
 # コンテナを停止
 log_info "Stopping containers..."
-docker-compose -f compose.production.yml down
+docker compose -f compose.production.yml down
 
 # データベースを復元
 if [ -f "$RESTORE_DIR/database.sql" ]; then
     log_info "Restoring database..."
 
     # DBコンテナのみ起動
-    docker-compose -f compose.production.yml up -d db
+    docker compose -f compose.production.yml up -d db
     sleep 5
 
     # データベースを復元
-    docker-compose -f compose.production.yml exec -T db psql -U daytrip_user daytrip_atlas_db < $RESTORE_DIR/database.sql
+    docker compose -f compose.production.yml exec -T db psql -U daytrip_user daytrip_atlas_db < $RESTORE_DIR/database.sql
 
     log_info "Database restored successfully!"
 else
@@ -103,7 +103,7 @@ fi
 
 # コンテナを再起動
 log_info "Starting containers..."
-docker-compose -f compose.production.yml up -d
+docker compose -f compose.production.yml up -d
 
 # ヘルスチェック待機
 log_info "Waiting for services to be healthy..."

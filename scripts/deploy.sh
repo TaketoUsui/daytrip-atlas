@@ -49,9 +49,9 @@ if [ "$BACKUP_ENABLED" = "true" ]; then
     mkdir -p $BACKUP_DIR
 
     # データベースバックアップ
-    if docker-compose -f compose.production.yml ps db | grep -q "Up"; then
+    if docker compose -f compose.production.yml ps db | grep -q "Up"; then
         log_info "Backing up database..."
-        docker-compose -f compose.production.yml exec -T db pg_dump -U daytrip_user daytrip_atlas_db > $BACKUP_DIR/database.sql || log_warn "Database backup failed"
+        docker compose -f compose.production.yml exec -T db pg_dump -U daytrip_user daytrip_atlas_db > $BACKUP_DIR/database.sql || log_warn "Database backup failed"
     fi
 
     # 設定ファイルのバックアップ
@@ -79,16 +79,16 @@ fi
 
 # Composer依存関係のインストール (本番環境用イメージに含まれているためスキップ可能)
 # log_info "Installing PHP dependencies..."
-# docker-compose -f compose.production.yml exec php composer install --no-dev --optimize-autoloader
+# docker compose -f compose.production.yml exec php composer install --no-dev --optimize-autoloader
 
 # Dockerイメージをビルド
 log_info "Building Docker images..."
-docker-compose -f compose.production.yml build --no-cache
+docker compose -f compose.production.yml build --no-cache
 
 # コンテナの再起動
 log_info "Restarting containers..."
-docker-compose -f compose.production.yml down
-docker-compose -f compose.production.yml up -d
+docker compose -f compose.production.yml down
+docker compose -f compose.production.yml up -d
 
 # ヘルスチェック待機
 log_info "Waiting for services to be healthy..."
@@ -96,21 +96,21 @@ sleep 10
 
 # マイグレーション実行
 log_info "Running database migrations..."
-docker-compose -f compose.production.yml exec -T php php artisan migrate --force
+docker compose -f compose.production.yml exec -T php php artisan migrate --force
 
 # ストレージリンク作成 (初回のみ必要)
 log_info "Creating storage link..."
-docker-compose -f compose.production.yml exec -T php php artisan storage:link || log_warn "Storage link already exists"
+docker compose -f compose.production.yml exec -T php php artisan storage:link || log_warn "Storage link already exists"
 
 # キャッシュ最適化
 log_info "Optimizing application caches..."
-docker-compose -f compose.production.yml exec -T php php artisan config:cache
-docker-compose -f compose.production.yml exec -T php php artisan route:cache
-docker-compose -f compose.production.yml exec -T php php artisan view:cache
+docker compose -f compose.production.yml exec -T php php artisan config:cache
+docker compose -f compose.production.yml exec -T php php artisan route:cache
+docker compose -f compose.production.yml exec -T php php artisan view:cache
 
 # Queue Workerの再起動 (キューに溜まったジョブを処理)
 log_info "Restarting queue workers..."
-docker-compose -f compose.production.yml restart queue
+docker compose -f compose.production.yml restart queue
 
 # 不要なDockerリソースを削除
 log_info "Cleaning up unused Docker resources..."
@@ -118,13 +118,13 @@ docker system prune -f
 
 # サービス状態確認
 log_info "Checking service status..."
-docker-compose -f compose.production.yml ps
+docker compose -f compose.production.yml ps
 
 log_info "====================================="
 log_info "Deployment completed successfully! ✅"
 log_info "====================================="
 log_info ""
 log_info "Next steps:"
-log_info "1. Check application logs: docker-compose -f compose.production.yml logs -f"
-log_info "2. Monitor queue workers: docker-compose -f compose.production.yml logs -f queue"
+log_info "1. Check application logs: docker compose -f compose.production.yml logs -f"
+log_info "2. Monitor queue workers: docker compose -f compose.production.yml logs -f queue"
 log_info "3. Verify health: curl -k https://your-domain.com/health"

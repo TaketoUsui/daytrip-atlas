@@ -32,51 +32,51 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Backend (run inside php container):**
 ```bash
 # Enter PHP container
-docker-compose exec php bash
+docker compose exec php bash
 
 # Run migrations
-docker-compose exec php php artisan migrate
+docker compose exec php php artisan migrate
 
 # Generate IDE helper (improves autocomplete)
-docker-compose exec php php artisan ide-helper:generate
+docker compose exec php php artisan ide-helper:generate
 
 # Clear caches
-docker-compose exec php php artisan config:clear
-docker-compose exec php php artisan cache:clear
+docker compose exec php php artisan config:clear
+docker compose exec php php artisan cache:clear
 
 # Tinker (REPL)
-docker-compose exec php php artisan tinker
+docker compose exec php php artisan tinker
 ```
 
 **Frontend:**
 ```bash
 # Start Vite dev server (already running in node container)
-docker-compose exec node npm run dev
+docker compose exec node npm run dev
 
 # Build for production
-docker-compose exec node npm run build
+docker compose exec node npm run build
 ```
 
 **Queue Management:**
 ```bash
-# Queue worker runs automatically in docker-compose (queue service)
+# Queue worker runs automatically in docker compose (queue service)
 # To manually run queue worker:
-docker-compose exec php php artisan queue:work --sleep=3 --tries=3
+docker compose exec php php artisan queue:work --sleep=3 --tries=3
 
 # Monitor queue
-docker-compose exec php php artisan queue:listen --tries=1
+docker compose exec php php artisan queue:listen --tries=1
 ```
 
 **Testing:**
 ```bash
 # Run all tests (uses Pest)
-docker-compose exec php php artisan test
+docker compose exec php php artisan test
 
 # Run specific test file
-docker-compose exec php php artisan test tests/Feature/ExampleTest.php
+docker compose exec php php artisan test tests/Feature/ExampleTest.php
 
 # Run with coverage (if configured)
-docker-compose exec php php artisan test --coverage
+docker compose exec php php artisan test --coverage
 ```
 
 **Development Workflow:**
@@ -89,10 +89,10 @@ composer dev
 **Code Quality:**
 ```bash
 # Run Laravel Pint (code formatter)
-docker-compose exec php ./vendor/bin/pint
+docker compose exec php ./vendor/bin/pint
 
 # Watch logs
-docker-compose exec php php artisan pail --timeout=0
+docker compose exec php php artisan pail --timeout=0
 ```
 
 ## Architecture
@@ -325,7 +325,7 @@ This architecture reduces user wait time from 3-5 minutes to under 1 minute whil
 
 - **Container-based Development**: All commands should run inside Docker containers
 - **Port Configuration**: App port configurable via `.env` (`APP_PORT`), Vite on 5173
-- **Queue Worker**: Must be running for async job processing (auto-starts with docker-compose)
+- **Queue Worker**: Must be running for async job processing (auto-starts with docker compose)
 - **PostGIS**: Database extensions must be enabled for geographic features
 - **HMR Configuration**: Vite configured for Docker with host `0.0.0.0` and HMR host `localhost`
 - **Japanese Language**: Documentation and comments are primarily in Japanese
