@@ -1,6 +1,6 @@
 # Multi-stage build for production
 # Stage 1: Composer dependencies
-FROM composer:latest AS composer-builder
+FROM composer/composer:2-php8.3 AS composer-builder
 
 WORKDIR /app
 
