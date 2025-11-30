@@ -46,7 +46,7 @@ EOF
 
 # docker-compose.ymlを一時的に上書き
 echo "Nginxコンテナを起動中..."
-docker-compose -f compose.production.yml up -d nginx
+docker compose -f compose.production.yml up -d nginx
 
 # 少し待つ
 echo "Nginxの起動を待機中..."
@@ -54,7 +54,7 @@ sleep 5
 
 # SSL証明書を取得
 echo "SSL証明書を取得中..."
-docker-compose -f compose.production.yml run --rm certbot certonly \
+docker compose -f compose.production.yml run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email $EMAIL \
