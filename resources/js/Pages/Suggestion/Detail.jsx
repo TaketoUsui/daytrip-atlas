@@ -1,11 +1,31 @@
-import { Link } from '@inertiajs/react';
+import { Link, Head } from '@inertiajs/react';
 import AppLayout from '../../Components/Shared/AppLayout';
 import ModelPlanTimeline from '../../Components/Domain/Cluster/ModelPlanTimeline';
 import { formatDuration } from '../../utils/timeFormat';
 
 export default function Detail({ modelPlan, suggestionSetUuid, generatedTravelTimeText }) {
+    // ページタイトルとOGP用の情報を準備
+    const pageTitle = modelPlan.cluster_name
+        ? `${modelPlan.cluster_name}の日帰り旅行|日帰り地図帳`
+        : '提案内容詳細|日帰り地図帳';
+
+    const description = modelPlan.description || modelPlan.catchphrase || '日帰り地図帳 - AI が提案する、あなただけの日帰り旅行プラン';
+    const ogImage = modelPlan.key_visual_url || '/ogp-default.jpg';
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+
     return (
         <AppLayout>
+            <Head>
+                <title>{pageTitle}</title>
+                <meta name="description" content={description} />
+
+                {/* OGP tags */}
+                <meta property="og:title" content={pageTitle} />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content={ogImage} />
+                <meta property="og:type" content="website" />
+                {currentUrl && <meta property="og:url" content={currentUrl} />}
+            </Head>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* 戻るリンク */}
                 {suggestionSetUuid && (
