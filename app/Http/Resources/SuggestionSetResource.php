@@ -29,7 +29,7 @@ class SuggestionSetResource extends JsonResource
                 $this->status === SuggestionStatus::Complete,
                 fn () => $this->modelPlans->map(function ($modelPlan) {
                     return [
-                        'uuid' => $modelPlan->id, // ModelPlanのIDをUUIDとして使用
+                        'uuid' => $modelPlan->pivot->uuid, // suggestion_set_model_plans の UUID
                         'cluster_uuid' => $modelPlan->cluster->uuid,
                         'cluster_name' => $modelPlan->cluster->name,
                         'key_visual_url' => $modelPlan->image?->public_url,

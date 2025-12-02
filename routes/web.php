@@ -18,5 +18,5 @@ Route::post('/suggestions', [TopController::class, 'store'])->name('suggestions.
 // 提案待機・結果一覧ページ（ポーリング対応）
 Route::get('/suggestions/{suggestionSet:uuid}', [SuggestionController::class, 'show'])->name('suggestions.show');
 
-// モデルプラン詳細ページ
-Route::get('/suggestions/detail/{modelPlan}', [ModelPlanController::class, 'show'])->name('model_plans.show');
+// モデルプラン詳細ページ（suggestion_set_model_plans の UUID 経由）
+Route::get('/suggestions/detail/{suggestionSetModelPlan:uuid}', [ModelPlanController::class, 'show'])->name('model_plans.show');
