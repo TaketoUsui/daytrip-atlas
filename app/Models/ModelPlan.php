@@ -98,7 +98,8 @@ class ModelPlan extends Model
     public function suggestionSets(): BelongsToMany
     {
         return $this->belongsToMany(SuggestionSet::class, 'suggestion_set_model_plans')
-            ->withPivot('display_order', 'generated_travel_time_text', 'created_at');
+            ->using(SuggestionSetModelPlan::class)
+            ->withPivot('uuid', 'display_order', 'generated_travel_time_text', 'created_at');
     }
 
     // AI分析関連のリレーション

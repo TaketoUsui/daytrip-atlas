@@ -55,7 +55,7 @@ class GenerateSuggestionsJob implements ShouldQueue
             $clusters = $clusterSelector->selectClusters(
                 $this->suggestionSet->input_latitude,
                 $this->suggestionSet->input_longitude,
-                3
+                6
             );
 
             if ($clusters->isEmpty()) {

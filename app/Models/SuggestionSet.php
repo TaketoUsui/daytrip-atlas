@@ -91,7 +91,8 @@ class SuggestionSet extends Model
     public function modelPlans(): BelongsToMany
     {
         return $this->belongsToMany(ModelPlan::class, 'suggestion_set_model_plans')
-            ->withPivot('display_order', 'generated_travel_time_text', 'created_at')
+            ->using(SuggestionSetModelPlan::class)
+            ->withPivot('uuid', 'display_order', 'generated_travel_time_text', 'created_at')
             ->orderByPivot('display_order');
     }
 
