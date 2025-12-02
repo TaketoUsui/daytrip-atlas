@@ -11,6 +11,7 @@ createInertiaApp({
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />)
     },
+    title: title => title ? title : '日帰り地図帳',
     progress: {
         color: '#4B5563',
     },
