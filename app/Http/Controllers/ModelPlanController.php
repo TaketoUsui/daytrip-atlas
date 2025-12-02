@@ -22,14 +22,25 @@ class ModelPlanController extends Controller
             'items.spot',
         ]);
 
-        // モデルプランが属する提案セットを取得（戻るリンク用）
+        // モデルプランが属する提案セットを取得（戻るリンク用と片道移動時間取得用）
         $suggestionSet = $modelPlan->suggestionSets()
             ->latest()
             ->first();
 
+        // ピボットテーブル (suggestion_set_model_plans) から片道移動時間を取得
+        $generatedTravelTimeText = null;
+        if ($suggestionSet) {
+            $pivot = $modelPlan->suggestionSets()
+                ->where('suggestion_sets.id', $suggestionSet->id)
+                ->first()
+                ?->pivot;
+            $generatedTravelTimeText = $pivot?->generated_travel_time_text;
+        }
+
         return Inertia::render('Suggestion/Detail', [
             'modelPlan' => (new ModelPlanResource($modelPlan))->resolve(),
             'suggestionSetUuid' => $suggestionSet?->uuid,
+            'generatedTravelTimeText' => $generatedTravelTimeText,
         ]);
     }
 }
